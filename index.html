@@ -109,6 +109,8 @@ input.inline{border:1px solid var(--line);border-radius:8px;padding:6px 8px;marg
 .col p.hint{margin:0 0 10px;font-size:12px;color:var(--muted)}
 .count{font:500 12px var(--body);color:var(--muted);margin-left:6px}
 .note{font-size:12px;color:var(--muted);margin:10px 2px 0}
+.donehead{border:0;border-top:1px solid var(--line);background:none;text-align:left;color:var(--muted);font-size:12px;font-weight:600;padding:10px 2px 2px;margin-top:6px}
+.col .chip.done{opacity:.75}
 
 /* schedule toolbar */
 .stool{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:12px}
@@ -234,6 +236,7 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
       <div class="cell q-deleg tgt" data-target="deleg"><h2>Срочно, не важно</h2><div class="list"></div></div>
       <div class="cell q-drop tgt" data-target="drop"><h2>Не срочно и не важно</h2><div class="list"></div></div>
     </div>
+    <p class="note" id="mNote"></p>
   </section>
 
   <!-- 2. Kind -->
@@ -311,7 +314,7 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
   const fmtEst=m=>m>720?'12+ ч':fmtMin(m);
   const fmtMin=m=>m<60?m+' мин':(Math.round(m/6)/10+' ч').replace('.',',');
 
-  let S={tasks:[],events:[],tab:1,view:'week',cur:TODAY(),invCollapsed:false};
+  let S={tasks:[],events:[],tab:1,view:'week',cur:TODAY(),invCollapsed:false,showDone:true};
   let sel=null;
   try{const raw=localStorage.getItem(KEY); if(raw){const d=JSON.parse(raw); if(d&&Array.isArray(d.tasks)) S=Object.assign(S,d);}}catch(e){}
   if(!Array.isArray(S.events)) S.events=[];
@@ -367,23 +370,37 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
     renderInv();
   }
 
+  // Матрица — рабочий стол на сегодня: только несделанные задачи без даты или с датой не позже сегодня
+  const inMatrix=t=>!t.done&&(!t.date||t.date<=TODAY());
   function renderMatrix(){
+    const fill=(q,list)=>{list.innerHTML=''; S.tasks.filter(t=>t.quad===q&&inMatrix(t)).forEach(t=>list.append(chip(t,'plain')));};
     document.querySelectorAll('#view1 .cell').forEach(c=>{
-      const q=c.dataset.target, list=c.querySelector('.list'); list.innerHTML='';
-      S.tasks.filter(t=>t.quad===q).forEach(t=>list.append(chip(t,'plain')));
+      const q=c.dataset.target, list=c.querySelector('.list');
+      fill(q,list);
       let p=c.querySelector('.plus,.inline');
       if(!p){p=el('button','plus','+ Добавить');p.type='button';c.append(p);}
-      if(p.classList.contains('plus')) p.onclick=e=>{e.stopPropagation(); inlineAdd(p,{quad:q},()=>{list.innerHTML=''; S.tasks.filter(t=>t.quad===q).forEach(t=>list.append(chip(t,'plain')));});};
+      if(p.classList.contains('plus')) p.onclick=e=>{e.stopPropagation(); inlineAdd(p,{quad:q},()=>fill(q,list));};
     });
+    const doneN=S.tasks.filter(t=>t.done).length, futN=S.tasks.filter(t=>!t.done&&t.date&&t.date>TODAY()).length;
+    const parts=[]; if(doneN) parts.push('выполненные: '+doneN); if(futN) parts.push('запланированные на другие дни: '+futN);
+    $('#mNote').textContent='Здесь только задачи на сегодня.'+(parts.length?' Скрыты '+parts.join(', ')+' — они в «Типе» и «Расписании».':'');
   }
 
   function renderKinds(){
     document.querySelectorAll('#view2 .col').forEach(c=>{
       const k=c.dataset.target, list=c.querySelector('.list'); list.innerHTML='';
-      sorted(S.tasks.filter(t=>t.kind===k)).forEach(t=>list.append(chip(t,'kind')));
+      const mine=S.tasks.filter(t=>t.kind===k), open=sorted(mine.filter(t=>!t.done)), done=mine.filter(t=>t.done);
+      if(!open.length) empty(list,done.length?'Всё сделано.':'Пока пусто.');
+      open.forEach(t=>list.append(chip(t,'kind')));
+      if(done.length){
+        const h=el('button','donehead',(S.showDone?'▾ ':'▸ ')+'Сделано · '+done.length); h.type='button';
+        h.onclick=e=>{e.stopPropagation(); S.showDone=!S.showDone; save(); render();};
+        list.append(h);
+        if(S.showDone) done.forEach(t=>list.append(chip(t,'kind')));
+      }
     });
-    $('#cConcept').textContent=S.tasks.filter(t=>t.kind==='concept').length||'';
-    $('#cOps').textContent=S.tasks.filter(t=>t.kind==='ops').length||'';
+    $('#cConcept').textContent=S.tasks.filter(t=>t.kind==='concept'&&!t.done).length||'';
+    $('#cOps').textContent=S.tasks.filter(t=>t.kind==='ops'&&!t.done).length||'';
   }
 
   function dayData(){
@@ -527,8 +544,8 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
 
   /* ---------- inventory: tasks not yet placed on the current tab ---------- */
   const INV={
-    1:{sub:'не в матрице',  test:t=>!t.quad,          clear:t=>{t.quad=null;}, mode:'plain', hint:'Нажмите на задачу, затем на клетку'},
-    2:{sub:'без типа',      test:t=>!t.kind,          clear:t=>{t.kind=null;}, mode:'kind',  hint:'Нажмите на задачу, затем на столбец'},
+    1:{sub:'не в матрице',  test:t=>!t.quad&&inMatrix(t),          clear:t=>{t.quad=null;}, mode:'plain', hint:'Нажмите на задачу, затем на клетку'},
+    2:{sub:'без типа',      test:t=>!t.kind&&!t.done,          clear:t=>{t.kind=null;}, mode:'kind',  hint:'Нажмите на задачу, затем на столбец'},
     3:{sub:'без даты',      test:t=>!t.date&&!t.done, clear:t=>{t.date=null;}, mode:'sched', hint:'Нажмите на задачу, затем на день'}
   };
   function renderInv(){
