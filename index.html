@@ -186,6 +186,46 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
 .grow{flex:1}
 .info{flex:1;font-size:13px;color:var(--muted);text-align:right}
 
+/* archive */
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:6px}
+.stat{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:12px}
+.stat b{display:block;font:700 22px/1.1 var(--display)}
+.stat span{font-size:12px;color:var(--muted)}
+.stats-note{font-size:12px;color:var(--muted);margin:0 2px 16px}
+.agroup h3{margin:16px 2px 8px;font-size:13px;font-weight:600;color:var(--muted)}
+.agroup h3::first-letter{text-transform:uppercase}
+.arow{display:flex;gap:10px;align-items:flex-start;width:100%;text-align:left;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:6px}
+.arow[aria-pressed="true"]{outline:2px solid var(--ink);outline-offset:-1px}
+.arow .ic{flex:none;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:700;color:#fff;background:var(--ops);margin-top:1px}
+.arow .ic.no{background:var(--drop)}
+.arow .ab{min-width:0;flex:1}
+.arow .at{font-weight:500;word-break:break-word}
+.badges{display:flex;flex-wrap:wrap;gap:4px 10px;margin-top:3px;font-size:12px;color:var(--muted)}
+.badges .good{color:var(--ops)} .badges .bad{color:var(--warn)}
+.badges .why{flex-basis:100%}
+
+/* completion quiz */
+.modal{position:fixed;inset:0;background:rgba(10,14,20,.5);display:flex;align-items:center;justify-content:center;z-index:50;padding:14px}
+.sheet{background:var(--paper);border-radius:18px;width:100%;max-width:460px;padding:18px;box-shadow:0 20px 60px rgba(0,0,0,.25);max-height:calc(100% - 20px);overflow:auto}
+.qtop{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.qtask{flex:1;min-width:0;font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.qx{border:0;background:var(--bg);border-radius:50%;width:32px;height:32px;font-size:18px;line-height:1}
+.qdots{display:flex;gap:5px;margin-bottom:14px}
+.qdots i{width:22px;height:4px;border-radius:2px;background:var(--line)}
+.qdots i.on{background:var(--ink)}
+.sheet h2{margin:0 0 4px;font:700 19px/1.25 var(--display)}
+.qhint{margin:0 0 14px;font-size:13px;color:var(--muted);min-height:1em}
+.qopts{display:flex;flex-direction:column;gap:8px}
+.qopts.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}
+.opt{border:1px solid var(--line);background:var(--bg);border-radius:12px;padding:13px 14px;text-align:left;font-weight:500}
+.qopts.grid .opt{text-align:center;padding:12px 6px}
+.opt:hover{border-color:var(--ink)}
+.opt.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.sheet textarea{width:100%;min-height:70px;border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:var(--bg);font:inherit;color:inherit;resize:vertical;margin-top:10px}
+.qfoot{display:flex;gap:8px;margin-top:14px}
+.qfoot .primary{flex:1}
+@media (max-width:620px){.modal{align-items:flex-end;padding:0}.sheet{border-radius:18px 18px 0 0;max-width:none;padding-bottom:calc(18px + env(safe-area-inset-bottom,0px))}.stats{grid-template-columns:1fr 1fr}.tab .n{display:none}}
+
 @media (max-width:760px){
   .week{grid-template-columns:1fr}
   .wday{min-height:0}
@@ -217,6 +257,7 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
       <button class="tab" role="tab" id="tab1"><span class="n">1</span>Матрица</button>
       <button class="tab" role="tab" id="tab2"><span class="n">2</span>Тип</button>
       <button class="tab" role="tab" id="tab3"><span class="n">3</span>Расписание</button>
+      <button class="tab" role="tab" id="tab4"><span class="n">4</span>Архив</button>
     </div>
   </header>
 
@@ -271,6 +312,13 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
     </div>
   </section>
 
+  <!-- 4. Archive -->
+  <section id="view4" hidden>
+    <div class="stats" id="aStats"></div>
+    <p class="stats-note" id="aNote"></p>
+    <div id="aList"></div>
+  </section>
+
   <details class="data">
     <summary>Данные и календарь</summary>
     <div class="drow">
@@ -285,6 +333,16 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
   </details>
 </div>
 
+<div class="modal" id="quiz" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="qTitle">
+    <div class="qtop"><span class="qtask" id="qTask"></span><button class="qx" id="qClose" type="button" aria-label="Закрыть">×</button></div>
+    <div class="qdots" id="qDots"></div>
+    <h2 id="qTitle"></h2>
+    <p class="qhint" id="qHint"></p>
+    <div id="qBody"></div>
+    <div class="qfoot" id="qFoot"></div>
+  </div>
+</div>
 <div class="bar"><div class="in">
   <div class="editrow" id="editRow" hidden></div>
   <div class="inv" id="inv">
@@ -361,19 +419,22 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
   /* ---------- render ---------- */
   function render(){
     const v=S.tab;
-    [1,2,3].forEach(i=>{$('#view'+i).hidden=v!==i; $('#tab'+i).setAttribute('aria-selected',v===i);});
+    [1,2,3,4].forEach(i=>{$('#view'+i).hidden=v!==i; $('#tab'+i).setAttribute('aria-selected',v===i);});
     document.body.classList.toggle('picking',!!sel);
     if(v===1) renderMatrix();
     if(v===2) renderKinds();
     if(v===3) renderSchedule();
+    if(v===4) renderArchive();
     renderBar();
     renderInv();
+    document.querySelector('.bar').hidden=(S.tab===4&&!sel);
   }
 
   // Матрица — рабочий стол на сегодня: только несделанные задачи без даты или с датой не позже сегодня
+  const live=()=>S.tasks.filter(t=>!(t.arch&&!t.arch.done));
   const inMatrix=t=>!t.done&&(!t.date||t.date<=TODAY());
   function renderMatrix(){
-    const fill=(q,list)=>{list.innerHTML=''; S.tasks.filter(t=>t.quad===q&&inMatrix(t)).forEach(t=>list.append(chip(t,'plain')));};
+    const fill=(q,list)=>{list.innerHTML=''; live().filter(t=>t.quad===q&&inMatrix(t)).forEach(t=>list.append(chip(t,'plain')));};
     document.querySelectorAll('#view1 .cell').forEach(c=>{
       const q=c.dataset.target, list=c.querySelector('.list');
       fill(q,list);
@@ -381,15 +442,15 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
       if(!p){p=el('button','plus','+ Добавить');p.type='button';c.append(p);}
       if(p.classList.contains('plus')) p.onclick=e=>{e.stopPropagation(); inlineAdd(p,{quad:q},()=>fill(q,list));};
     });
-    const doneN=S.tasks.filter(t=>t.done).length, futN=S.tasks.filter(t=>!t.done&&t.date&&t.date>TODAY()).length;
+    const doneN=live().filter(t=>t.done).length, futN=live().filter(t=>!t.done&&t.date&&t.date>TODAY()).length;
     const parts=[]; if(doneN) parts.push('выполненные: '+doneN); if(futN) parts.push('запланированные на другие дни: '+futN);
-    $('#mNote').textContent='Здесь только задачи на сегодня.'+(parts.length?' Скрыты '+parts.join(', ')+' — они в «Типе» и «Расписании».':'');
+    $('#mNote').textContent='Здесь только задачи на сегодня.'+(parts.length?' Скрыты '+parts.join(', ')+' — они в «Архиве» и «Расписании».':'');
   }
 
   function renderKinds(){
     document.querySelectorAll('#view2 .col').forEach(c=>{
       const k=c.dataset.target, list=c.querySelector('.list'); list.innerHTML='';
-      const mine=S.tasks.filter(t=>t.kind===k), open=sorted(mine.filter(t=>!t.done)), done=mine.filter(t=>t.done);
+      const mine=live().filter(t=>t.kind===k), open=sorted(mine.filter(t=>!t.done)), done=mine.filter(t=>t.done);
       if(!open.length) empty(list,done.length?'Всё сделано.':'Пока пусто.');
       open.forEach(t=>list.append(chip(t,'kind')));
       if(done.length){
@@ -399,14 +460,14 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
         if(S.showDone) done.forEach(t=>list.append(chip(t,'kind')));
       }
     });
-    $('#cConcept').textContent=S.tasks.filter(t=>t.kind==='concept'&&!t.done).length||'';
-    $('#cOps').textContent=S.tasks.filter(t=>t.kind==='ops'&&!t.done).length||'';
+    $('#cConcept').textContent=live().filter(t=>t.kind==='concept'&&!t.done).length||'';
+    $('#cOps').textContent=live().filter(t=>t.kind==='ops'&&!t.done).length||'';
   }
 
   function dayData(){
     const m={};
     const get=k=>m[k]||(m[k]={t:[],e:[],load:0});
-    S.tasks.forEach(t=>{if(t.date){const b=get(t.date); b.t.push(t); if(!t.done) b.load+=t.est||0;}});
+    live().forEach(t=>{if(t.date){const b=get(t.date); b.t.push(t); if(!t.done) b.load+=t.est||0;}});
     S.events.forEach(e=>get(e.d).e.push(e));
     Object.values(m).forEach(b=>b.e.sort((a,c)=>(a.h||'').localeCompare(c.h||'')));
     return k=>m[k]||{t:[],e:[],load:0};
@@ -416,7 +477,7 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
   function renderSchedule(){
     const today=TODAY();
     // tails
-    const tails=sorted(S.tasks.filter(t=>t.date&&t.date<today&&!t.done));
+    const tails=sorted(live().filter(t=>t.date&&t.date<today&&!t.done));
     $('#tailsBox').hidden=!tails.length;
     const tl=$('#tails'); tl.innerHTML=''; tails.forEach(t=>tl.append(chip(t,'sched')));
     // no date
@@ -530,15 +591,22 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
     i.addEventListener('input',()=>{t.text=i.value; save(); document.querySelectorAll('.chip[data-id="'+t.id+'"] .t').forEach(c=>c.textContent=t.text);});
     i.addEventListener('keydown',e=>{if(e.key==='Enter'){sel=null; render();}});
     bar.append(i);
-    bar.append(btn(t.done?'Вернуть в работу':'Сделано','ghost',()=>{t.done=!t.done; sel=null; save(); render();}));
-    bar.append(btn('★ Главное','ghost'+(t.top?' on':''),()=>{t.top=!t.top; save(); render();}));
-    const s=el('select'); s.setAttribute('aria-label','Сколько времени займёт');
-    EST.forEach(([v,l])=>{const o=el('option',null,l); o.value=v; if((t.est||0)===v) o.selected=true; s.append(o);});
-    s.onchange=()=>{t.est=+s.value; save(); render();};
-    bar.append(s);
-    if(t.date&&t.date<TODAY()&&!t.done) bar.append(btn('На сегодня','ghost',()=>{t.date=TODAY(); sel=null; save(); render();}));
-    bar.append(el('span','grow'));
-    bar.append(btn('Удалить','ghost danger',()=>{S.tasks=S.tasks.filter(x=>x.id!==t.id); sel=null; save(); render();}));
+    const hardDelete=()=>{ if(confirm('Удалить задачу без следа? В архив она не попадёт.')){ S.tasks=S.tasks.filter(x=>x.id!==t.id); sel=null; save(); render(); } };
+    if(t.arch||t.done){
+      bar.append(btn('Вернуть в работу','ghost',()=>{restore(t); sel=null; save(); render();}));
+      bar.append(el('span','grow'));
+      bar.append(btn('Удалить без следа','ghost danger',hardDelete));
+    } else {
+      bar.append(btn('Завершить или убрать…','ghost on',()=>openQuiz(t)));
+      bar.append(btn('★ Главное','ghost'+(t.top?' on':''),()=>{t.top=!t.top; save(); render();}));
+      const s=el('select'); s.setAttribute('aria-label','Сколько времени займёт');
+      EST.forEach(([v,l])=>{const o=el('option',null,l); o.value=v; if((t.est||0)===v) o.selected=true; s.append(o);});
+      s.onchange=()=>{t.est=+s.value; save(); render();};
+      bar.append(s);
+      if(t.date&&t.date<TODAY()) bar.append(btn('На сегодня','ghost',()=>{t.date=TODAY(); sel=null; save(); render();}));
+      bar.append(el('span','grow'));
+      bar.append(btn('Удалить без следа','ghost danger',hardDelete));
+    }
     bar.append(btn('Готово','ghost',()=>{sel=null; render();}));
   }
 
@@ -549,7 +617,8 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
     3:{sub:'без даты',      test:t=>!t.date&&!t.done, clear:t=>{t.date=null;}, mode:'sched', hint:'Нажмите на задачу, затем на день'}
   };
   function renderInv(){
-    const cfg=INV[S.tab], items=sorted(S.tasks.filter(cfg.test));
+    $('#inv').hidden=S.tab===4; if(S.tab===4) return;
+    const cfg=INV[S.tab], items=sorted(live().filter(cfg.test));
     $('#inv').classList.toggle('collapsed',!!S.invCollapsed);
     $('#invTog').textContent=S.invCollapsed?'Развернуть':'Свернуть';
     $('#invSub').textContent=cfg.sub+(items.length?' · '+items.length:'')+(items.length&&!S.invCollapsed?'. '+cfg.hint:'');
@@ -557,6 +626,113 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
     if(!items.length) empty(l,'Пусто. Новые задачи будут появляться здесь.');
     items.forEach(t=>l.append(chip(t,cfg.mode)));
   }
+  /* ---------- completion quiz ---------- */
+  const REASONS=['Потеряло актуальность','Не хватило времени','Передал другому','Жду других / заблокировано','Передумал','Другое'];
+  const dateLabel=k=>{const d=P(k); if(k===TODAY()) return 'сегодня'; if(k===addDays(TODAY(),-1)) return 'вчера'; return WD_FULL[d.getDay()]+', '+d.getDate()+' '+MON_G[d.getMonth()];};
+  let Z=null; // {t, a:{}, path:[]}
+  function openQuiz(t){ Z={t,a:{},path:['did']}; $('#qTask').textContent=t.text; $('#quiz').hidden=false; showStep(); }
+  function closeQuiz(){ Z=null; $('#quiz').hidden=true; }
+  function nextAfter(step){
+    const t=Z.t, a=Z.a;
+    if(step==='did') return a.done ? (t.date?'ontime':(t.est?'inest':'actual')) : 'reason';
+    if(step==='ontime') return t.est?'inest':'actual';
+    if(step==='inest') return (a.inEst&&!a.faster)?null:'actual';
+    return null;
+  }
+  function answer(step,apply){ apply(); const n=nextAfter(step); if(n){Z.path.push(n); showStep();} else finish(); }
+  function opt(label,fn,on){const b=el('button','opt'+(on?' on':''),label); b.type='button'; b.onclick=fn; return b;}
+  function showStep(){
+    const step=Z.path[Z.path.length-1], t=Z.t, body=$('#qBody'), foot=$('#qFoot');
+    body.innerHTML=''; foot.innerHTML=''; $('#qHint').textContent='';
+    const total=Z.a.done===false?2:(1+(t.date?1:0)+1+((Z.a.inEst===false||!t.est)&&t.est?1:0));
+    const dots=$('#qDots'); dots.innerHTML=''; for(let i=0;i<Math.max(total,Z.path.length);i++){const d=el('i'); if(i<Z.path.length) d.className='on'; dots.append(d);}
+    const box=el('div','qopts');
+    if(step==='did'){
+      $('#qTitle').textContent='Задача выполнена?';
+      box.append(opt('Да, сделал',()=>answer('did',()=>{Z.a.done=true;})), opt('Нет, убираю без выполнения',()=>answer('did',()=>{Z.a.done=false;})));
+    }
+    if(step==='ontime'){
+      $('#qTitle').textContent='Успел к сроку?';
+      $('#qHint').textContent='Срок: '+dateLabel(t.date)+(t.date<TODAY()?' — он уже прошёл':'');
+      box.append(opt('Да, в срок',()=>answer('ontime',()=>{Z.a.onTime=true;})), opt('Нет, позже срока',()=>answer('ontime',()=>{Z.a.onTime=false;})));
+    }
+    if(step==='inest'){
+      $('#qTitle').textContent='Уложился в '+fmtEst(t.est)+'?';
+      $('#qHint').textContent='Столько времени вы закладывали на задачу.';
+      box.append(opt('Да, уложился',()=>answer('inest',()=>{Z.a.inEst=true; Z.a.actual=t.est;})), opt('Нет, заняло больше',()=>answer('inest',()=>{Z.a.inEst=false;})), opt('Сделал быстрее',()=>answer('inest',()=>{Z.a.inEst=true; Z.a.faster=true;})));
+    }
+    if(step==='actual'){
+      $('#qTitle').textContent=t.est?'Сколько заняло на самом деле?':'Сколько времени заняла задача?';
+      if(!t.est) $('#qHint').textContent='Время заранее не было указано.';
+      box.classList.add('grid');
+      EST.filter(([v])=>v>0).forEach(([v,l])=>box.append(opt(l,()=>answer('actual',()=>{Z.a.actual=v; if(t.est) Z.a.inEst=v<=t.est;}))));
+    }
+    if(step==='reason'){
+      $('#qTitle').textContent='Почему не сделал?';
+      $('#qHint').textContent='Необязательно, но так в архиве будет видно, что мешает чаще всего.';
+      REASONS.forEach(r=>box.append(opt(r,()=>{Z.a.reason=Z.a.reason===r?null:r; showStep();},Z.a.reason===r)));
+    }
+    body.append(box);
+    if(step==='reason'){
+      const ta=el('textarea'); ta.placeholder='Комментарий, если хочется'; ta.value=Z.a.note||''; ta.oninput=()=>{Z.a.note=ta.value;};
+      body.append(ta);
+    }
+    if(Z.path.length>1) foot.append(btn('Назад','ghost',()=>{Z.path.pop(); showStep();}));
+    if(step==='reason') foot.append(btn('Убрать в архив','primary',finish));
+    if(step==='actual'&&Z.a.faster) $('#qHint').textContent='Отметьте, сколько получилось на самом деле.';
+    if(step==='inest'&&false){}
+  }
+  function finish(){
+    const t=Z.t, a=Z.a;
+    if(a.faster&&a.actual==null) a.actual=t.est;
+    t.arch={at:TODAY(), done:!!a.done, due:t.date||null, onTime:a.done&&t.date?!!a.onTime:null,
+            planned:t.est||0, actual:a.done?(a.actual||0):0, inEst:a.done&&t.est?(a.inEst!==false):null,
+            reason:a.done?null:(a.reason||null), note:a.done?'':(a.note||'').trim()};
+    t.done=!!a.done; t.top=false;
+    if(a.done&&!t.date) t.date=TODAY();
+    closeQuiz(); sel=null; save(); render();
+  }
+  function restore(t){ delete t.arch; t.done=false; }
+  $('#qClose').onclick=closeQuiz;
+  $('#quiz').addEventListener('click',e=>{ if(e.target.id==='quiz') closeQuiz(); });
+
+  /* ---------- archive ---------- */
+  function renderArchive(){
+    const all=S.tasks.filter(t=>t.arch).sort((a,b)=>b.arch.at.localeCompare(a.arch.at));
+    const from=addDays(TODAY(),-29), recent=all.filter(t=>t.arch.at>=from);
+    const done=recent.filter(t=>t.arch.done);
+    const pct=(n,d)=>d?Math.round(n/d*100)+'%':'—';
+    const onT=done.filter(t=>t.arch.onTime!==null), inE=done.filter(t=>t.arch.inEst!==null);
+    const both=done.filter(t=>t.arch.planned&&t.arch.actual);
+    const ratio=both.length?both.reduce((s,t)=>s+t.arch.actual,0)/both.reduce((s,t)=>s+t.arch.planned,0):null;
+    const st=$('#aStats'); st.innerHTML='';
+    [[done.length+' из '+recent.length,'сделано из убранных'],[pct(onT.filter(t=>t.arch.onTime).length,onT.length),'в срок'],[pct(inE.filter(t=>t.arch.inEst).length,inE.length),'уложился во время'],[ratio?('×'+(Math.round(ratio*10)/10).toString().replace('.',',')):'—','факт к плану по времени']]
+      .forEach(([v,l])=>{const c=el('div','stat'); c.append(el('b',null,v),el('span',null,l)); st.append(c);});
+    const reasons={}; recent.filter(t=>!t.arch.done&&t.arch.reason).forEach(t=>reasons[t.arch.reason]=(reasons[t.arch.reason]||0)+1);
+    const top=Object.entries(reasons).sort((a,b)=>b[1]-a[1])[0];
+    $('#aNote').textContent='За последние 30 дней.'+(top?' Чаще всего задачи не делаются по причине: «'+top[0]+'».':'')+(ratio&&ratio>1.2?' Задачи в среднем занимают больше времени, чем вы закладываете.':'');
+    const list=$('#aList'); list.innerHTML='';
+    if(!all.length){ empty(list,'Архив пуст. Выберите задачу и нажмите «Завершить или убрать…» — после короткого опроса она окажется здесь.'); return; }
+    let cur=null, g=null;
+    all.forEach(t=>{
+      if(t.arch.at!==cur){ cur=t.arch.at; g=el('div','agroup'); g.append(el('h3',null,dateLabel(cur))); list.append(g); }
+      const a=t.arch, r=el('button','arow'); r.type='button'; r.dataset.id=t.id; r.setAttribute('aria-pressed',sel===t.id?'true':'false');
+      r.append(el('span','ic'+(a.done?'':' no'),a.done?'✓':'✕'));
+      const b=el('div','ab'); b.append(el('div','at',t.text));
+      const bd=el('div','badges');
+      if(!a.done) bd.append(el('span',null,'не сделано'));
+      if(a.onTime===true) bd.append(el('span','good','в срок'));
+      if(a.onTime===false) bd.append(el('span','bad','позже срока'));
+      if(a.done&&a.planned&&a.actual) bd.append(el('span',a.actual>a.planned?'bad':'good','план '+fmtEst(a.planned)+' → факт '+fmtEst(a.actual)));
+      else if(a.done&&a.actual) bd.append(el('span',null,'заняло '+fmtEst(a.actual)));
+      if(t.kind) bd.append(el('span',null,t.kind==='concept'?'концептуальная':'операционная'));
+      if(a.reason||a.note) bd.append(el('span','why',[a.reason,a.note].filter(Boolean).join(' — ')));
+      b.append(bd); r.append(b);
+      r.onclick=()=>{ sel=(sel===t.id)?null:t.id; render(); };
+      g.append(r);
+    });
+  }
+
   function go(n){S.tab=n; sel=null; save(); render(); window.scrollTo({top:0});}
 
   /* ---------- static targets ---------- */
@@ -582,6 +758,7 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
   $('#tab1').onclick=()=>go(1);
   $('#tab2').onclick=()=>go(2);
   $('#tab3').onclick=()=>go(3);
+  $('#tab4').onclick=()=>go(4);
   document.querySelectorAll('#scale button').forEach(b=>b.onclick=()=>{S.view=b.dataset.v; save(); render();});
   function shift(k){
     if(S.view==='day') S.cur=addDays(S.cur,k);
@@ -593,6 +770,7 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
   $('#next').onclick=()=>shift(1);
   $('#todayBtn').onclick=()=>{S.cur=TODAY(); save(); render();};
   document.addEventListener('keydown',e=>{
+    if(e.key==='Escape'&&Z){closeQuiz(); return;}
     if(e.key==='Escape'&&sel){sel=null; render(); return;}
     if(S.tab===3&&!sel&&!/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)){
       if(e.key==='ArrowLeft') shift(-1);
