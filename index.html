@@ -145,8 +145,11 @@ input.inline{border:1px solid var(--line);border-radius:8px;padding:6px 8px;marg
 .dayv h3:first-child{margin-top:0}
 .dayv .ev{font-size:14px;padding:8px 10px}
 .loadbar{height:6px;border-radius:3px;background:var(--bg);overflow:hidden;margin:0 0 4px}
-.loadbar i{display:block;height:100%;background:var(--ops)}
+.loadbar{display:flex}
+.loadbar i{display:block;height:100%;background:var(--plan);opacity:.45}
+.loadbar i.done{background:var(--ops);opacity:1}
 .loadbar.over-l i{background:var(--warn)}
+.mday .hrs{font-size:11px;color:var(--muted)}
 .loadtxt{font-size:12px;color:var(--muted)}
 
 /* month */
@@ -400,7 +403,7 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
     b.append(el('span','t',t.text));
     if(mode!=='plain'){
       const meta=el('span','meta');
-      if(mode==='sched'&&t.est) meta.append(el('span','est',fmtEst(t.est)));
+      if(mode==='sched'){const mins=t.done?spent(t):t.est; if(mins) meta.append(el('span','est',(t.done?'':'')+fmtEst(mins)));}
       if(t.quad) meta.append(el('span','tag',Q[t.quad].short));
       if(meta.childElementCount) b.append(meta);
     }
@@ -471,13 +474,16 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
     $('#cOps').textContent=live().filter(t=>t.kind==='ops'&&!t.done).length||'';
   }
 
+  // сколько заняла сделанная задача: факт из опроса, иначе заложенное время
+  const spent=t=>(t.arch&&t.arch.actual)||t.est||0;
+  const EMPTY={t:[],e:[],load:0,fact:0,plan:0};
   function dayData(){
     const m={};
-    const get=k=>m[k]||(m[k]={t:[],e:[],load:0});
-    live().forEach(t=>{if(t.date){const b=get(t.date); b.t.push(t); if(!t.done) b.load+=t.est||0;}});
+    const get=k=>m[k]||(m[k]={t:[],e:[],load:0,fact:0,plan:0});
+    live().forEach(t=>{if(t.date){const b=get(t.date); b.t.push(t); if(t.done) b.fact+=spent(t); else b.plan+=t.est||0; b.load=b.fact+b.plan;}});
     S.events.forEach(e=>get(e.d).e.push(e));
     Object.values(m).forEach(b=>b.e.sort((a,c)=>(a.h||'').localeCompare(c.h||'')));
-    return k=>m[k]||{t:[],e:[],load:0};
+    return k=>m[k]||EMPTY;
   }
   function evRow(e){const r=el('div','ev'); r.append(el('span',null,e.h||'весь день'),el('b',null,e.t)); return r;}
 
@@ -497,7 +503,21 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
     else renderMonth(box,D,today);
   }
 
-  function loadLabel(load){const s=el('span','load'+(load>DAY_LIMIT?' over-l':''), load?('≈ '+fmtMin(load)):''); return s;}
+  function loadLabel(b){
+    const s=el('span','load'+(b.load>DAY_LIMIT?' over-l':''));
+    if(!b.load) return s;
+    s.textContent=fmtMin(b.load);
+    s.title=(b.fact?'Потрачено '+fmtMin(b.fact):'')+(b.fact&&b.plan?', ':'')+(b.plan?'осталось ≈ '+fmtMin(b.plan):'');
+    if(b.plan) s.textContent='≈ '+s.textContent;
+    return s;
+  }
+  function loadText(b){
+    if(!b.load) return 'Время задач не указано. Выберите задачу и задайте время внизу.';
+    const parts=[];
+    if(b.fact) parts.push('потрачено '+fmtMin(b.fact));
+    if(b.plan) parts.push('осталось ≈ '+fmtMin(b.plan));
+    return 'За день '+(b.plan?'≈ ':'')+fmtMin(b.load)+(parts.length>1?' ('+parts.join(', ')+')':'')+(b.load>DAY_LIMIT?' — день перегружен':'');
+  }
 
   function renderWeek(box,D,today){
     const start=monday(S.cur), end=addDays(start,6);
@@ -511,7 +531,7 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
       const col=el('div','wday'); if(k===today) col.classList.add('is-today'); if(k<today) col.classList.add('past');
       if(!b.t.length&&!b.e.length) col.classList.add('empty-day');
       const h=el('button','whead'); h.type='button';
-      h.append(el('span','wd',WD[i]),el('span','dn',d.getDate()),loadLabel(b.load));
+      h.append(el('span','wd',WD[i]),el('span','dn',d.getDate()),loadLabel(b));
       h.setAttribute('aria-label','Открыть день: '+WD_FULL[d.getDay()]+', '+d.getDate()+' '+MON_G[d.getMonth()]);
       h.addEventListener('click',e=>{ if(sel) return; e.stopPropagation(); S.cur=k; S.view='day'; save(); render(); window.scrollTo({top:0}); });
       col.append(h);
@@ -531,8 +551,11 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
     $('#sTitle').textContent=WD_FULL[d.getDay()]+', '+d.getDate()+' '+MON_G[d.getMonth()]+(k===today?' · сегодня':'');
     const v=el('div','dayv');
     // load
-    const lb=el('div','loadbar'+(b.load>DAY_LIMIT?' over-l':'')); const fill=el('i'); fill.style.width=Math.min(100,b.load/DAY_LIMIT*100)+'%'; lb.append(fill);
-    v.append(lb, el('div','loadtxt', b.load?('Запланировано ≈ '+fmtMin(b.load)+(b.load>DAY_LIMIT?' — день перегружен':'')):'Время задач не указано. Выберите задачу и задайте время внизу.'));
+    const lb=el('div','loadbar'+(b.load>DAY_LIMIT?' over-l':''));
+    const f1=el('i','done'); f1.style.width=Math.min(100,b.fact/DAY_LIMIT*100)+'%';
+    const f2=el('i'); f2.style.width=Math.min(100-Math.min(100,b.fact/DAY_LIMIT*100),b.plan/DAY_LIMIT*100)+'%';
+    lb.append(f1,f2);
+    v.append(lb, el('div','loadtxt', loadText(b)));
     if(b.e.length){ v.append(el('h3',null,'События')); const l=el('div','list'); b.e.forEach(e=>l.append(evRow(e))); v.append(l); }
     const tops=sorted(b.t.filter(t=>t.top)), rest=sorted(b.t.filter(t=>!t.top));
     v.append(el('h3',null,'Главное на день'));
@@ -561,6 +584,7 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
       c.append(el('span','n',d.getDate()));
       const open=b.t.filter(t=>!t.done).length;
       if(open||b.e.length) c.append(el('span','c',[open?open+' зад.':'',b.e.length?b.e.length+' соб.':''].filter(Boolean).join(', ')));
+      if(b.load) c.append(el('span','hrs',(b.plan?'≈ ':'')+fmtMin(b.load)));
       const bars=el('div','bars');
       b.t.filter(t=>!t.done).slice(0,6).forEach(t=>{const i2=el('i'); if(t.kind) i2.className='kc-'+t.kind; bars.append(i2);});
       if(b.e.length) bars.append(el('i','e'));
