@@ -714,11 +714,14 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
   function closeQuiz(){ Z=null; $('#quiz').hidden=true; }
   function nextAfter(step){
     const t=Z.t, a=Z.a;
-    const branch=()=>a.done ? (t.date?'ontime':(t.est?'inest':'actual')) : 'reason';
+    const branch=()=>'split';
+    const after=()=>a.done ? (t.date?'ontime':(t.est?'inest':'actual')) : 'reason';
     if(step==='did') return 'moved';
     if(step==='moved') return a.moved?'moveCount':branch();
     if(step==='moveCount') return 'moveDays';
     if(step==='moveDays') return branch();
+    if(step==='split') return a.split?'splitCount':after();
+    if(step==='splitCount') return after();
     if(step==='ontime') return t.est?'inest':'actual';
     if(step==='inest') return (a.inEst&&!a.faster)?null:'actual';
     return null;
@@ -752,6 +755,16 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
       const DAYS=[[1,'1 день'],[2,'2 дня'],[3,'3 дня'],[5,'5 дней'],[7,'7 дней'],[8,'больше 7']];
       const auto=t.moveDays?(DAYS.find(([v])=>v>=t.moveDays)||DAYS[5])[0]:0;
       DAYS.forEach(([v,l])=>box.append(opt(l,()=>answer('moveDays',()=>{Z.a.moveDays=v;}),auto===v)));
+    }
+    if(step==='split'){
+      $('#qTitle').textContent='Делил задачу на части?';
+      $('#qHint').textContent='Крупные задачи обычно идут легче, когда разбиты на шаги.';
+      box.append(opt('Да, делил',()=>answer('split',()=>{Z.a.split=true;})), opt('Нет, делал целиком',()=>answer('split',()=>{Z.a.split=false;})));
+    }
+    if(step==='splitCount'){
+      $('#qTitle').textContent='На сколько частей?';
+      box.classList.add('grid');
+      [[2,'2'],[3,'3'],[4,'4'],[5,'5'],[6,'больше 5']].forEach(([v,l])=>box.append(opt(l,()=>answer('splitCount',()=>{Z.a.splitCount=v;}))));
     }
     if(step==='ontime'){
       $('#qTitle').textContent='Успел к сроку?';
@@ -789,6 +802,7 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
     if(a.faster&&a.actual==null) a.actual=t.est;
     t.arch={at:TODAY(), done:!!a.done, due:t.date||null, onTime:a.done&&t.date?!!a.onTime:null,
             planned:t.est||0, actual:a.done?(a.actual||0):0, inEst:a.done&&t.est?(a.inEst!==false):null,
+            split:a.split===undefined?null:!!a.split, splitCount:a.split?a.splitCount:0,
             moved:a.moved===undefined?null:!!a.moved, moveCount:a.moved?a.moveCount:0, moveDays:a.moved?a.moveDays:0,
             reason:a.done?null:(a.reason||null), note:a.done?'':(a.note||'').trim()};
     t.done=!!a.done; t.top=false;
@@ -871,8 +885,10 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
     const reasons={}; recent.filter(t=>!t.arch.done&&t.arch.reason).forEach(t=>reasons[t.arch.reason]=(reasons[t.arch.reason]||0)+1);
     const top=Object.entries(reasons).sort((a,b)=>b[1]-a[1])[0];
     const mv=recent.filter(t=>t.arch.moved), mvDays=mv.reduce((s,t)=>s+(t.arch.moveDays||0),0);
+    const sp=recent.filter(t=>t.arch.split);
+    const spTxt=sp.length?(' Делились на части '+sp.length+' из '+recent.length+'.'):'';
     const mvTxt=mv.length?(' Переносились '+mv.length+' из '+recent.length+' задач, суммарно минимум на '+mvDays+' дн.'):'';
-    $('#aNote').textContent='За последние 30 дней.'+mvTxt+(top?' Чаще всего задачи не делаются по причине: «'+top[0]+'».':'')+(ratio&&ratio>1.2?' Задачи в среднем занимают больше времени, чем вы закладываете.':'');
+    $('#aNote').textContent='За последние 30 дней.'+mvTxt+spTxt+(top?' Чаще всего задачи не делаются по причине: «'+top[0]+'».':'')+(ratio&&ratio>1.2?' Задачи в среднем занимают больше времени, чем вы закладываете.':'');
     const list=$('#aList'); list.innerHTML='';
     if(!all.length){ empty(list,'Архив пуст. Выберите задачу и нажмите «Завершить или убрать…» — после короткого опроса она окажется здесь.'); return; }
     let cur=null, g=null;
@@ -888,6 +904,7 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
       if(a.done&&a.planned&&a.actual) bd.append(el('span',a.actual>a.planned?'bad':'good','план '+fmtEst(a.planned)+' → факт '+fmtEst(a.actual)));
       else if(a.done&&a.actual) bd.append(el('span',null,'заняло '+fmtEst(a.actual)));
       if(a.moved) bd.append(el('span','bad','перенос ×'+(a.moveCount>=5?'5+':a.moveCount)+' · '+(a.moveDays>7?'больше 7 дн.':'+'+a.moveDays+' дн.')));
+      if(a.split) bd.append(el('span',null,'делил на '+(a.splitCount>5?'6+':a.splitCount)+' ч.'));
       if(t.kind) bd.append(el('span',null,t.kind==='concept'?'концептуальная':'операционная'));
       if(a.reason||a.note) bd.append(el('span','why',[a.reason,a.note].filter(Boolean).join(' — ')));
       b.append(bd); r.append(b);
