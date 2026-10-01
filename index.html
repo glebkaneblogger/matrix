@@ -209,6 +209,16 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
 .colors button{width:30px;height:30px;border-radius:50%;border:2px solid transparent;background:var(--c)}
 .colors button.on{border-color:var(--ink);transform:scale(1.1)}
 
+/* day review */
+.review{margin-top:16px;border-top:1px solid var(--line);padding-top:12px}
+.review .rbtn{border:1px solid var(--line);background:var(--bg);border-radius:12px;padding:10px 13px;text-align:left;width:100%;font-weight:500}
+.review .rbtn:hover{border-color:var(--ink)}
+.rsaved{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline;width:100%;text-align:left;border:1px solid var(--line);background:var(--bg);border-radius:12px;padding:10px 13px}
+.rsaved b{font:700 15px/1.2 var(--display)}
+.rsaved .rhow{flex-basis:100%;font-size:13px;color:var(--muted);white-space:pre-wrap}
+.rsaved .redit{margin-left:auto;font-size:12px;color:var(--muted)}
+.wday .proc{font-size:11px;color:var(--muted);border-top:1px dashed var(--line);padding-top:4px;margin-top:2px}
+
 /* archive */
 .stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:6px}
 .stat{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:12px}
@@ -368,6 +378,17 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
   </details>
 </div>
 
+<div class="modal" id="revModal" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="rTitle">
+    <div class="qtop"><span class="qtask" id="rDay"></span><button class="qx" id="rClose" type="button" aria-label="Закрыть">×</button></div>
+    <div class="qdots" id="rDots"></div>
+    <h2 id="rTitle"></h2>
+    <p class="qhint" id="rHint"></p>
+    <div id="rBody"></div>
+    <div class="qfoot" id="rFoot"></div>
+  </div>
+</div>
+
 <div class="modal" id="ideaModal" hidden>
   <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="iTitle">
     <div class="qtop"><span class="qtask" id="iKind"></span><button class="qx" id="iClose" type="button" aria-label="Закрыть">×</button></div>
@@ -422,11 +443,12 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
   const fmtEst=m=>m>720?'12+ ч':fmtMin(m);
   const fmtMin=m=>m<60?m+' мин':(Math.round(m/6)/10+' ч').replace('.',',');
 
-  let S={tasks:[],events:[],ideas:[],ideaFilter:'open',tab:1,view:'week',cur:TODAY(),invCollapsed:false,showDone:true};
+  let S={tasks:[],events:[],ideas:[],days:{},ideaFilter:'open',tab:1,view:'week',cur:TODAY(),invCollapsed:false,showDone:true};
   let sel=null;
   try{const raw=localStorage.getItem(KEY); if(raw){const d=JSON.parse(raw); if(d&&Array.isArray(d.tasks)) S=Object.assign(S,d);}}catch(e){}
   if(!Array.isArray(S.events)) S.events=[];
   if(!Array.isArray(S.ideas)) S.ideas=[];
+  if(!S.days||typeof S.days!=='object') S.days={};
   S.tab=1; // при открытии всегда начинаем с матрицы
   function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){status('Не удалось сохранить: хранилище браузера переполнено или отключено.');}}
   const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
@@ -586,6 +608,8 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
       col.append(h);
       b.e.forEach(e=>col.append(evRow(e)));
       sorted(b.t).forEach(t=>col.append(chip(t,'sched')));
+      const dr=S.days[k];
+      if(dr&&(dr.proc!=null||dr.how)) col.append(el('div','proc','прокрастинация: '+(dr.proc?fmtMin(dr.proc):'не было')));
       const p=el('button','plus wadd','+ Задача'); p.type='button';
       p.onclick=e=>{e.stopPropagation(); if(sel) return col.click(); inlineAdd(p,{date:k},render);};
       col.append(p);
@@ -611,6 +635,7 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
     const lt=el('div','list'); if(!tops.length) empty(lt,'Отметьте до трёх задач звёздочкой — это главное на день.'); tops.forEach(t=>lt.append(chip(t,'sched'))); v.append(lt);
     v.append(el('h3',null,'Остальные задачи'));
     const lr=el('div','list'); if(!rest.length) empty(lr,'Пусто.'); rest.forEach(t=>lr.append(chip(t,'sched'))); v.append(lr);
+    v.append(dayReview(k));
     const p=el('button','plus','+ Задача на этот день'); p.type='button';
     p.onclick=e=>{e.stopPropagation(); if(sel) return v.click(); inlineAdd(p,{date:k},render);};
     v.append(p);
@@ -870,6 +895,81 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
     });
   }
 
+  /* ---------- итог дня: прокрастинация ---------- */
+  // «1,5», «1.5», «90 мин», «2 ч 30», «30м» → минуты
+  function parseDur(str){
+    let t=String(str).toLowerCase().replace(/,/g,'.').trim();
+    if(!t) return 0;
+    if(/^(0|нет|ноль|не было)$/.test(t)) return 0;
+    if(!/\d/.test(t)) return null;
+    let min=0, rest=t;
+    const h=rest.match(/(\d+(?:\.\d+)?)\s*(?:часов|часа|час|ч|hours|hour|hrs|hr|h)/);
+    if(h){ min+=parseFloat(h[1])*60; rest=rest.replace(h[0],' '); }
+    const m=rest.match(/(\d+(?:\.\d+)?)\s*(?:минут|мин|мины|м|minutes|min|mins|m)/);
+    if(m){ min+=parseFloat(m[1]); rest=rest.replace(m[0],' '); }
+    const bare=rest.match(/(\d+(?:\.\d+)?)/);
+    if(bare){ min += h ? parseFloat(bare[1]) : parseFloat(bare[1])*60; rest=rest.replace(bare[0],' '); }
+    if(/\d/.test(rest)) return null;
+    if(!isFinite(min)||min<0||min>24*60) return null;
+    return Math.round(min);
+  }
+  let R=null; // {k, step, mins, how}
+  function openReview(k){
+    const cur=S.days[k]||{};
+    R={k,step:1,mins:cur.proc!=null?cur.proc:null,how:cur.how||''};
+    $('#rDay').textContent=dateLabel(k);
+    $('#revModal').hidden=false; showReview();
+  }
+  function closeReview(){ R=null; $('#revModal').hidden=true; }
+  function showReview(){
+    const body=$('#rBody'), foot=$('#rFoot'); body.innerHTML=''; foot.innerHTML='';
+    const dots=$('#rDots'); dots.innerHTML=''; [1,2].forEach(i=>{const d=el('i'); if(i<=R.step) d.className='on'; dots.append(d);});
+    if(R.step===1){
+      $('#rTitle').textContent='Сколько сегодня прокрастинировал?';
+      $('#rHint').textContent='Напишите часами: 1,5 — полтора часа. Можно «40 мин» или «2 ч 30».';
+      const i=el('input','ti'); i.id='rInput'; i.placeholder='например, 1,5'; i.inputMode='decimal'; i.autocomplete='off';
+      if(R.mins!=null) i.value=R.mins%60?(Math.floor(R.mins/60)?Math.floor(R.mins/60)+' ч '+(R.mins%60)+' мин':R.mins+' мин'):String(R.mins/60).replace('.',',');
+      i.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault(); step1();}});
+      body.append(i); setTimeout(()=>i.focus(),30);
+      foot.append(btn('Дальше','primary',step1));
+    } else {
+      $('#rTitle').textContent='Как прокрастинировал?';
+      $('#rHint').textContent=R.mins?('Отмечено '+fmtMin(R.mins)+'. На что ушло время и что этому предшествовало.'):'Можно записать, что помогло не отвлекаться.';
+      const ta=el('textarea'); ta.id='rHow'; ta.placeholder='Например: залип в ленте после обеда, пока ждал правки от клиента'; ta.value=R.how;
+      body.append(ta); setTimeout(()=>ta.focus(),30);
+      foot.append(btn('Назад','ghost',()=>{R.how=$('#rHow').value; R.step=1; showReview();}));
+      foot.append(btn('Сохранить','primary',()=>{R.how=$('#rHow').value.trim(); saveReview();}));
+    }
+  }
+  function step1(){
+    const raw=$('#rInput').value.trim();
+    const mins=raw===''?0:parseDur(raw);
+    if(mins===null){ $('#rHint').textContent='Не понял число. Напишите, например, 1,5 или 40 мин.'; return; }
+    R.mins=mins; R.step=2; showReview();
+  }
+  function saveReview(){
+    const d=S.days[R.k]||{};
+    d.proc=R.mins; d.how=R.how;
+    if(!d.proc&&!d.how) delete S.days[R.k]; else S.days[R.k]=d;
+    closeReview(); save(); render();
+  }
+  $('#rClose').onclick=closeReview;
+  $('#revModal').addEventListener('click',e=>{ if(e.target.id==='revModal') closeReview(); });
+
+  function dayReview(k){
+    const d=S.days[k], box=el('div','review');
+    if(!d||(d.proc==null&&!d.how)){
+      const b=el('button','rbtn','＋ Отметить прокрастинацию за день'); b.type='button';
+      b.onclick=e=>{e.stopPropagation(); openReview(k);};
+      box.append(b); return box;
+    }
+    const r=el('button','rsaved'); r.type='button';
+    r.append(el('b',null,'Прокрастинация: '+(d.proc?fmtMin(d.proc):'не было')), el('span','redit','изменить'));
+    if(d.how) r.append(el('span','rhow',d.how));
+    r.onclick=e=>{e.stopPropagation(); openReview(k);};
+    box.append(r); return box;
+  }
+
   /* ---------- archive ---------- */
   function renderArchive(){
     const all=S.tasks.filter(t=>t.arch).sort((a,b)=>b.arch.at.localeCompare(a.arch.at));
@@ -885,10 +985,13 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
     const reasons={}; recent.filter(t=>!t.arch.done&&t.arch.reason).forEach(t=>reasons[t.arch.reason]=(reasons[t.arch.reason]||0)+1);
     const top=Object.entries(reasons).sort((a,b)=>b[1]-a[1])[0];
     const mv=recent.filter(t=>t.arch.moved), mvDays=mv.reduce((s,t)=>s+(t.arch.moveDays||0),0);
+    const pdays=Object.keys(S.days).filter(k=>k>=from&&S.days[k].proc!=null);
+    const pmin=pdays.reduce((x,k)=>x+S.days[k].proc,0);
+    const pTxt=pdays.length?(' Прокрастинация отмечена за '+pdays.length+' дн., всего '+fmtMin(pmin)+' (в среднем '+fmtMin(Math.round(pmin/pdays.length))+' в день).'):'';
     const sp=recent.filter(t=>t.arch.split);
     const spTxt=sp.length?(' Делились на части '+sp.length+' из '+recent.length+'.'):'';
     const mvTxt=mv.length?(' Переносились '+mv.length+' из '+recent.length+' задач, суммарно минимум на '+mvDays+' дн.'):'';
-    $('#aNote').textContent='За последние 30 дней.'+mvTxt+spTxt+(top?' Чаще всего задачи не делаются по причине: «'+top[0]+'».':'')+(ratio&&ratio>1.2?' Задачи в среднем занимают больше времени, чем вы закладываете.':'');
+    $('#aNote').textContent='За последние 30 дней.'+mvTxt+spTxt+pTxt+(top?' Чаще всего задачи не делаются по причине: «'+top[0]+'».':'')+(ratio&&ratio>1.2?' Задачи в среднем занимают больше времени, чем вы закладываете.':'');
     const list=$('#aList'); list.innerHTML='';
     if(!all.length){ empty(list,'Архив пуст. Выберите задачу и нажмите «Завершить или убрать…» — после короткого опроса она окажется здесь.'); return; }
     let cur=null, g=null;
@@ -954,6 +1057,7 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
   document.addEventListener('keydown',e=>{
     if(e.key==='Escape'&&Z){closeQuiz(); return;}
     if(e.key==='Escape'&&I){saveIdea(); return;}
+    if(e.key==='Escape'&&R){closeReview(); return;}
     if(e.key==='Escape'&&sel){sel=null; render(); return;}
     if(S.tab===3&&!sel&&!/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)){
       if(e.key==='ArrowLeft') shift(-1);
