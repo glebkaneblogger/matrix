@@ -189,7 +189,27 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
 .grow{flex:1}
 .info{flex:1;font-size:13px;color:var(--muted);text-align:right}
 
-/* archive */
+/* ideas board */
+.ideabar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:14px}
+.ideabar .primary{flex:0 0 auto}
+.ideabar .seg{margin-left:auto}
+.board{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px;align-items:start}
+.sticky{position:relative;border:0;border-radius:4px;padding:14px 14px 16px;text-align:left;min-height:120px;display:flex;flex-direction:column;gap:6px;box-shadow:0 6px 14px rgba(20,26,36,.14);transform:rotate(var(--rot,0deg));color:#1A1F27;background:var(--sc,#FFE88A);word-break:break-word}
+.sticky:hover{box-shadow:0 10px 20px rgba(20,26,36,.2)}
+.sticky .st{font:700 15px/1.25 var(--display)}
+.sticky .sd{font-size:13.5px;line-height:1.4;white-space:pre-wrap;opacity:.85}
+.sticky .sdate{margin-top:auto;font-size:11px;opacity:.55}
+.sticky .spin{position:absolute;top:-5px;right:10px;font-size:13px;opacity:.55}
+.sticky.pinned .spin{opacity:1}
+.sticky.used{opacity:.6}
+.sticky.used .st{text-decoration:line-through}
+.ideas-empty{background:var(--paper);border:1.5px dashed var(--line);border-radius:14px;padding:26px 18px;text-align:center;color:var(--muted);font-size:14px}
+.sheet input.ti{width:100%;border:1px solid var(--line);border-radius:12px;padding:11px 12px;background:var(--bg);font:inherit;color:inherit}
+.colors{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.colors button{width:30px;height:30px;border-radius:50%;border:2px solid transparent;background:var(--c)}
+.colors button.on{border-color:var(--ink);transform:scale(1.1)}
+
+/* archive 
 .stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:6px}
 .stat{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:12px}
 .stat b{display:block;font:700 22px/1.1 var(--display)}
@@ -227,7 +247,7 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
 .sheet textarea{width:100%;min-height:70px;border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:var(--bg);font:inherit;color:inherit;resize:vertical;margin-top:10px}
 .qfoot{display:flex;gap:8px;margin-top:14px}
 .qfoot .primary{flex:1}
-@media (max-width:620px){.modal{align-items:flex-end;padding:0}.sheet{border-radius:18px 18px 0 0;max-width:none;padding-bottom:calc(18px + env(safe-area-inset-bottom,0px))}.stats{grid-template-columns:1fr 1fr}.tab .n{display:none}}
+@media (max-width:620px){.board{grid-template-columns:1fr 1fr;gap:10px}.sticky{padding:12px}.modal{align-items:flex-end;padding:0}.sheet{border-radius:18px 18px 0 0;max-width:none;padding-bottom:calc(18px + env(safe-area-inset-bottom,0px))}.stats{grid-template-columns:1fr 1fr}.tab .n{display:none}}
 
 @media (max-width:760px){
   .week{grid-template-columns:1fr}
@@ -260,7 +280,8 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
       <button class="tab" role="tab" id="tab1"><span class="n">1</span>Матрица</button>
       <button class="tab" role="tab" id="tab2"><span class="n">2</span>Тип</button>
       <button class="tab" role="tab" id="tab3"><span class="n">3</span>Расписание</button>
-      <button class="tab" role="tab" id="tab4"><span class="n">4</span>Архив</button>
+      <button class="tab" role="tab" id="tab5"><span class="n">4</span>Идеи</button>
+      <button class="tab" role="tab" id="tab4"><span class="n">5</span>Архив</button>
     </div>
   </header>
 
@@ -315,6 +336,17 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
     </div>
   </section>
 
+  <!-- 5. Ideas -->
+  <section id="view5" hidden>
+    <div class="ideabar">
+      <button class="primary" id="newIdea" type="button">+ Новая идея</button>
+      <div class="seg" id="ideaFilter">
+        <button data-v="open">В работе</button><button data-v="used">Использованные</button><button data-v="all">Все</button>
+      </div>
+    </div>
+    <div class="board" id="board"></div>
+  </section>
+
   <!-- 4. Archive -->
   <section id="view4" hidden>
     <div class="stats" id="aStats"></div>
@@ -334,6 +366,21 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
     <input type="file" id="impFile" accept=".json,application/json" hidden>
     <input type="file" id="icsFile" accept=".ics,text/calendar" hidden>
   </details>
+</div>
+
+<div class="modal" id="ideaModal" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="iTitle">
+    <div class="qtop"><span class="qtask" id="iKind"></span><button class="qx" id="iClose" type="button" aria-label="Закрыть">×</button></div>
+    <h2 id="iTitle">Идея</h2>
+    <input class="ti" id="iName" placeholder="Заголовок" autocomplete="off">
+    <textarea id="iDesc" placeholder="Описание: в чём суть, зачем, с чего начать"></textarea>
+    <div class="colors" id="iColors"></div>
+    <div class="qfoot">
+      <button class="ghost" id="iDel" type="button">Удалить</button>
+      <button class="ghost" id="iUsed" type="button">В работу</button>
+      <button class="primary" id="iSave" type="button">Сохранить</button>
+    </div>
+  </div>
 </div>
 
 <div class="modal" id="quiz" hidden>
@@ -375,10 +422,11 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
   const fmtEst=m=>m>720?'12+ ч':fmtMin(m);
   const fmtMin=m=>m<60?m+' мин':(Math.round(m/6)/10+' ч').replace('.',',');
 
-  let S={tasks:[],events:[],tab:1,view:'week',cur:TODAY(),invCollapsed:false,showDone:true};
+  let S={tasks:[],events:[],ideas:[],ideaFilter:'open',tab:1,view:'week',cur:TODAY(),invCollapsed:false,showDone:true};
   let sel=null;
   try{const raw=localStorage.getItem(KEY); if(raw){const d=JSON.parse(raw); if(d&&Array.isArray(d.tasks)) S=Object.assign(S,d);}}catch(e){}
   if(!Array.isArray(S.events)) S.events=[];
+  if(!Array.isArray(S.ideas)) S.ideas=[];
   S.tab=1; // при открытии всегда начинаем с матрицы
   function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){status('Не удалось сохранить: хранилище браузера переполнено или отключено.');}}
   const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
@@ -429,15 +477,16 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
   /* ---------- render ---------- */
   function render(){
     const v=S.tab;
-    [1,2,3,4].forEach(i=>{$('#view'+i).hidden=v!==i; $('#tab'+i).setAttribute('aria-selected',v===i);});
+    [1,2,3,4,5].forEach(i=>{$('#view'+i).hidden=v!==i; $('#tab'+i).setAttribute('aria-selected',v===i);});
     document.body.classList.toggle('picking',!!sel);
     if(v===1) renderMatrix();
     if(v===2) renderKinds();
     if(v===3) renderSchedule();
     if(v===4) renderArchive();
+    if(v===5) renderIdeas();
     renderBar();
     renderInv();
-    document.querySelector('.bar').hidden=(S.tab===4&&!sel);
+    document.querySelector('.bar').hidden=((S.tab===4||S.tab===5)&&!sel);
   }
 
   // Матрица — рабочий стол на сегодня: только несделанные задачи без даты или с датой не позже сегодня
@@ -648,7 +697,7 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
     3:{sub:'без даты',      test:t=>!t.date&&!t.done, clear:t=>setDate(t,null), mode:'sched', hint:'Нажмите на задачу, затем на день'}
   };
   function renderInv(){
-    $('#inv').hidden=S.tab===4; if(S.tab===4) return;
+    $('#inv').hidden=S.tab>=4; if(S.tab>=4) return;
     const cfg=INV[S.tab], items=sorted(live().filter(cfg.test));
     $('#inv').classList.toggle('collapsed',!!S.invCollapsed);
     $('#invTog').textContent=S.invCollapsed?'Развернуть':'Свернуть';
@@ -750,6 +799,63 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
   $('#qClose').onclick=closeQuiz;
   $('#quiz').addEventListener('click',e=>{ if(e.target.id==='quiz') closeQuiz(); });
 
+  /* ---------- ideas board ---------- */
+  const SC=['#FFE88A','#BFE6A6','#AFD8F2','#F6B9C8','#E2CDF6','#FFD2A6'];
+  let I=null; // редактируемая идея
+  function openIdea(idea,preset){
+    I=idea||{id:uid(),name:preset||'',desc:'',color:SC[S.ideas.length%SC.length],at:TODAY(),used:false,pin:false,isNew:true};
+    $('#iTitle').textContent=idea?'Идея':'Новая идея';
+    $('#iKind').textContent=idea?('добавлена '+dateLabel(idea.at)):'';
+    $('#iName').value=I.name; $('#iDesc').value=I.desc;
+    $('#iDel').hidden=!idea; $('#iUsed').hidden=!idea;
+    $('#iUsed').textContent=I.used?'Вернуть на доску':'В работу';
+    const c=$('#iColors'); c.innerHTML='';
+    SC.forEach(col=>{const b=el('button',I.color===col?'on':''); b.type='button'; b.style.setProperty('--c',col); b.setAttribute('aria-label','Цвет стикера');
+      b.onclick=()=>{I.color=col; openColors();}; c.append(b);});
+    $('#ideaModal').hidden=false; setTimeout(()=>$('#iName').focus(),30);
+  }
+  function openColors(){ $('#iColors').querySelectorAll('button').forEach((b,i)=>b.classList.toggle('on',SC[i]===I.color)); }
+  function closeIdea(){ I=null; $('#ideaModal').hidden=true; }
+  function saveIdea(){
+    if(!I) return;
+    I.name=$('#iName').value.trim(); I.desc=$('#iDesc').value.trim();
+    if(!I.name&&!I.desc){ closeIdea(); render(); return; }
+    if(!I.name) I.name=I.desc.split('\n')[0].slice(0,60);
+    if(I.isNew){ delete I.isNew; S.ideas.unshift(I); }
+    closeIdea(); save(); render();
+  }
+  $('#iClose').onclick=()=>{saveIdea();};
+  $('#iSave').onclick=saveIdea;
+  $('#iDel').onclick=()=>{ if(confirm('Удалить идею?')){ S.ideas=S.ideas.filter(x=>x.id!==I.id); closeIdea(); save(); render(); } };
+  $('#iUsed').onclick=()=>{ I.used=!I.used; saveIdea(); };
+  $('#ideaModal').addEventListener('click',e=>{ if(e.target.id==='ideaModal') saveIdea(); });
+  $('#newIdea').onclick=()=>openIdea(null);
+  document.querySelectorAll('#ideaFilter button').forEach(b=>b.onclick=()=>{S.ideaFilter=b.dataset.v; save(); render();});
+
+  function renderIdeas(){
+    document.querySelectorAll('#ideaFilter button').forEach(b=>b.setAttribute('aria-selected',b.dataset.v===S.ideaFilter));
+    const f=S.ideaFilter;
+    const list=S.ideas.filter(i=>f==='all'||(f==='used'?i.used:!i.used))
+      .sort((a,b)=>((b.pin?1:0)-(a.pin?1:0))||b.at.localeCompare(a.at));
+    const board=$('#board'); board.innerHTML='';
+    if(!list.length){
+      const e=el('div','ideas-empty',f==='used'?'Использованных идей пока нет.':'Пока пусто. Нажмите «+ Новая идея» — заголовок, описание, и стикер появится на доске.');
+      board.append(e); return;
+    }
+    list.forEach((i,n)=>{
+      const c=el('button','sticky'+(i.used?' used':'')+(i.pin?' pinned':'')); c.type='button';
+      c.style.setProperty('--sc',i.color||SC[0]);
+      c.style.setProperty('--rot',((i.id.charCodeAt(0)+n)%3-1)*0.7+'deg');
+      const pin=el('span','spin','📌'); pin.title=i.pin?'Открепить':'Закрепить';
+      pin.onclick=e=>{e.stopPropagation(); i.pin=!i.pin; save(); render();};
+      c.append(pin, el('div','st',i.name));
+      if(i.desc) c.append(el('div','sd',i.desc));
+      c.append(el('div','sdate',(i.used?'в работе · ':'')+dateLabel(i.at)));
+      c.onclick=()=>openIdea(i);
+      board.append(c);
+    });
+  }
+
   /* ---------- archive ---------- */
   function renderArchive(){
     const all=S.tasks.filter(t=>t.arch).sort((a,b)=>b.arch.at.localeCompare(a.arch.at));
@@ -790,7 +896,7 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
     });
   }
 
-  function go(n){S.tab=n; sel=null; save(); render(); window.scrollTo({top:0});}
+  function go(n){S.tab=n; $('#addInput').placeholder=n===5?'Новая идея':'Новая задача'; sel=null; save(); render(); window.scrollTo({top:0});}
 
   /* ---------- static targets ---------- */
   document.querySelectorAll('[data-target]').forEach(node=>{
@@ -806,6 +912,7 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
 
   function addTop(){
     const i=$('#addInput'), v=i.value.trim(); if(!v){i.focus(); return;}
+    if(S.tab===5){ openIdea(null,v); i.value=''; return; }
     S.tasks.push(newTask(v)); i.value=''; save(); render(); i.focus();
   }
   $('#addBtn').addEventListener('click',addTop);
@@ -816,6 +923,7 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
   $('#tab2').onclick=()=>go(2);
   $('#tab3').onclick=()=>go(3);
   $('#tab4').onclick=()=>go(4);
+  $('#tab5').onclick=()=>go(5);
   document.querySelectorAll('#scale button').forEach(b=>b.onclick=()=>{S.view=b.dataset.v; save(); render();});
   function shift(k){
     if(S.view==='day') S.cur=addDays(S.cur,k);
@@ -828,6 +936,7 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
   $('#todayBtn').onclick=()=>{S.cur=TODAY(); save(); render();};
   document.addEventListener('keydown',e=>{
     if(e.key==='Escape'&&Z){closeQuiz(); return;}
+    if(e.key==='Escape'&&I){saveIdea(); return;}
     if(e.key==='Escape'&&sel){sel=null; render(); return;}
     if(S.tab===3&&!sel&&!/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)){
       if(e.key==='ArrowLeft') shift(-1);
