@@ -216,8 +216,25 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
 .rsaved{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline;width:100%;text-align:left;border:1px solid var(--line);background:var(--bg);border-radius:12px;padding:10px 13px}
 .rsaved b{font:700 15px/1.2 var(--display)}
 .rsaved .rhow{flex-basis:100%;font-size:13px;color:var(--muted);white-space:pre-wrap}
+.rsaved .rhow2{font-size:12px;color:var(--muted)}
 .rsaved .redit{margin-left:auto;font-size:12px;color:var(--muted)}
 .wday .proc{font-size:11px;color:var(--muted);border-top:1px dashed var(--line);padding-top:4px;margin-top:2px}
+
+/* leak journal */
+.jrn{margin-top:22px;border-top:1px solid var(--line);padding-top:14px}
+.jrn h3{margin:0 0 2px;font:700 15px/1.2 var(--display)}
+.jrn .sub{margin:0 0 10px;font-size:12px;color:var(--muted)}
+.jadd{display:flex;gap:8px;margin-bottom:10px}
+.jadd input{flex:1;min-width:0;border:1px solid var(--line);background:var(--paper);border-radius:10px;padding:9px 11px}
+.jadd button{border:1px solid var(--line);background:var(--paper);border-radius:10px;padding:0 14px;font-weight:500}
+.jrow{display:flex;align-items:center;gap:10px;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:9px 12px;margin-bottom:6px}
+.jrow .jn{flex:1;min-width:0;word-break:break-word}
+.jrow .jm{font-size:12px;color:var(--muted);white-space:nowrap}
+.jrow .jx{border:0;background:none;color:var(--muted);font-size:17px;line-height:1;padding:2px 4px}
+.jrow .jx:hover{color:var(--do)}
+.jbar{height:4px;border-radius:2px;background:var(--deleg);opacity:.5;margin-top:5px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chips .opt{padding:9px 12px;border-radius:999px;font-size:14px}
 
 /* archive */
 .stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:6px}
@@ -362,6 +379,15 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
     <div class="stats" id="aStats"></div>
     <p class="stats-note" id="aNote"></p>
     <div id="aList"></div>
+    <div class="jrn">
+      <h3>Журнал прокрастинаций</h3>
+      <p class="sub">Ваши частые утечки времени. Они появятся кнопками в опросе дня, а здесь видно, сколько времени каждая съедает и как часто возвращается.</p>
+      <div class="jadd">
+        <input id="jInput" placeholder="Например: лента в телефоне" autocomplete="off">
+        <button id="jAdd" type="button">Добавить</button>
+      </div>
+      <div id="jList"></div>
+    </div>
   </section>
 
   <details class="data">
@@ -443,12 +469,13 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
   const fmtEst=m=>m>720?'12+ ч':fmtMin(m);
   const fmtMin=m=>m<60?m+' мин':(Math.round(m/6)/10+' ч').replace('.',',');
 
-  let S={tasks:[],events:[],ideas:[],days:{},ideaFilter:'open',tab:1,view:'week',cur:TODAY(),invCollapsed:false,showDone:true};
+  let S={tasks:[],events:[],ideas:[],leaks:[],days:{},ideaFilter:'open',tab:1,view:'week',cur:TODAY(),invCollapsed:false,showDone:true};
   let sel=null;
   try{const raw=localStorage.getItem(KEY); if(raw){const d=JSON.parse(raw); if(d&&Array.isArray(d.tasks)) S=Object.assign(S,d);}}catch(e){}
   if(!Array.isArray(S.events)) S.events=[];
   if(!Array.isArray(S.ideas)) S.ideas=[];
   if(!S.days||typeof S.days!=='object') S.days={};
+  if(!Array.isArray(S.leaks)) S.leaks=[];
   S.tab=1; // при открытии всегда начинаем с матрицы
   function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){status('Не удалось сохранить: хранилище браузера переполнено или отключено.');}}
   const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
@@ -916,7 +943,7 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
   let R=null; // {k, step, mins, how}
   function openReview(k){
     const cur=S.days[k]||{};
-    R={k,step:1,mins:cur.proc!=null?cur.proc:null,how:cur.how||''};
+    R={k,step:1,mins:cur.proc!=null?cur.proc:null,how:cur.how||'',leaks:(cur.leaks||[]).slice()};
     $('#rDay').textContent=dateLabel(k);
     $('#revModal').hidden=false; showReview();
   }
@@ -934,9 +961,22 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
       foot.append(btn('Дальше','primary',step1));
     } else {
       $('#rTitle').textContent='Как прокрастинировал?';
-      $('#rHint').textContent=R.mins?('Отмечено '+fmtMin(R.mins)+'. На что ушло время и что этому предшествовало.'):'Можно записать, что помогло не отвлекаться.';
-      const ta=el('textarea'); ta.id='rHow'; ta.placeholder='Например: залип в ленте после обеда, пока ждал правки от клиента'; ta.value=R.how;
-      body.append(ta); setTimeout(()=>ta.focus(),30);
+      $('#rHint').textContent=R.mins?('Отмечено '+fmtMin(R.mins)+'. Отметьте, на что ушло время.'):'Можно записать, что помогло не отвлекаться.';
+      const chips=el('div','chips');
+      S.leaks.forEach(L=>{
+        const on=R.leaks.includes(L.id);
+        chips.append(opt(L.name,()=>{ R.how=$('#rHow').value; R.leaks=on?R.leaks.filter(x=>x!==L.id):R.leaks.concat(L.id); showReview(); },on));
+      });
+      if(S.leaks.length) body.append(chips);
+      const add=el('div','jadd');
+      const ni=el('input'); ni.placeholder=S.leaks.length?'Свой вариант':'На что ушло время? Например: лента в телефоне'; ni.autocomplete='off';
+      const nb=el('button',null,'Добавить'); nb.type='button';
+      const addLeak=()=>{ const v=ni.value.trim(); if(!v) return; R.how=$('#rHow').value; const L=addLeakTo(v); if(!R.leaks.includes(L.id)) R.leaks.push(L.id); ni.value=''; save(); showReview(); };
+      nb.onclick=addLeak; ni.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault(); addLeak();}});
+      add.append(ni,nb); body.append(add);
+      const ta=el('textarea'); ta.id='rHow'; ta.placeholder='Комментарий: что этому предшествовало'; ta.value=R.how;
+      body.append(ta);
+      if(!S.leaks.length) setTimeout(()=>ni.focus(),30);
       foot.append(btn('Назад','ghost',()=>{R.how=$('#rHow').value; R.step=1; showReview();}));
       foot.append(btn('Сохранить','primary',()=>{R.how=$('#rHow').value.trim(); saveReview();}));
     }
@@ -949,8 +989,8 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
   }
   function saveReview(){
     const d=S.days[R.k]||{};
-    d.proc=R.mins; d.how=R.how;
-    if(!d.proc&&!d.how) delete S.days[R.k]; else S.days[R.k]=d;
+    d.proc=R.mins; d.how=R.how; d.leaks=R.leaks.slice();
+    if(!d.proc&&!d.how&&!d.leaks.length) delete S.days[R.k]; else S.days[R.k]=d;
     closeReview(); save(); render();
   }
   $('#rClose').onclick=closeReview;
@@ -964,14 +1004,54 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
       box.append(b); return box;
     }
     const r=el('button','rsaved'); r.type='button';
-    r.append(el('b',null,'Прокрастинация: '+(d.proc?fmtMin(d.proc):'не было')), el('span','redit','изменить'));
+    r.append(el('b',null,'Прокрастинация: '+(d.proc?fmtMin(d.proc):'не было')));
+    const names=(d.leaks||[]).map(leakName).filter(Boolean);
+    if(names.length) r.append(el('span','rhow2',names.join(' · ')));
+    r.append(el('span','redit','изменить'));
     if(d.how) r.append(el('span','rhow',d.how));
     r.onclick=e=>{e.stopPropagation(); openReview(k);};
     box.append(r); return box;
   }
 
+  function addLeakTo(name){
+    const ex=S.leaks.find(L=>L.name.toLowerCase()===name.toLowerCase());
+    if(ex) return ex;
+    const L={id:uid(),name}; S.leaks.push(L); return L;
+  }
+  const leakName=id=>{const L=S.leaks.find(x=>x.id===id); return L?L.name:null;};
+  // минуты дня делятся поровну между отмеченными утечками
+  function leakStats(){
+    const m={};
+    Object.keys(S.days).forEach(k=>{
+      const d=S.days[k], ids=(d.leaks||[]).filter(leakName);
+      if(!ids.length) return;
+      const per=(d.proc||0)/ids.length;
+      ids.forEach(id=>{ const x=m[id]||(m[id]={days:0,mins:0,last:''}); x.days++; x.mins+=per; if(k>x.last) x.last=k; });
+    });
+    return m;
+  }
+  function renderJournal(){
+    const st=leakStats(), list=$('#jList'); list.innerHTML='';
+    if(!S.leaks.length){ empty(list,'Пока пусто. Добавьте свои частые отвлечения — или впишите их прямо в опросе дня.'); return; }
+    const max=Math.max(1,...S.leaks.map(L=>(st[L.id]||{}).mins||0));
+    S.leaks.slice().sort((a,b)=>(((st[b.id]||{}).mins||0)-((st[a.id]||{}).mins||0))).forEach(L=>{
+      const x=st[L.id]||{days:0,mins:0,last:''};
+      const row=el('div','jrow'), box=el('div','jn');
+      box.append(el('div',null,L.name));
+      const bar=el('div','jbar'); bar.style.width=Math.round(((x.mins||0)/max)*100)+'%'; if(x.mins) box.append(bar);
+      row.append(box);
+      row.append(el('span','jm',x.days?(x.days+' дн. · '+fmtMin(Math.round(x.mins))+(x.last?' · был '+dateLabel(x.last):'')):'ещё не отмечалась'));
+      const del=el('button','jx','×'); del.type='button'; del.title='Убрать из журнала';
+      del.onclick=()=>{ if(confirm('Убрать «'+L.name+'» из журнала? Отметки в днях останутся, но перестанут учитываться.')){ S.leaks=S.leaks.filter(y=>y.id!==L.id); save(); render(); } };
+      row.append(del); list.append(row);
+    });
+  }
+  $('#jAdd').onclick=()=>{ const i=$('#jInput'), v=i.value.trim(); if(!v){i.focus(); return;} addLeakTo(v); i.value=''; save(); render(); i.focus(); };
+  $('#jInput').addEventListener('keydown',e=>{ if(e.key==='Enter'){e.preventDefault(); $('#jAdd').click();} });
+
   /* ---------- archive ---------- */
   function renderArchive(){
+    renderJournal();
     const all=S.tasks.filter(t=>t.arch).sort((a,b)=>b.arch.at.localeCompare(a.arch.at));
     const from=addDays(TODAY(),-29), recent=all.filter(t=>t.arch.at>=from);
     const done=recent.filter(t=>t.arch.done);
