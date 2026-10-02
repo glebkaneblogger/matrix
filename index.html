@@ -209,6 +209,22 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
 .colors button{width:30px;height:30px;border-radius:50%;border:2px solid transparent;background:var(--c)}
 .colors button.on{border-color:var(--ink);transform:scale(1.1)}
 
+/* timer */
+.timer-bar{display:flex;align-items:center;gap:10px;padding-bottom:10px;margin-bottom:2px;border-bottom:1px solid var(--line);flex-basis:100%}
+.timer-bar .tdisp{font:700 22px/1 var(--display);letter-spacing:.02em;min-width:90px}
+.timer-bar .tdisp.on{color:var(--do)}
+.timer-bar .tdisp.pause{color:var(--deleg)}
+.timer-bar .tsub{font-size:12px;color:var(--muted)}
+.tbtn{border:0;border-radius:10px;padding:8px 14px;font-weight:600;font-size:14px}
+.tbtn.play{background:var(--ops);color:#fff}
+.tbtn.stop{background:var(--do);color:#fff}
+.tbtn.brk{background:var(--deleg);color:#fff}
+.tbtn.resume{background:var(--ops);color:#fff}
+.chip .trun{display:flex;align-items:center;gap:5px;font:700 12px/1 var(--display);color:var(--do);animation:pulse 1.5s ease infinite;flex:none}
+.chip .trun.paused{color:var(--deleg);animation:none}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.tracked{font-size:11px;color:var(--muted);flex:none;margin-left:auto}
+
 /* day review */
 .review{margin-top:16px;border-top:1px solid var(--line);padding-top:12px}
 .review .rbtn{border:1px solid var(--line);background:var(--bg);border-radius:12px;padding:10px 13px;text-align:left;width:100%;font-weight:500}
@@ -471,13 +487,16 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
 
   let S={tasks:[],events:[],ideas:[],leaks:[],days:{},ideaFilter:'open',tab:1,view:'week',cur:TODAY(),invCollapsed:false,showDone:true};
   let sel=null;
+  let TM={id:null, acc:0, start:null, paused:false}; // active timer
   try{const raw=localStorage.getItem(KEY); if(raw){const d=JSON.parse(raw); if(d&&Array.isArray(d.tasks)) S=Object.assign(S,d);}}catch(e){}
   if(!Array.isArray(S.events)) S.events=[];
   if(!Array.isArray(S.ideas)) S.ideas=[];
   if(!S.days||typeof S.days!=='object') S.days={};
   if(!Array.isArray(S.leaks)) S.leaks=[];
+  if(S._timer&&S._timer.id){ TM=S._timer; if(TM.start) TM.start=TM.start; } // resume timer across reloads
   S.tab=1; // при открытии всегда начинаем с матрицы
-  function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){status('Не удалось сохранить: хранилище браузера переполнено или отключено.');}}
+  function saveTimer(){ S._timer={id:TM.id,acc:TM.acc,start:TM.start,paused:TM.paused}; }
+  function save(){try{saveTimer(); localStorage.setItem(KEY,JSON.stringify(S));}catch(e){status('Не удалось сохранить: хранилище браузера переполнено или отключено.');}}
   const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
   const $=s=>document.querySelector(s);
   const el=(tag,cls,txt)=>{const e=document.createElement(tag); if(cls)e.className=cls; if(txt!=null)e.textContent=txt; return e;};
@@ -491,6 +510,8 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
     const b=el('button','chip'); b.type='button'; b.draggable=true; b.dataset.id=t.id;
     b.setAttribute('aria-pressed',sel===t.id?'true':'false');
     if(t.done) b.classList.add('done');
+    if(TM.id===t.id){ const tr=el('span','trun'+(TM.paused?' paused':''),'● '+fmtSec(tmElapsed())); b.append(tr); }
+    else if(t.tracked){ b.append(el('span','tracked','⏱ '+fmtMin(t.tracked))); }
     if(mode!=='plain'){
       if(t.kind) b.classList.add('kc-'+t.kind);
       if(t.quad) b.classList.add(Q[t.quad].cls);
@@ -573,7 +594,7 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
   }
 
   // сколько заняла сделанная задача: факт из опроса, иначе заложенное время
-  const spent=t=>(t.arch&&t.arch.actual)||t.est||0;
+  const spent=t=>(t.arch&&t.arch.actual)||t.tracked||t.est||0;
   const EMPTY={t:[],e:[],load:0,fact:0,plan:0};
   function dayData(){
     const m={};
@@ -729,6 +750,25 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
       bar.append(el('span','grow'));
       bar.append(btn('Удалить без следа','ghost danger',hardDelete));
     } else {
+      // timer
+      const tmBox=el('div','timer-bar');
+      const isMe=TM.id===t.id;
+      if(isMe){
+        const disp=el('span','tdisp'+(TM.paused?' pause':' on'),fmtSec(tmElapsed()));
+        const sub=el('span','tsub',TM.paused?'на перерыве':'работаю');
+        tmBox.append(disp,sub);
+        if(TM.paused){
+          tmBox.append(btn('Продолжить','tbtn resume',tmResume));
+        } else {
+          tmBox.append(btn('Перерыв','tbtn brk',tmPause));
+        }
+        tmBox.append(btn('Завершить таймер','tbtn stop',()=>{tmStop(); sel=null; render();}));
+      } else {
+        const prev=t.tracked?('уже отработано '+fmtMin(t.tracked)):'';
+        tmBox.append(el('span','tsub',prev||'таймер не запускался'));
+        tmBox.append(btn('▶ Старт','tbtn play',()=>tmStart(t)));
+      }
+      bar.append(tmBox);
       bar.append(btn('Завершить или убрать…','ghost on',()=>openQuiz(t)));
       bar.append(btn('★ Главное','ghost'+(t.top?' on':''),()=>{t.top=!t.top; save(); render();}));
       const s=el('select'); s.setAttribute('aria-label','Сколько времени займёт');
@@ -758,11 +798,38 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
     if(!items.length) empty(l,'Пусто. Новые задачи будут появляться здесь.');
     items.forEach(t=>l.append(chip(t,cfg.mode)));
   }
+  /* ---------- timer ---------- */
+  function tmElapsed(){ return TM.acc + (TM.start&&!TM.paused ? Math.floor((Date.now()-TM.start)/1000) : 0); }
+  function fmtSec(s){ const h=Math.floor(s/3600),m=Math.floor(s%3600/60),sc=s%60; return (h?h+':'+String(m).padStart(2,'0'):m)+':'+String(sc).padStart(2,'0'); }
+  function tmStart(t){
+    if(TM.id&&TM.id!==t.id) tmStop(); // stop previous
+    TM.id=t.id; TM.paused=false; TM.start=Date.now(); save(); render(); startTick();
+  }
+  function tmPause(){ TM.acc=tmElapsed(); TM.start=Date.now(); TM.paused=true; save(); render(); }
+  function tmResume(){ TM.paused=false; TM.start=Date.now(); save(); render(); startTick(); }
+  function tmStop(){
+    const t=S.tasks.find(x=>x.id===TM.id); if(!t) return tmReset();
+    const secs=tmElapsed(), mins=Math.max(1,Math.ceil(secs/60));
+    t.tracked=(t.tracked||0)+mins;
+    tmReset(); save(); render();
+  }
+  function tmReset(){ TM={id:null,acc:0,start:null,paused:false}; save(); stopTick(); }
+  let tickId=null;
+  function startTick(){ if(tickId) return; tickId=setInterval(()=>{
+    if(!TM.id||TM.paused){stopTick();return;}
+    const d=document.querySelector('.tdisp'); if(d) d.textContent=fmtSec(tmElapsed());
+    document.querySelectorAll('.chip[data-id="'+TM.id+'"] .trun').forEach(r=>r.textContent='● '+fmtSec(tmElapsed()));
+  },1000); }
+  function stopTick(){ if(tickId){clearInterval(tickId); tickId=null;} }
+  if(TM.id&&TM.start&&!TM.paused) startTick();
+
   /* ---------- completion quiz ---------- */
   const REASONS=['Потеряло актуальность','Не хватило времени','Передал другому','Жду других / заблокировано','Передумал','Другое'];
   const dateLabel=k=>{const d=P(k); if(k===TODAY()) return 'сегодня'; if(k===addDays(TODAY(),-1)) return 'вчера'; return WD_FULL[d.getDay()]+', '+d.getDate()+' '+MON_G[d.getMonth()];};
   let Z=null; // {t, a:{}, path:[]}
-  function openQuiz(t){ Z={t,a:{},path:['did']}; $('#qTask').textContent=t.text; $('#quiz').hidden=false; showStep(); }
+  function openQuiz(t){
+    if(TM.id===t.id) tmStop(); // stop timer if running
+    Z={t,a:{},path:['did']}; $('#qTask').textContent=t.text; $('#quiz').hidden=false; showStep(); }
   function closeQuiz(){ Z=null; $('#quiz').hidden=true; }
   function nextAfter(step){
     const t=Z.t, a=Z.a;
@@ -1084,7 +1151,7 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
       if(!a.done) bd.append(el('span',null,'не сделано'));
       if(a.onTime===true) bd.append(el('span','good','в срок'));
       if(a.onTime===false) bd.append(el('span','bad','позже срока'));
-      if(a.done&&a.planned&&a.actual) bd.append(el('span',a.actual>a.planned?'bad':'good','план '+fmtEst(a.planned)+' → факт '+fmtEst(a.actual)));
+      if(a.done&&a.planned&&a.actual) bd.append(el('span',a.actual>a.planned?'bad':'good','план '+fmtEst(a.planned)+' → факт '+fmtEst(a.actual)+(t.tracked?' · таймер '+fmtMin(t.tracked):'')));
       else if(a.done&&a.actual) bd.append(el('span',null,'заняло '+fmtEst(a.actual)));
       if(a.moved) bd.append(el('span','bad','перенос ×'+(a.moveCount>=5?'5+':a.moveCount)+' · '+(a.moveDays>7?'больше 7 дн.':'+'+a.moveDays+' дн.')));
       if(a.split) bd.append(el('span',null,'делил на '+(a.splitCount>5?'6+':a.splitCount)+' ч.'));
