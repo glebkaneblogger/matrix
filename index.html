@@ -209,6 +209,21 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
 .colors button{width:30px;height:30px;border-radius:50%;border:2px solid transparent;background:var(--c)}
 .colors button.on{border-color:var(--ink);transform:scale(1.1)}
 
+/* day focus (разбор дня) */
+.focusbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;background:var(--ink);color:var(--bg);border-radius:12px;padding:8px 10px;margin-bottom:12px}
+.focusbar .fl{font-size:12px;opacity:.7}
+.focusbar b{font:700 14px/1.2 var(--display)}
+.focusbar b::first-letter{text-transform:uppercase}
+.focusbar .fs{font-size:12px;opacity:.8}
+.focusbar .grow{flex:1}
+.focusbar button{border:1px solid color-mix(in srgb,var(--bg) 35%,transparent);background:transparent;color:var(--bg);border-radius:9px;padding:6px 10px;font-size:13px}
+.focusbar button.nx{background:var(--bg);color:var(--ink);border-color:var(--bg);font-weight:600}
+.focusbar .arr{width:32px;padding:6px 0;font-size:16px}
+.classify{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 12px}
+.classify .cs{font-size:12px;color:var(--muted)}
+.mstart{border:1px dashed var(--line);background:none;border-radius:10px;padding:8px 12px;font-size:13px;color:var(--muted);margin-top:10px}
+.mstart:hover{color:var(--ink);border-color:var(--ink)}
+
 /* timer */
 .timer-bar{display:flex;align-items:center;gap:10px;padding-bottom:10px;margin-bottom:2px;border-bottom:1px solid var(--line);flex-basis:100%}
 .timer-bar .tdisp{font:700 22px/1 var(--display);letter-spacing:.02em;min-width:90px}
@@ -332,6 +347,8 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
     <input id="addInput" placeholder="Новая задача" autocomplete="off" enterkeyhint="done">
     <button type="button" id="addBtn">Добавить</button>
   </div>
+
+  <div id="focusBar" hidden></div>
 
   <!-- 1. Matrix -->
   <section id="view1">
@@ -494,7 +511,7 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
   if(!S.days||typeof S.days!=='object') S.days={};
   if(!Array.isArray(S.leaks)) S.leaks=[];
   if(S._timer&&S._timer.id){ TM=S._timer; if(TM.start) TM.start=TM.start; } // resume timer across reloads
-  S.tab=1; // при открытии всегда начинаем с матрицы
+  S.tab=1; S.focus=null; // при открытии всегда начинаем с матрицы на сегодня
   function saveTimer(){ S._timer={id:TM.id,acc:TM.acc,start:TM.start,paused:TM.paused}; }
   function save(){try{saveTimer(); localStorage.setItem(KEY,JSON.stringify(S));}catch(e){status('Не удалось сохранить: хранилище браузера переполнено или отключено.');}}
   const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
@@ -553,6 +570,7 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
     if(v===2) renderKinds();
     if(v===3) renderSchedule();
     if(v===4) renderArchive();
+    renderFocusBar();
     if(v===5) renderIdeas();
     renderBar();
     renderInv();
@@ -561,36 +579,52 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
 
   // Матрица — рабочий стол на сегодня: только несделанные задачи без даты или с датой не позже сегодня
   const live=()=>S.tasks.filter(t=>!(t.arch&&!t.arch.done));
-  const inMatrix=t=>!t.done&&(!t.date||t.date<=TODAY());
+  const inMatrixToday=t=>!t.done&&(!t.date||t.date<=TODAY());
+  // Разбор дня: если выбран день, матрица и «Тип» показывают все задачи этого дня, включая сделанные
+  const dayOf=t=>t.date||(t.arch&&t.arch.at)||null;
+  const inFocus=t=>dayOf(t)===S.focus;
+  const inMatrix=t=>S.focus?inFocus(t):inMatrixToday(t);
   function renderMatrix(){
-    const fill=(q,list)=>{list.innerHTML=''; live().filter(t=>t.quad===q&&inMatrix(t)).forEach(t=>list.append(chip(t,'plain')));};
+    const pool=()=>S.focus?S.tasks:live();
+    const fill=(q,list)=>{list.innerHTML=''; sorted(pool().filter(t=>t.quad===q&&inMatrix(t))).forEach(t=>list.append(chip(t,'plain')));};
     document.querySelectorAll('#view1 .cell').forEach(c=>{
       const q=c.dataset.target, list=c.querySelector('.list');
       fill(q,list);
       let p=c.querySelector('.plus,.inline');
       if(!p){p=el('button','plus','+ Добавить');p.type='button';c.append(p);}
-      if(p.classList.contains('plus')) p.onclick=e=>{e.stopPropagation(); inlineAdd(p,{quad:q},()=>fill(q,list));};
+      if(p.classList.contains('plus')) p.onclick=e=>{e.stopPropagation(); inlineAdd(p,S.focus?{quad:q,date:S.focus}:{quad:q},()=>fill(q,list));};
     });
+    if(S.focus){ $('#mNote').textContent='Показаны все задачи выбранного дня, включая выполненные. Разложите их по клеткам — это сохранится в задачах и архиве.'; return; }
     const doneN=live().filter(t=>t.done).length, futN=live().filter(t=>!t.done&&t.date&&t.date>TODAY()).length;
     const parts=[]; if(doneN) parts.push('выполненные: '+doneN); if(futN) parts.push('запланированные на другие дни: '+futN);
     $('#mNote').textContent='Здесь только задачи на сегодня.'+(parts.length?' Скрыты '+parts.join(', ')+' — они в «Архиве» и «Расписании».':'');
+    // кнопка входа в разбор прошлых дней
+    const n=$('#mNote'); const un=nextUnsorted(TODAY(),'quad',true);
+    if(un){ const b=el('button','mstart','Разобрать прошлые дни по матрице →'); b.type='button'; b.onclick=()=>startFocus(un); n.append(el('br'),b); }
   }
 
   function renderKinds(){
     document.querySelectorAll('#view2 .col').forEach(c=>{
       const k=c.dataset.target, list=c.querySelector('.list'); list.innerHTML='';
-      const mine=live().filter(t=>t.kind===k), open=sorted(mine.filter(t=>!t.done)), done=mine.filter(t=>t.done);
+      const mine=(S.focus?S.tasks.filter(inFocus):live()).filter(t=>t.kind===k), open=sorted(mine.filter(t=>!t.done)), done=sorted(mine.filter(t=>t.done));
       if(!open.length) empty(list,done.length?'Всё сделано.':'Пока пусто.');
       open.forEach(t=>list.append(chip(t,'kind')));
       if(done.length){
         const h=el('button','donehead',(S.showDone?'▾ ':'▸ ')+'Сделано · '+done.length); h.type='button';
         h.onclick=e=>{e.stopPropagation(); S.showDone=!S.showDone; save(); render();};
         list.append(h);
-        if(S.showDone) done.forEach(t=>list.append(chip(t,'kind')));
+        if(S.showDone||S.focus) done.forEach(t=>list.append(chip(t,'kind')));
       }
     });
-    $('#cConcept').textContent=live().filter(t=>t.kind==='concept'&&!t.done).length||'';
-    $('#cOps').textContent=live().filter(t=>t.kind==='ops'&&!t.done).length||'';
+    const cnt=k=>S.focus?S.tasks.filter(t=>inFocus(t)&&t.kind===k).length:live().filter(t=>t.kind===k&&!t.done).length;
+    $('#cConcept').textContent=cnt('concept')||'';
+    $('#cOps').textContent=cnt('ops')||'';
+    const kn=$('#view2 .note');
+    if(kn){
+      kn.textContent=S.focus?'Показаны все задачи выбранного дня, включая выполненные.':'Внутри столбцов задачи идут в порядке матрицы: от «важно и срочно» до «не срочно и не важно».';
+      const un=!S.focus&&nextUnsorted(TODAY(),'kind',true);
+      if(un){ const b=el('button','mstart','Разобрать прошлые дни по типам →'); b.type='button'; b.onclick=()=>startFocus(un); kn.append(el('br'),b); }
+    }
   }
 
   // сколько заняла сделанная задача: факт из опроса, иначе заложенное время
@@ -671,6 +705,14 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
     const k=S.cur, d=P(k), b=D(k);
     $('#sTitle').textContent=WD_FULL[d.getDay()]+', '+d.getDate()+' '+MON_G[d.getMonth()]+(k===today?' · сегодня':'');
     const v=el('div','dayv');
+    const all=S.tasks.filter(t=>dayOf(t)===k);
+    if(all.length){
+      const cl=el('div','classify');
+      const q=all.filter(t=>t.quad).length, kd=all.filter(t=>t.kind).length;
+      cl.append(btn('Разобрать в матрице','ghost',e=>{e.stopPropagation(); startFocus(k,1);}), btn('Разобрать по типам','ghost',e=>{e.stopPropagation(); startFocus(k,2);}));
+      cl.append(el('span','cs','в матрице '+q+' из '+all.length+' · с типом '+kd+' из '+all.length));
+      v.append(cl);
+    }
     // load
     const lb=el('div','loadbar'+(b.load>DAY_LIMIT?' over-l':''));
     const f1=el('i','done'); f1.style.width=Math.min(100,b.fact/DAY_LIMIT*100)+'%';
@@ -785,12 +827,13 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
   /* ---------- inventory: tasks not yet placed on the current tab ---------- */
   const INV={
     1:{sub:'не в матрице',  test:t=>!t.quad&&inMatrix(t),          clear:t=>{t.quad=null;}, mode:'plain', hint:'Нажмите на задачу, затем на клетку'},
-    2:{sub:'без типа',      test:t=>!t.kind&&!t.done,          clear:t=>{t.kind=null;}, mode:'kind',  hint:'Нажмите на задачу, затем на столбец'},
+    2:{sub:'без типа',      test:t=>!t.kind&&(S.focus?inFocus(t):!t.done),          clear:t=>{t.kind=null;}, mode:'kind',  hint:'Нажмите на задачу, затем на столбец'},
     3:{sub:'без даты',      test:t=>!t.date&&!t.done, clear:t=>setDate(t,null), mode:'sched', hint:'Нажмите на задачу, затем на день'}
   };
   function renderInv(){
+    if(S.focus&&(S.tab===1||S.tab===2)){ /* в разборе дня инвентарь показывает задачи этого дня */ }
     $('#inv').hidden=S.tab>=4; if(S.tab>=4) return;
-    const cfg=INV[S.tab], items=sorted(live().filter(cfg.test));
+    const cfg=INV[S.tab], items=sorted((S.focus&&S.tab<=2?S.tasks:live()).filter(cfg.test));
     $('#inv').classList.toggle('collapsed',!!S.invCollapsed);
     $('#invTog').textContent=S.invCollapsed?'Развернуть':'Свернуть';
     $('#invSub').textContent=cfg.sub+(items.length?' · '+items.length:'')+(items.length&&!S.invCollapsed?'. '+cfg.hint:'');
@@ -1157,6 +1200,7 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
       if(a.moved) bd.append(el('span','bad','перенос ×'+(a.moveCount>=5?'5+':a.moveCount)+' · '+(a.moveDays>7?'больше 7 дн.':'+'+a.moveDays+' дн.')));
       if(a.split) bd.append(el('span',null,'делил на '+(a.splitCount>5?'6+':a.splitCount)+' ч.'));
       if(t.kind) bd.append(el('span',null,t.kind==='concept'?'концептуальная':'операционная'));
+      if(t.quad) bd.append(el('span',null,{do:'важно и срочно',plan:'важно, не срочно',deleg:'срочно, не важно',drop:'не важно и не срочно'}[t.quad]));
       if(a.reason||a.note) bd.append(el('span','why',[a.reason,a.note].filter(Boolean).join(' — ')));
       b.append(bd); r.append(b);
       r.onclick=()=>{ sel=(sel===t.id)?null:t.id; render(); };
@@ -1170,7 +1214,34 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
     }
   }
 
-  function go(n){S.tab=n; $('#addInput').placeholder=n===5?'Новая идея':'Новая задача'; sel=null; save(); render(); window.scrollTo({top:0});}
+  /* ---------- разбор дня ---------- */
+  function taskDays(){ return [...new Set(S.tasks.map(dayOf).filter(Boolean))].sort(); }
+  // ближайший день (назад от from, включительно если incl) с задачами без поля field
+  function nextUnsorted(from,field,incl){
+    const days=taskDays().filter(d=>incl?d<=from:d<from).reverse();
+    return days.find(d=>S.tasks.some(t=>dayOf(t)===d&&!t[field]))||null;
+  }
+  function startFocus(day,tab){ S.focus=day; sel=null; if(tab) S.tab=tab; else if(S.tab!==1&&S.tab!==2) S.tab=1; render(); window.scrollTo({top:0}); }
+  function stopFocus(){ S.focus=null; sel=null; render(); }
+  function renderFocusBar(){
+    const fb=$('#focusBar');
+    const on=S.focus&&(S.tab===1||S.tab===2);
+    fb.hidden=!on; if(!on){ fb.innerHTML=''; fb.className=''; return; }
+    fb.className='focusbar'; fb.innerHTML='';
+    const ts=S.tasks.filter(inFocus), field=S.tab===1?'quad':'kind';
+    const doneN=ts.filter(t=>t[field]).length;
+    const days=taskDays(), i=days.indexOf(S.focus);
+    const prev=i>0?days[i-1]:null, next=i>=0&&i<days.length-1?days[i+1]:null;
+    const bp=btn('‹','arr',()=>prev&&startFocus(prev)); bp.disabled=!prev; bp.setAttribute('aria-label','Предыдущий день с задачами');
+    const bn=btn('›','arr',()=>next&&startFocus(next)); bn.disabled=!next; bn.setAttribute('aria-label','Следующий день с задачами');
+    const lab=el('div'); lab.append(el('div','fl','Разбор дня'), el('b',null,dateLabel(S.focus)));
+    fb.append(bp,lab,bn,el('span','fs',(S.tab===1?'в матрице ':'с типом ')+doneN+' из '+ts.length),el('span','grow'));
+    const un=nextUnsorted(S.focus,field,false);
+    if(un) fb.append(btn('Следующий неразобранный','nx',()=>startFocus(un)));
+    fb.append(btn('Сегодня','',()=>stopFocus()));
+  }
+
+  function go(n){if(n>2) S.focus=null; S.tab=n; $('#addInput').placeholder=n===5?'Новая идея':'Новая задача'; sel=null; save(); render(); window.scrollTo({top:0});}
 
   /* ---------- static targets ---------- */
   document.querySelectorAll('[data-target]').forEach(node=>{
@@ -1187,7 +1258,7 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
   function addTop(){
     const i=$('#addInput'), v=i.value.trim(); if(!v){i.focus(); return;}
     if(S.tab===5){ openIdea(null,v); i.value=''; return; }
-    S.tasks.push(newTask(v)); i.value=''; save(); render(); i.focus();
+    S.tasks.push(newTask(v,S.focus&&(S.tab===1||S.tab===2)?{date:S.focus}:undefined)); i.value=''; save(); render(); i.focus();
   }
   $('#addBtn').addEventListener('click',addTop);
   $('#addInput').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault(); addTop();}});
