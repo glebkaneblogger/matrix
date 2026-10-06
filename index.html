@@ -410,7 +410,7 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
     <summary>Данные и календарь</summary>
     <div class="drow">
       <button class="ghost" id="expBtn">Скачать копию задач</button>
-      <button class="ghost" id="impBtn">Загрузить копию</button>
+      <button class="ghost" id="impBtn">Импорт задач (.json)</button>
       <button class="ghost" id="icsBtn">Загрузить календарь (.ics)</button>
       <button class="ghost" id="icsClear">Убрать события календаря</button>
     </div>
@@ -1117,6 +1117,7 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
   $('#jInput').addEventListener('keydown',e=>{ if(e.key==='Enter'){e.preventDefault(); $('#jAdd').click();} });
 
   /* ---------- archive ---------- */
+  let archLimit=150;
   function renderArchive(){
     renderJournal();
     const all=S.tasks.filter(t=>t.arch).sort((a,b)=>b.arch.at.localeCompare(a.arch.at));
@@ -1142,7 +1143,7 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
     const list=$('#aList'); list.innerHTML='';
     if(!all.length){ empty(list,'Архив пуст. Выберите задачу и нажмите «Завершить или убрать…» — после короткого опроса она окажется здесь.'); return; }
     let cur=null, g=null;
-    all.forEach(t=>{
+    all.slice(0,archLimit).forEach(t=>{
       if(t.arch.at!==cur){ cur=t.arch.at; g=el('div','agroup'); g.append(el('h3',null,dateLabel(cur))); list.append(g); }
       const a=t.arch, r=el('button','arow'); r.type='button'; r.dataset.id=t.id; r.setAttribute('aria-pressed',sel===t.id?'true':'false');
       r.append(el('span','ic'+(a.done?'':' no'),a.done?'✓':'✕'));
@@ -1161,6 +1162,12 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
       r.onclick=()=>{ sel=(sel===t.id)?null:t.id; render(); };
       g.append(r);
     });
+    if(all.length>archLimit){
+      const more=el('button','ghost','Показать ещё ('+Math.min(150,all.length-archLimit)+' из '+(all.length-archLimit)+')'); more.type='button';
+      more.style.cssText='width:100%;margin-top:8px';
+      more.onclick=()=>{ archLimit+=150; renderArchive(); };
+      list.append(more);
+    }
   }
 
   function go(n){S.tab=n; $('#addInput').placeholder=n===5?'Новая идея':'Новая задача'; sel=null; save(); render(); window.scrollTo({top:0});}
@@ -1214,10 +1221,10 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
 
   /* ---------- export / import ---------- */
   $('#expBtn').onclick=()=>{
-    const blob=new Blob([JSON.stringify({version:2,exported:new Date().toISOString(),tasks:S.tasks},null,2)],{type:'application/json'});
+    const blob=new Blob([JSON.stringify({version:2,exported:new Date().toISOString(),tasks:S.tasks,ideas:S.ideas,leaks:S.leaks,days:S.days},null,2)],{type:'application/json'});
     const a=el('a'); a.href=URL.createObjectURL(blob); a.download='zadachi-'+TODAY()+'.json';
     document.body.append(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),1000);
-    status('Копия сохранена в файл. Загрузите его на другом устройстве, чтобы перенести задачи.');
+    status('Копия сохранена в файл: задачи, архив, идеи и журнал. Загрузите его на другом устройстве, чтобы перенести всё.');
   };
   $('#impBtn').onclick=()=>$('#impFile').click();
   $('#impFile').addEventListener('change',e=>{
@@ -1226,10 +1233,22 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
     r.onload=()=>{
       try{
         const d=JSON.parse(String(r.result)); if(!d||!Array.isArray(d.tasks)) throw 0;
-        if(S.tasks.length&&!confirm('Заменить текущие задачи ('+S.tasks.length+') задачами из файла ('+d.tasks.length+')?')) return;
-        S.tasks=d.tasks.map(t=>newTask(String(t.text||''),t)); save(); render();
-        status('Загружено задач: '+S.tasks.length+'.');
-      }catch(err){ status('Это не файл копии задач. Нужен .json, скачанный кнопкой «Скачать копию задач».'); }
+        // слияние: добавляем только то, чего ещё нет (по id), текущие данные не трогаем
+        const have=new Set(S.tasks.map(t=>t.id));
+        const fresh=d.tasks.filter(t=>t&&t.id&&!have.has(t.id));
+        const ideasN=Array.isArray(d.ideas)?d.ideas.filter(i=>i&&i.id&&!S.ideas.some(x=>x.id===i.id)):[];
+        const leaksN=Array.isArray(d.leaks)?d.leaks.filter(L=>L&&L.id&&!S.leaks.some(x=>x.id===L.id)):[];
+        const daysN=d.days&&typeof d.days==='object'?Object.keys(d.days).filter(k=>!S.days[k]):[];
+        const total=fresh.length+ideasN.length+leaksN.length+daysN.length;
+        if(!total){ status('В файле нет ничего нового: все задачи из него уже есть.'); e.target.value=''; return; }
+        const parts=[]; if(fresh.length) parts.push('задач: '+fresh.length); if(ideasN.length) parts.push('идей: '+ideasN.length); if(leaksN.length) parts.push('утечек: '+leaksN.length); if(daysN.length) parts.push('итогов дня: '+daysN.length);
+        if(!confirm('Добавить из файла '+parts.join(', ')+'? Текущие данные останутся, повторы пропускаются.')){ e.target.value=''; return; }
+        fresh.forEach(t=>S.tasks.push(newTask(String(t.text||''),t)));
+        ideasN.forEach(i=>S.ideas.push(i)); leaksN.forEach(L=>S.leaks.push(L)); daysN.forEach(k=>S.days[k]=d.days[k]);
+        save(); render();
+        const skipped=d.tasks.length-fresh.length;
+        status('Добавлено: '+parts.join(', ')+'.'+(skipped?' Уже были и пропущены: '+skipped+'.':''));
+      }catch(err){ status('Это не файл копии задач. Нужен .json с задачами — например, скачанный кнопкой «Скачать копию задач».'); }
       e.target.value='';
     };
     r.readAsText(f);
