@@ -1501,7 +1501,7 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
     if(sub) c.append(el('div','gl',sub));
     return c;
   }
-  function renderWeek(){
+  function renderWeekReport(){
     const W=weekStats(WK), a=P(W.mon), b=P(W.sun);
     const ttl=$('#wkTitle'); ttl.innerHTML=''; ttl.append(el('span','wkl','Итоги недели'), (a.getMonth()===b.getMonth()?a.getDate()+'–'+b.getDate()+' '+MON_G[b.getMonth()]:a.getDate()+' '+MON_G[a.getMonth()]+' – '+b.getDate()+' '+MON_G[b.getMonth()])+(WK===monday(TODAY())?' · текущая':''));
     $('#wkNext').disabled=WK>=monday(TODAY());
@@ -1584,12 +1584,12 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
     const s5=el('div','wksec'); const det=el('details'); const sm=el('summary',null,'Все закрытые задачи · '+W.closed.length); sm.style.cssText='cursor:pointer;font:700 14px var(--display)'; det.append(sm);
     const l5=el('div','wklist'); l5.style.marginTop='8px'; W.closed.slice().sort((x,y)=>(closedAt(x)||'').localeCompare(closedAt(y)||'')).forEach(t=>l5.append(item(t,t.kind==='concept'&&t.quad==='do'))); det.append(l5); s5.append(det); body.append(s5);
   }
-  function openWeek(mon){ WK=mon||monday(TODAY()); $('#weekModal').hidden=false; renderWeek(); }
+  function openWeek(mon){ WK=mon||monday(TODAY()); $('#weekModal').hidden=false; renderWeekReport(); }
   function closeWeek(){ $('#weekModal').hidden=true; WK=null; }
   $('#weekBtn').onclick=()=>openWeek();
   $('#wkClose').onclick=closeWeek;
-  $('#wkPrev').onclick=()=>{WK=addDays(WK,-7); renderWeek();};
-  $('#wkNext').onclick=()=>{ if(WK<monday(TODAY())){WK=addDays(WK,7); renderWeek();} };
+  $('#wkPrev').onclick=()=>{WK=addDays(WK,-7); renderWeekReport();};
+  $('#wkNext').onclick=()=>{ if(WK<monday(TODAY())){WK=addDays(WK,7); renderWeekReport();} };
   $('#weekModal').addEventListener('click',e=>{ if(e.target.id==='weekModal') closeWeek(); });
   document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&WK) closeWeek(); });
 
