@@ -209,6 +209,51 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
 .colors button{width:30px;height:30px;border-radius:50%;border:2px solid transparent;background:var(--c)}
 .colors button.on{border-color:var(--ink);transform:scale(1.1)}
 
+/* weekly report */
+.hleft{display:flex;align-items:center;gap:10px}
+.wkbtn{border:1px solid var(--line);background:var(--paper);border-radius:10px;padding:6px 10px;font-size:13px;font-weight:600;white-space:nowrap}
+.wkbtn:hover{border-color:var(--ink)}
+.sheet.wide{max-width:720px}
+.wkhead{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.wkhead h2{flex:1;margin:0;font:700 17px/1.2 var(--display)}
+.wkhead .wkl{display:block;font:500 12px/1.3 var(--body);color:var(--muted)}
+.wkhead .nav{border:1px solid var(--line);background:var(--bg);border-radius:10px;width:34px;height:34px;font-size:16px}
+.wksec{margin-top:18px}
+.wksec h3{margin:0 0 8px;font:700 14px/1.2 var(--display)}
+.wksec .sub{font-size:12px;color:var(--muted);margin:-4px 0 8px}
+.grade{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.gcard{border:1px solid var(--line);border-radius:12px;padding:12px;background:var(--bg)}
+.gcard .gl{font-size:12px;color:var(--muted)}
+.gcard .gv{display:flex;align-items:center;gap:8px;margin-top:4px;font:700 17px/1.2 var(--display)}
+.scale{display:flex;gap:3px;margin-top:8px}
+.scale i{flex:1;height:6px;border-radius:3px;background:var(--line)}
+.lv-good .gv{color:var(--ops)} .lv-good .scale i.on{background:var(--ops)}
+.lv-mid .gv{color:var(--deleg)} .lv-mid .scale i.on{background:var(--deleg)}
+.lv-bad .gv{color:var(--do)} .lv-bad .scale i.on{background:var(--do)}
+.lv-none .gv{color:var(--muted)}
+.crit{display:flex;gap:8px;align-items:baseline;font-size:13px;padding:6px 0;border-bottom:1px solid var(--line)}
+.crit:last-child{border-bottom:0}
+.crit .cd{flex:none;width:10px;height:10px;border-radius:50%;background:var(--line);transform:translateY(1px)}
+.crit .cd.g{background:var(--ops)} .crit .cd.m{background:var(--deleg)} .crit .cd.b{background:var(--do)}
+.crit .ct{flex:1}
+.crit .ct small{display:block;color:var(--muted);font-size:12px}
+.crit .cv{flex:none;font-weight:600;white-space:nowrap}
+.mtx{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.mtx div{border-radius:10px;padding:8px;background:var(--bg);border-top:3px solid var(--c)}
+.mtx b{display:block;font:700 18px/1 var(--display)}
+.mtx span{font-size:11px;color:var(--muted)}
+.wklist{display:flex;flex-direction:column;gap:5px}
+.wkitem{display:flex;gap:8px;align-items:baseline;font-size:14px;padding:7px 10px;border-radius:9px;background:var(--bg)}
+.wkitem .wd{flex:none;font-size:11px;color:var(--muted);width:24px}
+.wkitem .tt{flex:1;word-break:break-word}
+.wkitem .tm{flex:none;font-size:12px;color:var(--muted)}
+.wkitem.key{background:color-mix(in srgb,var(--concept) 12%,var(--bg));border-left:3px solid var(--concept)}
+.wkbars{display:flex;height:10px;border-radius:5px;overflow:hidden;background:var(--line);margin:6px 0 4px}
+.wkbars i{display:block;height:100%}
+.wklegend{display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:var(--muted)}
+.wklegend span::before{content:'';display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--c);margin-right:5px}
+@media (max-width:620px){.grade{grid-template-columns:1fr}.mtx{grid-template-columns:1fr 1fr}.wkbtn{padding:5px 8px;font-size:12px}}
+
 /* day focus (разбор дня) */
 .focusbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;background:var(--ink);color:var(--bg);border-radius:12px;padding:8px 10px;margin-bottom:12px}
 .focusbar .fl{font-size:12px;opacity:.7}
@@ -333,7 +378,7 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
 <body>
 <div class="wrap">
   <header>
-    <h1>Задачи</h1>
+    <div class="hleft"><h1>Задачи</h1><button class="wkbtn" id="weekBtn" type="button">📊 Итоги недели</button></div>
     <div class="seg" role="tablist">
       <button class="tab" role="tab" id="tab1"><span class="n">1</span>Матрица</button>
       <button class="tab" role="tab" id="tab2"><span class="n">2</span>Тип</button>
@@ -435,6 +480,18 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
     <input type="file" id="impFile" accept=".json,application/json" hidden>
     <input type="file" id="icsFile" accept=".ics,text/calendar" hidden>
   </details>
+</div>
+
+<div class="modal" id="weekModal" hidden>
+  <div class="sheet wide" role="dialog" aria-modal="true" aria-labelledby="wkTitle">
+    <div class="wkhead">
+      <button class="nav" id="wkPrev" type="button" aria-label="Предыдущая неделя">‹</button>
+      <h2 id="wkTitle"></h2>
+      <button class="nav" id="wkNext" type="button" aria-label="Следующая неделя">›</button>
+      <button class="qx" id="wkClose" type="button" aria-label="Закрыть">×</button>
+    </div>
+    <div id="wkBody"></div>
+  </div>
 </div>
 
 <div class="modal" id="revModal" hidden>
@@ -1400,7 +1457,152 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
     }
   }
 
+  /* ---------- итоги недели ---------- */
+  let WK=null; // monday of shown week
+  const inRange=(d,a,b)=>d&&d>=a&&d<=b;
+  const closedAt=t=>t.arch?t.arch.at:(t.done?t.date:null);
+  const words=t=>String(t.text||'').trim().split(/\s+/).filter(Boolean).length;
+  function weekStats(mon){
+    const sun=addDays(mon,6);
+    const closed=S.tasks.filter(t=>t.done&&inRange(closedAt(t),mon,sun));
+    const removed=S.tasks.filter(t=>t.arch&&!t.arch.done&&inRange(t.arch.at,mon,sun));
+    const openPlanned=S.tasks.filter(t=>!t.done&&!t.arch&&inRange(t.date,mon,sun));
+    const touched=[...closed,...removed,...openPlanned];
+    const mins=t=>spent(t);
+    const hrs={concept:0,ops:0,none:0};
+    closed.forEach(t=>{hrs[t.kind||'none']+=mins(t);});
+    const q={do:0,plan:0,deleg:0,drop:0,none:0};
+    closed.forEach(t=>{q[t.quad||'none']++;});
+    const onT=closed.filter(t=>t.arch&&t.arch.onTime!=null), inE=closed.filter(t=>t.arch&&t.arch.inEst!=null);
+    const both=closed.filter(t=>t.arch&&t.arch.planned&&t.arch.actual);
+    const ratio=both.length?both.reduce((x,t)=>x+t.arch.actual,0)/both.reduce((x,t)=>x+t.arch.planned,0):null;
+    const moved=touched.filter(t=>(t.arch&&t.arch.moved)||(t.moves||0)>0);
+    const big=touched.filter(t=>(t.est||0)>=240||(t.arch&&(t.arch.actual||0)>=240));
+    const bigSplit=big.filter(t=>t.arch&&t.arch.split);
+    const withEst=touched.filter(t=>(t.est||0)>0||(t.arch&&t.arch.planned>0));
+    const clear=touched.filter(t=>words(t)>=3);
+    const kinded=closed.filter(t=>t.kind);
+    // прокрастинация
+    const pdays=[]; for(let i=0;i<7;i++){const k=addDays(mon,i); const d=S.days[k]; if(d&&d.proc!=null) pdays.push({k,d});}
+    const pmin=pdays.reduce((x,o)=>x+(o.d.proc||0),0);
+    const lk={}; pdays.forEach(o=>{const ids=(o.d.leaks||[]).filter(leakName); ids.forEach(id=>{lk[id]=(lk[id]||0)+(o.d.proc||0)/ids.length;});});
+    const topLeaks=Object.entries(lk).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([id,m])=>leakName(id)+' · '+fmtMin(Math.round(m)));
+    return {mon,sun,closed,removed,openPlanned,touched,hrs,q,onT,inE,ratio,moved,big,bigSplit,withEst,clear,kinded,pdays,pmin,topLeaks};
+  }
+  // уровень по доле: хорошо / средне / слабо
+  const lvl=(x,good,mid)=>x==null?null:(x>=good?2:(x>=mid?1:0));
+  const lvlInv=(x,good,mid)=>x==null?null:(x<=good?2:(x<=mid?1:0));
+  const pct=(a,b)=>b?Math.round(a/b*100)+'%':'—';
+  function gradeCard(label,level,text,sub){
+    const c=el('div','gcard '+(level==null?'lv-none':['lv-bad','lv-mid','lv-good'][level]));
+    c.append(el('div','gl',label));
+    const v=el('div','gv',text); c.append(v);
+    const sc=el('div','scale'); for(let i=0;i<3;i++){const b=el('i'); if(level!=null&&i<=level) b.className='on'; sc.append(b);} c.append(sc);
+    if(sub) c.append(el('div','gl',sub));
+    return c;
+  }
+  function renderWeek(){
+    const W=weekStats(WK), a=P(W.mon), b=P(W.sun);
+    const ttl=$('#wkTitle'); ttl.innerHTML=''; ttl.append(el('span','wkl','Итоги недели'), (a.getMonth()===b.getMonth()?a.getDate()+'–'+b.getDate()+' '+MON_G[b.getMonth()]:a.getDate()+' '+MON_G[a.getMonth()]+' – '+b.getDate()+' '+MON_G[b.getMonth()])+(WK===monday(TODAY())?' · текущая':''));
+    $('#wkNext').disabled=WK>=monday(TODAY());
+    const body=$('#wkBody'); body.innerHTML='';
+    if(!W.touched.length&&!W.pdays.length){ empty(body,'За эту неделю нет закрытых или запланированных задач.'); return; }
+
+    // ключевые цифры
+    const totalH=W.hrs.concept+W.hrs.ops+W.hrs.none;
+    const st=el('div','stats');
+    [[String(W.closed.length),'задач закрыто'],[String(W.removed.length),'убрано без выполнения'],[totalH?fmtMin(totalH):'—','отработано по задачам'],[W.ratio?('×'+(Math.round(W.ratio*10)/10).toString().replace('.',',')):'—','факт к плану по времени']]
+      .forEach(([v,l])=>{const c=el('div','stat'); c.append(el('b',null,v),el('span',null,l)); st.append(c);});
+    body.append(st);
+
+    // оценки
+    const sec1=el('div','wksec'); sec1.append(el('h3',null,'Оценка недели'));
+    const g=el('div','grade');
+    // постановка задач: среднее по критериям
+    const crits=[
+      {name:'Время заложено заранее', v:W.touched.length?W.withEst.length/W.touched.length:null, l:lvl(W.touched.length?W.withEst.length/W.touched.length:null,.7,.4), val:W.withEst.length+' из '+W.touched.length, hint:'Без оценки нельзя понять, перегружен ли день.'},
+      {name:'Точность оценок', v:W.inE.length?W.inE.filter(t=>t.arch.inEst).length/W.inE.length:null, l:lvl(W.inE.length?W.inE.filter(t=>t.arch.inEst).length/W.inE.length:null,.7,.4), val:W.inE.length?pct(W.inE.filter(t=>t.arch.inEst).length,W.inE.length)+' уложились':'нет данных', hint:W.ratio&&W.ratio>1.2?'Задачи занимают в среднем в '+(Math.round(W.ratio*10)/10).toString().replace('.',',')+' раза больше заложенного.':'Сравнение заложенного и фактического времени.'},
+      {name:'Без переносов', v:W.touched.length?W.moved.length/W.touched.length:null, l:lvlInv(W.touched.length?W.moved.length/W.touched.length:null,.15,.35), val:W.moved.length?W.moved.length+' переносились':'не было', hint:'Задачи, которые двигали на более поздние дни.'},
+      {name:'Крупные задачи разбиты', v:W.big.length?W.bigSplit.length/W.big.length:null, l:lvl(W.big.length?W.bigSplit.length/W.big.length:null,.6,.3), val:W.big.length?W.bigSplit.length+' из '+W.big.length:'крупных не было', hint:'Задачи от 4 часов, которые делили на части.'},
+      {name:'Понятные формулировки', v:W.touched.length?W.clear.length/W.touched.length:null, l:lvl(W.touched.length?W.clear.length/W.touched.length:null,.85,.65), val:pct(W.clear.length,W.touched.length), hint:'Задачи из 3 слов и больше: действие + объект.'},
+      {name:'Есть задачи на рост', v:W.kinded.length?W.kinded.filter(t=>t.kind==='concept').length/W.kinded.length:null, l:lvl(W.kinded.length?W.kinded.filter(t=>t.kind==='concept').length/W.kinded.length:null,.25,.1), val:W.kinded.length?pct(W.kinded.filter(t=>t.kind==='concept').length,W.kinded.length)+' концептуальных':'типы не размечены', hint:'Доля концептуальных среди закрытых задач с типом.'}
+    ];
+    const scored=crits.filter(c=>c.l!=null);
+    const avg=scored.length?scored.reduce((x,c)=>x+c.l,0)/scored.length:null;
+    const setLvl=avg==null?null:(avg>=1.5?2:(avg>=0.85?1:0));
+    g.append(gradeCard('Постановка задач',setLvl,setLvl==null?'мало данных':['слабая','средняя','хорошая'][setLvl],scored.length?'по '+scored.length+' критериям ниже':null));
+    // выполнение
+    const plannedAll=W.closed.length+W.removed.length+W.openPlanned.length;
+    const execShare=plannedAll?W.closed.length/plannedAll:null;
+    const execLvl=lvl(execShare,.75,.5);
+    g.append(gradeCard('Выполнение',execLvl,execShare==null?'—':pct(W.closed.length,plannedAll)+' закрыто',W.openPlanned.length?W.openPlanned.length+' запланированных на неделю ещё открыты':'всё запланированное закрыто или убрано'));
+    // в срок
+    const onShare=W.onT.length?W.onT.filter(t=>t.arch.onTime).length/W.onT.length:null;
+    g.append(gradeCard('Сроки',lvl(onShare,.8,.55),onShare==null?'нет данных':pct(W.onT.filter(t=>t.arch.onTime).length,W.onT.length)+' в срок',W.onT.length?'из '+W.onT.length+' задач с датой':null));
+    // прокрастинация: много / средне / мало
+    const pAvg=W.pdays.length?W.pmin/W.pdays.length:null;
+    const pLvl=pAvg==null?null:(pAvg<=30?2:(pAvg<=90?1:0));
+    g.append(gradeCard('Прокрастинация',pLvl,pLvl==null?'не отмечалась':['много','средне','мало'][pLvl],W.pdays.length?fmtMin(W.pmin)+' за '+W.pdays.length+' дн. · в среднем '+fmtMin(Math.round(pAvg))+' в день':'отмечайте итог дня в Расписании → День'));
+    sec1.append(g);
+    if(scored.length){
+      const cl=el('div'); cl.style.marginTop='10px';
+      crits.forEach(c=>{
+        const r=el('div','crit'); r.append(el('span','cd'+(c.l==null?'':' '+['b','m','g'][c.l])));
+        const t=el('span','ct',c.name); t.append(el('small',null,c.hint)); r.append(t, el('span','cv',c.val)); cl.append(r);
+      });
+      sec1.append(cl);
+    }
+    if(W.topLeaks.length) sec1.append(el('div','sub','Главные утечки: '+W.topLeaks.join(', ')));
+    body.append(sec1);
+
+    // главное недели: концептуальные + важные и срочные
+    const key=sorted(W.closed.filter(t=>t.kind==='concept'&&t.quad==='do'));
+    const conc=sorted(W.closed.filter(t=>t.kind==='concept'&&t.quad!=='do'));
+    const item=(t,isKey)=>{const r=el('div','wkitem'+(isKey?' key':'')); const d=closedAt(t); r.append(el('span','wd',d?WD[(P(d).getDay()+6)%7]:''), el('span','tt',t.text)); const m=spent(t); if(m) r.append(el('span','tm',fmtMin(m))); return r;};
+    const s2=el('div','wksec'); s2.append(el('h3',null,'Самое важное: концептуальные, важные и срочные'));
+    const l2=el('div','wklist'); if(!key.length) empty(l2,'Таких задач на этой неделе не было.'); key.forEach(t=>l2.append(item(t,true))); s2.append(l2); body.append(s2);
+    const s3=el('div','wksec'); s3.append(el('h3',null,'Остальные закрытые концептуальные · '+conc.length));
+    const l3=el('div','wklist'); if(!conc.length) empty(l3,'Нет.'); conc.forEach(t=>l3.append(item(t,false))); s3.append(l3); body.append(s3);
+
+    // характер задач
+    const s4=el('div','wksec'); s4.append(el('h3',null,'Характер закрытых задач'));
+    s4.append(el('div','sub','По матрице'));
+    const mx=el('div','mtx');
+    [['do','важно и срочно','var(--do)'],['plan','важно, не срочно','var(--plan)'],['deleg','срочно, не важно','var(--deleg)'],['drop','не срочно, не важно','var(--drop)']].forEach(([k,l,c])=>{const d=el('div'); d.style.setProperty('--c',c); d.append(el('b',null,String(W.q[k])),el('span',null,l)); mx.append(d);});
+    s4.append(mx);
+    if(W.q.none) s4.append(el('div','sub','Без клетки матрицы: '+W.q.none+'. Их можно разложить через «Разбор дня».'));
+    s4.append(el('div','sub','Время по типам'));
+    const bars=el('div','wkbars'), tot=Math.max(1,totalH);
+    [['concept','var(--concept)'],['ops','var(--ops)'],['none','var(--line)']].forEach(([k,c])=>{const i=el('i'); i.style.width=(W.hrs[k]/tot*100)+'%'; i.style.background=c; bars.append(i);});
+    s4.append(bars);
+    const lg=el('div','wklegend');
+    [['концептуальные',W.hrs.concept,'var(--concept)',W.closed.filter(t=>t.kind==='concept').length],['операционные',W.hrs.ops,'var(--ops)',W.closed.filter(t=>t.kind==='ops').length],['без типа',W.hrs.none,'var(--line)',W.closed.filter(t=>!t.kind).length]].forEach(([l,m,c,n])=>{const sp=el('span',null,l+': '+n+' зад.'+(m?' · '+fmtMin(m):'')); sp.style.setProperty('--c',c); lg.append(sp);});
+    s4.append(lg);
+    body.append(s4);
+
+    // все закрытые задачи
+    const s5=el('div','wksec'); const det=el('details'); const sm=el('summary',null,'Все закрытые задачи · '+W.closed.length); sm.style.cssText='cursor:pointer;font:700 14px var(--display)'; det.append(sm);
+    const l5=el('div','wklist'); l5.style.marginTop='8px'; W.closed.slice().sort((x,y)=>(closedAt(x)||'').localeCompare(closedAt(y)||'')).forEach(t=>l5.append(item(t,t.kind==='concept'&&t.quad==='do'))); det.append(l5); s5.append(det); body.append(s5);
+  }
+  function openWeek(mon){ WK=mon||monday(TODAY()); $('#weekModal').hidden=false; renderWeek(); }
+  function closeWeek(){ $('#weekModal').hidden=true; WK=null; }
+  $('#weekBtn').onclick=()=>openWeek();
+  $('#wkClose').onclick=closeWeek;
+  $('#wkPrev').onclick=()=>{WK=addDays(WK,-7); renderWeek();};
+  $('#wkNext').onclick=()=>{ if(WK<monday(TODAY())){WK=addDays(WK,7); renderWeek();} };
+  $('#weekModal').addEventListener('click',e=>{ if(e.target.id==='weekModal') closeWeek(); });
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&WK) closeWeek(); });
+
   render();
+
+  // автопоказ: в воскресенье после 18:00 — текущая неделя, в другие дни — прошлая, один раз
+  (function autoWeek(){
+    const now=new Date(), thisMon=monday(TODAY()), lastMon=addDays(thisMon,-7);
+    const target=(now.getDay()===0&&now.getHours()>=18)?thisMon:lastMon;
+    if(S.weekSeen===target) return;
+    const W=weekStats(target); if(!W.closed.length&&!W.removed.length) return;
+    S.weekSeen=target; save(); openWeek(target);
+  })();
 })();
 </script>
 </body>
