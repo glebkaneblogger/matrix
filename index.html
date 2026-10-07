@@ -209,6 +209,40 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
 .colors button{width:30px;height:30px;border-radius:50%;border:2px solid transparent;background:var(--c)}
 .colors button.on{border-color:var(--ink);transform:scale(1.1)}
 
+/* life table */
+.life{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:18px 16px}
+.life h2{margin:0;text-align:center;font:700 24px/1.15 var(--display)}
+.life .lsub{margin:4px 0 14px;text-align:center;font-size:13px;color:var(--muted)}
+.lctl{display:flex;flex-wrap:wrap;gap:10px;align-items:end;justify-content:center;margin-bottom:16px}
+.lctl label{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--muted)}
+.lctl input,.lctl select{border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:8px 10px;font:inherit;color:var(--ink);min-width:150px}
+.lgrid{display:flex;flex-direction:column;gap:2px;max-width:940px;margin:0 auto}
+.lrow{display:flex;align-items:center;gap:6px}
+.lrow.gap5{margin-top:5px}
+.lrow .ly{flex:none;width:22px;text-align:right;font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
+.lcells{flex:1;display:grid;grid-template-columns:repeat(52,minmax(0,1fr));gap:2px}
+.lcells i{display:block;aspect-ratio:1;border:1px solid var(--line);border-radius:1.5px;background:transparent}
+.lcells i.l{background:var(--do);border-color:var(--do)}
+.lcells i.now{background:var(--ink);border-color:var(--ink);box-shadow:0 0 0 2px color-mix(in srgb,var(--do) 45%,transparent);animation:pulse 1.6s ease infinite}
+.lcells i.q{margin-left:0}
+.lfoot{max-width:940px;margin:16px auto 0}
+.lbar{height:10px;border-radius:5px;background:var(--line);overflow:hidden}
+.lbar i{display:block;height:100%;background:var(--do);border-radius:5px}
+.lstat{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 18px;margin-top:10px}
+.lstat .big{font-size:17px}
+.lstat .big b{font-weight:600}
+.lstat .lg{display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--muted)}
+.lstat .lg span::before{content:'';display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px;border:1px solid var(--line)}
+.lstat .lg .a::before{background:var(--do);border-color:var(--do)}
+.lstat .lg .c::before{background:var(--ink);border-color:var(--ink)}
+.lnums{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:12px}
+.lnums div{background:var(--bg);border-radius:10px;padding:10px}
+.lnums b{display:block;font:700 18px/1.1 var(--display)}
+.lnums span{font-size:12px;color:var(--muted)}
+.lempty{text-align:center;color:var(--muted);padding:30px 10px}
+@media (max-width:620px){.life{padding:14px 8px}.life h2{font-size:20px}.lcells{gap:1px}.lgrid{gap:1px}.lrow{gap:3px}.lrow .ly{width:16px;font-size:9px}.lnums{grid-template-columns:1fr 1fr 1fr}.lnums b{font-size:15px}
+  header .seg{overflow-x:auto;max-width:100%;-webkit-overflow-scrolling:touch;scrollbar-width:none}}
+
 /* weekly report */
 .hleft{display:flex;align-items:center;gap:10px}
 .wkbtn{border:1px solid var(--line);background:var(--paper);border-radius:10px;padding:6px 10px;font-size:13px;font-weight:600;white-space:nowrap}
@@ -385,6 +419,7 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
       <button class="tab" role="tab" id="tab3"><span class="n">3</span>Расписание</button>
       <button class="tab" role="tab" id="tab5"><span class="n">4</span>Идеи</button>
       <button class="tab" role="tab" id="tab4"><span class="n">5</span>Архив</button>
+      <button class="tab" role="tab" id="tab6"><span class="n">6</span>Жизнь</button>
     </div>
   </header>
 
@@ -450,6 +485,19 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
       </div>
     </div>
     <div class="board" id="board"></div>
+  </section>
+
+  <!-- 6. Life table -->
+  <section id="view6" hidden>
+    <div class="life">
+      <h2>Таблица жизни</h2>
+      <p class="lsub" id="lSub">Одна клетка — одна неделя, одна строка — один год.</p>
+      <div class="lctl">
+        <label>Дата рождения<input type="date" id="lBirth"></label>
+        <label>Горизонт<select id="lYears"><option value="60">60 лет</option><option value="65">65 лет</option><option value="70">70 лет</option><option value="75">75 лет</option><option value="80">80 лет</option><option value="90">90 лет</option></select></label>
+      </div>
+      <div id="lBody"></div>
+    </div>
   </section>
 
   <!-- 4. Archive -->
@@ -621,7 +669,7 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
   /* ---------- render ---------- */
   function render(){
     const v=S.tab;
-    [1,2,3,4,5].forEach(i=>{$('#view'+i).hidden=v!==i; $('#tab'+i).setAttribute('aria-selected',v===i);});
+    [1,2,3,4,5,6].forEach(i=>{$('#view'+i).hidden=v!==i; $('#tab'+i).setAttribute('aria-selected',v===i);});
     document.body.classList.toggle('picking',!!sel);
     if(v===1) renderMatrix();
     if(v===2) renderKinds();
@@ -629,9 +677,11 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
     if(v===4) renderArchive();
     renderFocusBar();
     if(v===5) renderIdeas();
+    if(v===6) renderLife();
+    $('#addForm').hidden=v===6;
     renderBar();
     renderInv();
-    document.querySelector('.bar').hidden=((S.tab===4||S.tab===5)&&!sel);
+    document.querySelector('.bar').hidden=(S.tab>=4&&!sel);
   }
 
   // Матрица — рабочий стол на сегодня: только несделанные задачи без даты или с датой не позже сегодня
@@ -1326,6 +1376,7 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
   $('#tab3').onclick=()=>go(3);
   $('#tab4').onclick=()=>go(4);
   $('#tab5').onclick=()=>go(5);
+  $('#tab6').onclick=()=>go(6);
   document.querySelectorAll('#scale button').forEach(b=>b.onclick=()=>{S.view=b.dataset.v; save(); render();});
   function shift(k){
     if(S.view==='day') S.cur=addDays(S.cur,k);
@@ -1456,6 +1507,53 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
       if(d>until||n>=cnt) return; n++; push(d);
     }
   }
+
+  /* ---------- таблица жизни ---------- */
+  function renderLife(){
+    const bi=$('#lBirth'), ys=$('#lYears');
+    if(S.birth&&bi.value!==S.birth) bi.value=S.birth;
+    ys.value=String(S.lifeYears||70);
+    const body=$('#lBody'); body.innerHTML='';
+    const years=S.lifeYears||70;
+    $('#lSub').textContent='Красным — прожитые недели, тёмная — текущая. Горизонт таблицы — '+years+' лет.';
+    if(!S.birth){ body.append(el('div','lempty','Укажите дату рождения — таблица построится от неё.')); return; }
+    const birth=P(S.birth), now=new Date(); now.setHours(12,0,0,0);
+    const DAY=864e5;
+    let lived=0, cur=null;
+    const grid=el('div','lgrid');
+    for(let y=0;y<years;y++){
+      const ys0=new Date(birth.getFullYear()+y,birth.getMonth(),birth.getDate());
+      const row=el('div','lrow'+(y>0&&y%5===0?' gap5':''));
+      row.append(el('span','ly',(y%5===0&&y>0)?String(y):''));
+      const cells=el('div','lcells');
+      for(let w=0;w<52;w++){
+        const ws=new Date(ys0.getTime()+w*7*DAY), we=new Date(ws.getTime()+7*DAY);
+        const c=el('i');
+        if(we<=now){ c.className='l'; lived++; }
+        else if(ws<=now&&now<we){ c.className='now'; cur={y,w,ws}; }
+        c.title='Возраст '+y+', неделя '+(w+1)+' · с '+ws.getDate()+' '+MON_G[ws.getMonth()]+' '+ws.getFullYear();
+        cells.append(c);
+      }
+      row.append(cells); grid.append(row);
+    }
+    body.append(grid);
+    const total=years*52, ageDays=Math.floor((now-birth)/DAY);
+    const ageY=cur?cur.y:Math.floor(ageDays/365.25), ageW=cur?cur.w:0;
+    const foot=el('div','lfoot');
+    const bar=el('div','lbar'), fill=el('i'); fill.style.width=Math.min(100,lived/total*100)+'%'; bar.append(fill); foot.append(bar);
+    const st=el('div','lstat');
+    const big=el('div','big'); big.append('Прожито недель: ', el('b',null,lived.toLocaleString('ru-RU')+' из '+total.toLocaleString('ru-RU')), ' • '+(Math.round(lived/total*1000)/10).toString().replace('.',',')+'%');
+    const lg=el('div','lg'); lg.append(el('span','a','прожитые недели'), el('span','c','текущая неделя'), el('span',null,'будущие недели'));
+    st.append(big,lg); foot.append(st);
+    const nums=el('div','lnums');
+    const left=Math.max(0,total-lived-(cur?1:0));
+    [[ageY+' лет '+ageW+' нед.','возраст'],[left.toLocaleString('ru-RU'),'недель до '+years],[String(Math.round(left/52*10)/10).replace('.',',')+' лет','осталось по горизонту']]
+      .forEach(([v,l])=>{const d=el('div'); d.append(el('b',null,v),el('span',null,l)); nums.append(d);});
+    foot.append(nums);
+    body.append(foot);
+  }
+  $('#lBirth').addEventListener('change',e=>{ const v=e.target.value; if(/^\d{4}-\d{2}-\d{2}$/.test(v)&&v<=TODAY()){ S.birth=v; save(); renderLife(); } });
+  $('#lYears').addEventListener('change',e=>{ S.lifeYears=+e.target.value||70; save(); renderLife(); });
 
   /* ---------- итоги недели ---------- */
   let WK=null; // monday of shown week
