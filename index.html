@@ -328,6 +328,37 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
 .rsaved .rhow{flex-basis:100%;font-size:13px;color:var(--muted);white-space:pre-wrap}
 .rsaved .rhow2{font-size:12px;color:var(--muted)}
 .rsaved .redit{margin-left:auto;font-size:12px;color:var(--muted)}
+.actstart{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
+.abtn{display:flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--paper);border-radius:10px;padding:8px 12px;font-weight:500;font-size:14px}
+.abtn:hover{border-color:var(--ink)}
+.abtn.meal{--ac:#D9822B} .abtn.rest{--ac:var(--plan)}
+.abtn .dt{width:8px;height:8px;border-radius:50%;background:var(--ac)}
+.abtn.man{color:var(--muted);font-size:13px}
+.actrow{display:flex;align-items:center;gap:10px;padding:0 0 10px;margin-bottom:10px;border-bottom:1px solid var(--line)}
+.actrow .ai{font-size:20px}
+.actrow .at{font:700 22px/1 var(--display);color:var(--ac)}
+.actrow .al{font-size:12px;color:var(--muted)}
+.actrow .ghost{padding:8px 12px;font-size:14px;border-radius:10px}
+.actrow.meal{--ac:#D9822B} .actrow.rest{--ac:var(--plan)}
+.act{display:flex;align-items:center;gap:6px;font-size:12px;line-height:1.3;padding:4px 7px;border-radius:7px;background:color-mix(in srgb,var(--ac) 12%,var(--paper));border-left:3px solid var(--ac);text-align:left;width:100%;border-top:0;border-right:0;border-bottom:0;color:var(--ink)}
+.act.meal{--ac:#D9822B} .act.rest{--ac:var(--plan)}
+.act .am{margin-left:auto;color:var(--muted);white-space:nowrap}
+.act.live .am{color:var(--ac);font-weight:700}
+.dayv .act{font-size:14px;padding:8px 10px}
+.asum{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;color:var(--muted);margin-top:6px}
+.asum b{color:var(--ink);font-weight:600}
+.atypes{display:flex;gap:8px;margin-bottom:12px}
+.atypes .opt{flex:1;text-align:center}
+.arow2{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.arow2 label{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--muted)}
+.arow2 input{border:1px solid var(--line);border-radius:10px;padding:9px 10px;background:var(--bg);font:inherit;color:var(--ink);min-width:0}
+.wkdays{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;align-items:end}
+.wkdays .wdc{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;color:var(--muted)}
+.wkdays .bars{height:70px;width:100%;display:flex;align-items:flex-end;justify-content:center;gap:3px}
+.wkdays .bars i{width:40%;max-width:14px;border-radius:3px 3px 0 0;background:var(--ac);min-height:2px}
+.wkdays .bars i.meal{--ac:#D9822B} .wkdays .bars i.rest{--ac:var(--plan)}
+.wkdays .bars i.zero{opacity:.25}
+@media (max-width:620px){.arow2{grid-template-columns:1fr 1fr}.arow2 label:first-child{grid-column:1/-1}}
 .wday .proc{font-size:11px;color:var(--muted);border-top:1px dashed var(--line);padding-top:4px;margin-top:2px}
 
 /* leak journal */
@@ -467,12 +498,15 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
         <button class="nav" id="next" aria-label="Вперёд">›</button>
       </div>
     </div>
+    <div class="actstart" id="actStart"></div>
     <div id="sched"></div>
     <div class="legend">
       <span class="kc-concept"><i></i>Концептуальные</span>
       <span class="kc-ops"><i></i>Операционные</span>
       <span><i></i>Без типа</span>
       <span><i class="e"></i>Из календаря</span>
+      <span style="--kc:#D9822B"><i></i>Еда</span>
+      <span style="--kc:var(--plan)"><i></i>Отдых</span>
     </div>
   </section>
 
@@ -530,6 +564,25 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
   </details>
 </div>
 
+<div class="modal" id="actModal" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="amTitle">
+    <div class="qtop"><span class="qtask" id="amDay"></span><button class="qx" id="amClose" type="button" aria-label="Закрыть">×</button></div>
+    <h2 id="amTitle">Записать вручную</h2>
+    <p class="qhint">Если забыли включить таймер — укажите, когда и сколько.</p>
+    <div class="atypes" id="amTypes"></div>
+    <div class="arow2">
+      <label>Дата<input type="date" id="amDate"></label>
+      <label>Начало<input type="time" id="amTime"></label>
+      <label>Минут<input type="number" id="amMins" min="1" max="720" inputmode="numeric" placeholder="30"></label>
+    </div>
+    <div class="qfoot">
+      <button class="ghost danger" id="amDel" type="button">Удалить</button>
+      <span class="grow"></span>
+      <button class="primary" id="amSave" type="button">Сохранить</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal" id="weekModal" hidden>
   <div class="sheet wide" role="dialog" aria-modal="true" aria-labelledby="wkTitle">
     <div class="wkhead">
@@ -579,6 +632,7 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
   </div>
 </div>
 <div class="bar"><div class="in">
+  <div class="actrow" id="actRow" hidden></div>
   <div class="editrow" id="editRow" hidden></div>
   <div class="inv" id="inv">
     <div class="inv-head"><b>Инвентарь</b><span id="invSub"></span><button class="tog" id="invTog" type="button">Свернуть</button></div>
@@ -610,14 +664,17 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
   let S={tasks:[],events:[],ideas:[],leaks:[],days:{},ideaFilter:'open',tab:1,view:'week',cur:TODAY(),invCollapsed:false,showDone:true};
   let sel=null;
   let TM={id:null, acc:0, start:null, paused:false}; // active timer
+  let AT=null; // активность: {type:'meal'|'rest', start:ms}
   try{const raw=localStorage.getItem(KEY); if(raw){const d=JSON.parse(raw); if(d&&Array.isArray(d.tasks)) S=Object.assign(S,d);}}catch(e){}
   if(!Array.isArray(S.events)) S.events=[];
   if(!Array.isArray(S.ideas)) S.ideas=[];
   if(!S.days||typeof S.days!=='object') S.days={};
   if(!Array.isArray(S.leaks)) S.leaks=[];
+  if(!Array.isArray(S.acts)) S.acts=[];
+  if(S._act&&S._act.type&&S._act.start) AT=S._act;
   if(S._timer&&S._timer.id){ TM=S._timer; if(TM.start) TM.start=TM.start; } // resume timer across reloads
   S.tab=1; S.focus=null; // при открытии всегда начинаем с матрицы на сегодня
-  function saveTimer(){ S._timer={id:TM.id,acc:TM.acc,start:TM.start,paused:TM.paused}; }
+  function saveTimer(){ S._timer={id:TM.id,acc:TM.acc,start:TM.start,paused:TM.paused}; S._act=AT; }
   function save(){try{saveTimer(); localStorage.setItem(KEY,JSON.stringify(S));}catch(e){status('Не удалось сохранить: хранилище браузера переполнено или отключено.');}}
   const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
   const $=s=>document.querySelector(s);
@@ -681,7 +738,8 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
     $('#addForm').hidden=v===6;
     renderBar();
     renderInv();
-    document.querySelector('.bar').hidden=(S.tab>=4&&!sel);
+    document.querySelector('.bar').hidden=(S.tab>=4&&!sel&&!AT);
+    renderActRow();
   }
 
   // Матрица — рабочий стол на сегодня: только несделанные задачи без даты или с датой не позже сегодня
@@ -756,6 +814,7 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
     // no date
 
     document.querySelectorAll('#scale button').forEach(b=>b.setAttribute('aria-selected',b.dataset.v===S.view));
+    renderActStart();
     const box=$('#sched'); box.innerHTML='';
     const D=dayData();
     if(S.view==='day') renderDay(box,D,today);
@@ -789,7 +848,7 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
     for(let i=0;i<7;i++){
       const k=addDays(start,i), d=P(k), b=D(k);
       const col=el('div','wday'); if(k===today) col.classList.add('is-today'); if(k<today) col.classList.add('past');
-      if(!b.t.length&&!b.e.length) col.classList.add('empty-day');
+      if(!b.t.length&&!b.e.length&&!actsOn(k).length) col.classList.add('empty-day');
       const h=el('button','whead'); h.type='button';
       h.append(el('span','wd',WD[i]),el('span','dn',d.getDate()),loadLabel(b));
       h.setAttribute('aria-label','Открыть день: '+WD_FULL[d.getDay()]+', '+d.getDate()+' '+MON_G[d.getMonth()]);
@@ -797,6 +856,8 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
       col.append(h);
       b.e.forEach(e=>col.append(evRow(e)));
       sorted(b.t).forEach(t=>col.append(chip(t,'sched')));
+      actsOn(k).forEach(a=>col.append(actChip(a,true)));
+      if(AT&&k===ymd(new Date(AT.start))) col.append(liveChip());
       const dr=S.days[k];
       if(dr&&(dr.proc!=null||dr.how)) col.append(el('div','proc','прокрастинация: '+(dr.proc?fmtMin(dr.proc):'не было')));
       const p=el('button','plus wadd','+ Задача'); p.type='button';
@@ -832,6 +893,14 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
     const lt=el('div','list'); if(!tops.length) empty(lt,'Отметьте до трёх задач звёздочкой — это главное на день.'); tops.forEach(t=>lt.append(chip(t,'sched'))); v.append(lt);
     v.append(el('h3',null,'Остальные задачи'));
     const lr=el('div','list'); if(!rest.length) empty(lr,'Пусто.'); rest.forEach(t=>lr.append(chip(t,'sched'))); v.append(lr);
+    const as=actsOn(k), sm=actSum(k), live=AT&&k===ymd(new Date(AT.start));
+    v.append(el('h3',null,'Еда и отдых'));
+    const la=el('div','list');
+    as.forEach(a=>la.append(actChip(a)));
+    if(live) la.append(liveChip());
+    if(!as.length&&!live) empty(la,'Пока ничего. Включите таймер «Приём пищи» или «Отдых» над календарём.');
+    v.append(la);
+    if(as.length){ const su=el('div','asum'); su.append(el('span',null,'🍽 еда: '),el('b',null,sm.meal?fmtMin(sm.meal)+' ('+sm.meals+')':'—'),el('span',null,' · ☕ отдых: '),el('b',null,sm.rest?fmtMin(sm.rest):'—')); v.append(su); }
     v.append(dayReview(k));
     const p=el('button','plus','+ Задача на этот день'); p.type='button';
     p.onclick=e=>{e.stopPropagation(); if(sel) return v.click(); inlineAdd(p,{date:k},render);};
@@ -948,6 +1017,87 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
     if(!items.length) empty(l,'Пусто. Новые задачи будут появляться здесь.');
     items.forEach(t=>l.append(chip(t,cfg.mode)));
   }
+  /* ---------- еда и отдых ---------- */
+  const ACT={meal:{name:'Приём пищи',short:'Еда',icon:'🍽'},rest:{name:'Отдых',short:'Отдых',icon:'☕'}};
+  const hhmm=d=>pad(d.getHours())+':'+pad(d.getMinutes());
+  function actElapsed(){ return AT?Math.floor((Date.now()-AT.start)/1000):0; }
+  function actStart(type){
+    if(AT){ if(AT.type===type) return; actStop(); }
+    if(TM.id&&!TM.paused) tmPause(); // работа на паузу
+    AT={type,start:Date.now()}; save(); render(); startActTick();
+  }
+  function actStop(){
+    if(!AT) return;
+    const st=new Date(AT.start), mins=Math.max(1,Math.ceil(actElapsed()/60));
+    S.acts.push({id:uid(),type:AT.type,date:ymd(st),time:hhmm(st),mins});
+    AT=null; save(); render();
+  }
+  function actCancel(){ AT=null; save(); render(); }
+  let actTick=null;
+  function startActTick(){ if(actTick) return; actTick=setInterval(()=>{
+    if(!AT){clearInterval(actTick); actTick=null; return;}
+    const t=fmtSec(actElapsed());
+    const d=document.querySelector('#actRow .at'); if(d) d.textContent=t;
+    document.querySelectorAll('.act.live .am').forEach(x=>x.textContent=t);
+  },1000); }
+  if(AT) setTimeout(startActTick,0);
+  function renderActRow(){
+    const r=$('#actRow'); r.innerHTML='';
+    r.hidden=!AT; if(!AT){ r.className='actrow'; return; }
+    r.className='actrow '+AT.type;
+    const info=el('div'); info.append(el('div','al',ACT[AT.type].name+' · с '+hhmm(new Date(AT.start))));
+    r.append(el('span','ai',ACT[AT.type].icon), el('span','at',fmtSec(actElapsed())), info, el('span','grow'));
+    r.append(btn('Отмена','ghost',()=>{ if(confirm('Сбросить таймер без записи?')) actCancel(); }));
+    r.append(btn('Завершить','tbtn stop',actStop));
+  }
+  function renderActStart(){
+    const box=$('#actStart'); box.innerHTML='';
+    ['meal','rest'].forEach(k=>{
+      const on=AT&&AT.type===k;
+      const b=btn('','abtn '+k,()=>on?actStop():actStart(k));
+      b.append(el('span','dt'), on?'■ Завершить: '+ACT[k].short.toLowerCase():'▶ '+ACT[k].name);
+      box.append(b);
+    });
+    box.append(btn('+ записать вручную','abtn man',()=>openAct(null,S.view==='day'?S.cur:TODAY())));
+  }
+  const actsOn=k=>S.acts.filter(a=>a.date===k).sort((a,b)=>a.time.localeCompare(b.time));
+  function actChip(a,compact){
+    const b=el('button','act '+a.type); b.type='button';
+    const end=(()=>{const [h,m]=a.time.split(':').map(Number); const t=h*60+m+a.mins; return pad(Math.floor(t/60)%24)+':'+pad(t%60);})();
+    b.append(compact?ACT[a.type].icon+' '+a.time:ACT[a.type].icon+' '+ACT[a.type].short+' '+a.time+'–'+end, el('span','am',fmtMin(a.mins)));
+    b.title=ACT[a.type].name+' '+a.time+'–'+end+' · '+fmtMin(a.mins);
+    b.onclick=e=>{e.stopPropagation(); if(sel) return; openAct(a);};
+    return b;
+  }
+  function liveChip(){
+    const b=el('div','act live '+AT.type);
+    b.append(ACT[AT.type].icon+' '+ACT[AT.type].short+' с '+hhmm(new Date(AT.start)), el('span','am',fmtSec(actElapsed())));
+    return b;
+  }
+  function actSum(k){ const a=actsOn(k); return {meal:a.filter(x=>x.type==='meal').reduce((s,x)=>s+x.mins,0), rest:a.filter(x=>x.type==='rest').reduce((s,x)=>s+x.mins,0), n:a.length, meals:a.filter(x=>x.type==='meal').length}; }
+
+  let AM=null; // редактируемая запись
+  function openAct(a,day){
+    AM=a?{...a}:{id:null,type:'meal',date:day||TODAY(),time:hhmm(new Date()),mins:30};
+    $('#amTitle').textContent=a?'Изменить запись':'Записать вручную';
+    $('#amDay').textContent=a?ACT[a.type].name:'';
+    $('#amDel').hidden=!a;
+    $('#amDate').value=AM.date; $('#amTime').value=AM.time; $('#amMins').value=AM.mins;
+    drawAmTypes(); $('#actModal').hidden=false;
+  }
+  function drawAmTypes(){ const t=$('#amTypes'); t.innerHTML=''; ['meal','rest'].forEach(k=>t.append(opt(ACT[k].icon+' '+ACT[k].name,()=>{AM.type=k; drawAmTypes();},AM.type===k))); }
+  function closeAct(){ AM=null; $('#actModal').hidden=true; }
+  $('#amClose').onclick=closeAct;
+  $('#actModal').addEventListener('click',e=>{ if(e.target.id==='actModal') closeAct(); });
+  $('#amSave').onclick=()=>{
+    const d=$('#amDate').value, t=$('#amTime').value, m=parseInt($('#amMins').value,10);
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(d)||!/^\d{2}:\d{2}$/.test(t)||!(m>0&&m<=720)){ alert('Проверьте дату, время и минуты (от 1 до 720).'); return; }
+    const rec={id:AM.id||uid(),type:AM.type,date:d,time:t,mins:m};
+    if(AM.id){ const i=S.acts.findIndex(x=>x.id===AM.id); if(i>=0) S.acts[i]=rec; } else S.acts.push(rec);
+    closeAct(); save(); render();
+  };
+  $('#amDel').onclick=()=>{ if(AM&&AM.id&&confirm('Удалить запись?')){ S.acts=S.acts.filter(x=>x.id!==AM.id); closeAct(); save(); render(); } };
+
   /* ---------- timer ---------- */
   function tmElapsed(){ return TM.acc + (TM.start&&!TM.paused ? Math.floor((Date.now()-TM.start)/1000) : 0); }
   function fmtSec(s){ const h=Math.floor(s/3600),m=Math.floor(s%3600/60),sc=s%60; return (h?h+':'+String(m).padStart(2,'0'):m)+':'+String(sc).padStart(2,'0'); }
@@ -1388,6 +1538,7 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
   $('#next').onclick=()=>shift(1);
   $('#todayBtn').onclick=()=>{S.cur=TODAY(); save(); render();};
   document.addEventListener('keydown',e=>{
+    if(e.key==='Escape'&&AM){closeAct(); return;}
     if(e.key==='Escape'&&Z){closeQuiz(); return;}
     if(e.key==='Escape'&&I){saveIdea(); return;}
     if(e.key==='Escape'&&R){closeReview(); return;}
@@ -1400,7 +1551,7 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
 
   /* ---------- export / import ---------- */
   $('#expBtn').onclick=()=>{
-    const blob=new Blob([JSON.stringify({version:2,exported:new Date().toISOString(),tasks:S.tasks,ideas:S.ideas,leaks:S.leaks,days:S.days},null,2)],{type:'application/json'});
+    const blob=new Blob([JSON.stringify({version:2,exported:new Date().toISOString(),tasks:S.tasks,ideas:S.ideas,leaks:S.leaks,days:S.days,acts:S.acts},null,2)],{type:'application/json'});
     const a=el('a'); a.href=URL.createObjectURL(blob); a.download='zadachi-'+TODAY()+'.json';
     document.body.append(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),1000);
     status('Копия сохранена в файл: задачи, архив, идеи и журнал. Загрузите его на другом устройстве, чтобы перенести всё.');
@@ -1418,12 +1569,13 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
         const ideasN=Array.isArray(d.ideas)?d.ideas.filter(i=>i&&i.id&&!S.ideas.some(x=>x.id===i.id)):[];
         const leaksN=Array.isArray(d.leaks)?d.leaks.filter(L=>L&&L.id&&!S.leaks.some(x=>x.id===L.id)):[];
         const daysN=d.days&&typeof d.days==='object'?Object.keys(d.days).filter(k=>!S.days[k]):[];
-        const total=fresh.length+ideasN.length+leaksN.length+daysN.length;
+        const actsN=Array.isArray(d.acts)?d.acts.filter(a=>a&&a.id&&!S.acts.some(x=>x.id===a.id)):[];
+        const total=fresh.length+ideasN.length+leaksN.length+daysN.length+actsN.length;
         if(!total){ status('В файле нет ничего нового: все задачи из него уже есть.'); e.target.value=''; return; }
-        const parts=[]; if(fresh.length) parts.push('задач: '+fresh.length); if(ideasN.length) parts.push('идей: '+ideasN.length); if(leaksN.length) parts.push('утечек: '+leaksN.length); if(daysN.length) parts.push('итогов дня: '+daysN.length);
+        const parts=[]; if(fresh.length) parts.push('задач: '+fresh.length); if(actsN.length) parts.push('записей еды/отдыха: '+actsN.length); if(ideasN.length) parts.push('идей: '+ideasN.length); if(leaksN.length) parts.push('утечек: '+leaksN.length); if(daysN.length) parts.push('итогов дня: '+daysN.length);
         if(!confirm('Добавить из файла '+parts.join(', ')+'? Текущие данные останутся, повторы пропускаются.')){ e.target.value=''; return; }
         fresh.forEach(t=>S.tasks.push(newTask(String(t.text||''),t)));
-        ideasN.forEach(i=>S.ideas.push(i)); leaksN.forEach(L=>S.leaks.push(L)); daysN.forEach(k=>S.days[k]=d.days[k]);
+        ideasN.forEach(i=>S.ideas.push(i)); leaksN.forEach(L=>S.leaks.push(L)); daysN.forEach(k=>S.days[k]=d.days[k]); actsN.forEach(a=>S.acts.push(a));
         save(); render();
         const skipped=d.tasks.length-fresh.length;
         status('Добавлено: '+parts.join(', ')+'.'+(skipped?' Уже были и пропущены: '+skipped+'.':''));
@@ -1585,7 +1737,8 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
     const pmin=pdays.reduce((x,o)=>x+(o.d.proc||0),0);
     const lk={}; pdays.forEach(o=>{const ids=(o.d.leaks||[]).filter(leakName); ids.forEach(id=>{lk[id]=(lk[id]||0)+(o.d.proc||0)/ids.length;});});
     const topLeaks=Object.entries(lk).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([id,m])=>leakName(id)+' · '+fmtMin(Math.round(m)));
-    return {mon,sun,closed,removed,openPlanned,touched,hrs,q,onT,inE,ratio,moved,big,bigSplit,withEst,clear,kinded,pdays,pmin,topLeaks};
+    const acts=S.acts.filter(a=>inRange(a.date,mon,sun));
+    return {mon,sun,closed,removed,openPlanned,touched,hrs,q,onT,inE,ratio,moved,big,bigSplit,withEst,clear,kinded,pdays,pmin,topLeaks,acts};
   }
   // уровень по доле: хорошо / средне / слабо
   const lvl=(x,good,mid)=>x==null?null:(x>=good?2:(x>=mid?1:0));
@@ -1604,7 +1757,7 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
     const ttl=$('#wkTitle'); ttl.innerHTML=''; ttl.append(el('span','wkl','Итоги недели'), (a.getMonth()===b.getMonth()?a.getDate()+'–'+b.getDate()+' '+MON_G[b.getMonth()]:a.getDate()+' '+MON_G[a.getMonth()]+' – '+b.getDate()+' '+MON_G[b.getMonth()])+(WK===monday(TODAY())?' · текущая':''));
     $('#wkNext').disabled=WK>=monday(TODAY());
     const body=$('#wkBody'); body.innerHTML='';
-    if(!W.touched.length&&!W.pdays.length){ empty(body,'За эту неделю нет закрытых или запланированных задач.'); return; }
+    if(!W.touched.length&&!W.pdays.length&&!W.acts.length){ empty(body,'За эту неделю нет закрытых или запланированных задач.'); return; }
 
     // ключевые цифры
     const totalH=W.hrs.concept+W.hrs.ops+W.hrs.none;
@@ -1652,6 +1805,32 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
     }
     if(W.topLeaks.length) sec1.append(el('div','sub','Главные утечки: '+W.topLeaks.join(', ')));
     body.append(sec1);
+
+    // еда и отдых
+    if(W.acts.length){
+      const sa=el('div','wksec'); sa.append(el('h3',null,'Еда и отдых'));
+      const meals=W.acts.filter(a=>a.type==='meal'), rests=W.acts.filter(a=>a.type==='rest');
+      const mSum=meals.reduce((x,a)=>x+a.mins,0), rSum=rests.reduce((x,a)=>x+a.mins,0);
+      const mDays=new Set(meals.map(a=>a.date)).size, rDays=new Set(rests.map(a=>a.date)).size;
+      const st2=el('div','stats');
+      [[meals.length?fmtMin(mSum):'—','на еду · '+meals.length+' приёмов'],[meals.length?fmtMin(Math.round(mSum/meals.length)):'—','в среднем на приём'],[rests.length?fmtMin(rSum):'—','на отдых · '+rests.length+' раз'],[rDays?fmtMin(Math.round(rSum/rDays)):'—','отдыха в день (по '+rDays+' дн.)']]
+        .forEach(([v,l])=>{const c=el('div','stat'); c.append(el('b',null,v),el('span',null,l)); st2.append(c);});
+      sa.append(st2);
+      const days=el('div','wkdays'); let mx=1;
+      const per=[]; for(let i=0;i<7;i++){const k=addDays(W.mon,i); const m=W.acts.filter(a=>a.date===k&&a.type==='meal').reduce((x,a)=>x+a.mins,0), r=W.acts.filter(a=>a.date===k&&a.type==='rest').reduce((x,a)=>x+a.mins,0); per.push([k,m,r]); mx=Math.max(mx,m,r);}
+      per.forEach(([k,m,r],i)=>{
+        const c=el('div','wdc'), bars=el('div','bars');
+        const bm=el('i','meal'+(m?'':' zero')); bm.style.height=(m/mx*100)+'%'; bm.title='Еда: '+(m?fmtMin(m):'—');
+        const br=el('i','rest'+(r?'':' zero')); br.style.height=(r/mx*100)+'%'; br.title='Отдых: '+(r?fmtMin(r):'—');
+        bars.append(bm,br); c.append(bars, el('span',null,WD[i])); days.append(c);
+      });
+      sa.append(days);
+      const lgd=el('div','wklegend'); lgd.style.marginTop='6px';
+      const s1=el('span',null,'еда'); s1.style.setProperty('--c','#D9822B'); const s2=el('span',null,'отдых'); s2.style.setProperty('--c','var(--plan)'); lgd.append(s1,s2);
+      if(mDays<7&&mDays>0) lgd.append(el('span',null,'еда отмечена в '+mDays+' из 7 дней'));
+      sa.append(lgd);
+      body.append(sa);
+    }
 
     // главное недели: концептуальные + важные и срочные
     const key=sorted(W.closed.filter(t=>t.kind==='concept'&&t.quad==='do'));
