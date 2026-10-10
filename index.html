@@ -69,6 +69,12 @@ h1{font:700 22px/1.1 var(--display);margin:0;letter-spacing:-.01em}
 input.inline{border:1px solid var(--line);border-radius:8px;padding:6px 8px;margin-top:8px;background:var(--bg);width:100%}
 .picking .tgt{box-shadow:0 0 0 2px var(--c,var(--ink)) inset;cursor:copy}
 .over{background:color-mix(in srgb,var(--c,var(--ink)) 8%,var(--paper)) !important}
+.stool{position:relative}
+.wkmove{display:none;position:absolute;inset:0;z-index:6;gap:8px;background:var(--bg)}
+body.picking .wkmove:not([hidden]),body.dragging .wkmove:not([hidden]){display:flex}
+.wkmove button{flex:1;border:1.5px dashed var(--ink);background:var(--paper);border-radius:10px;padding:8px 12px;font-size:14px;font-weight:600;color:var(--ink);box-shadow:none !important}
+.wkmove button.next{text-align:right}
+.wkmove button.over{border-style:solid;background:color-mix(in srgb,var(--ink) 8%,var(--paper))}
 
 .q-do{--c:var(--do)} .q-plan{--c:var(--plan)} .q-deleg{--c:var(--deleg)} .q-drop{--c:var(--drop)}
 .k-concept{--c:var(--concept)} .k-ops{--c:var(--ops)}
@@ -493,6 +499,10 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
         <button data-v="day">День</button><button data-v="week">Неделя</button><button data-v="month">Месяц</button>
       </div>
       <h2 id="sTitle"></h2>
+      <div class="wkmove" id="wkMove" hidden>
+        <button class="prev" type="button" data-k="-1" title="Перетащите сюда задачу или выберите её и нажмите">‹ На прошлую неделю</button>
+        <button class="next" type="button" data-k="1" title="Перетащите сюда задачу или выберите её и нажмите">На следующую неделю ›</button>
+      </div>
       <div class="navs">
         <button class="nav" id="prev" aria-label="Назад">‹</button>
         <button class="today" id="todayBtn">Сегодня</button>
@@ -742,7 +752,8 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
       if(meta.childElementCount) b.append(meta);
     }
     b.addEventListener('click',e=>{e.stopPropagation(); sel=(sel===t.id)?null:t.id; render();});
-    b.addEventListener('dragstart',e=>{sel=t.id; e.dataTransfer.setData('text/plain',t.id); e.dataTransfer.effectAllowed='move';});
+    b.addEventListener('dragstart',e=>{sel=t.id; e.dataTransfer.setData('text/plain',t.id); e.dataTransfer.effectAllowed='move'; setTimeout(()=>setDragging(true),0);});
+    b.addEventListener('dragend',()=>setDragging(false));
     return b;
   }
   // Смена даты: если задачу двигают на более поздний день — считаем перенос
@@ -752,12 +763,16 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
     if(prev&&k>prev){ t.moves=(t.moves||0)+1; t.moveDays=(t.moveDays||0)+Math.round((P(k)-P(prev))/864e5); }
     t.date=k; delete t.lastDate;
   }
+  // перетаскивание: флаг на body, чтобы показать зоны «на соседнюю неделю»
+  function setDragging(on){ document.body.classList.toggle('dragging',!!on); }
+  window.addEventListener('drop',()=>setDragging(false),true);
+  window.addEventListener('mousemove',e=>{ if(e.buttons===0&&document.body.classList.contains('dragging')) setDragging(false); });
   function makeTarget(node,apply){
     node.classList.add('tgt');
     node.addEventListener('click',()=>{ if(sel){ const t=S.tasks.find(x=>x.id===sel); if(t) apply(t); sel=null; save(); render(); } });
     node.addEventListener('dragover',e=>{e.preventDefault(); node.classList.add('over');});
     node.addEventListener('dragleave',()=>node.classList.remove('over'));
-    node.addEventListener('drop',e=>{e.preventDefault(); node.classList.remove('over'); const t=S.tasks.find(x=>x.id===e.dataTransfer.getData('text/plain')); if(t) apply(t); sel=null; save(); render();});
+    node.addEventListener('drop',e=>{e.preventDefault(); node.classList.remove('over'); setDragging(false); const id=e.dataTransfer.getData('text/plain')||sel; const t=S.tasks.find(x=>x.id===id); if(t) apply(t); sel=null; save(); render();});
   }
 
   /* ---------- render ---------- */
@@ -853,6 +868,7 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
 
     document.querySelectorAll('#scale button').forEach(b=>b.setAttribute('aria-selected',b.dataset.v===S.view));
     renderActStart();
+    $('#wkMove').hidden=S.view!=='week';
     const box=$('#sched'); box.innerHTML='';
     const D=dayData();
     if(S.view==='day') renderDay(box,D,today);
@@ -1034,6 +1050,8 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
       s.onchange=()=>{t.est=+s.value; save(); render();};
       bar.append(s);
       if(t.date&&t.date<TODAY()) bar.append(btn('На сегодня','ghost',()=>{setDate(t,TODAY()); sel=null; save(); render();}));
+      // перенос на неделю вперёд прямо из нижней панели — удобно на телефоне
+      if(S.tab===3) bar.append(btn('На неделю вперёд ›','ghost',()=>{ const nd=addDays(t.date||TODAY(),7); setDate(t,nd); S.cur=nd; sel=null; save(); render(); }));
       bar.append(el('span','grow'));
       bar.append(btn('Удалить без следа','ghost danger',hardDelete));
     }
@@ -1590,6 +1608,14 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
     else {const d=P(S.cur); S.cur=ymd(new Date(d.getFullYear(),d.getMonth()+k,1));}
     save(); render();
   }
+  document.querySelectorAll('#wkMove button').forEach(z=>{
+    const k=+z.dataset.k;
+    makeTarget(z,t=>{
+      const start=monday(S.cur), end=addDays(start,6), inWeek=TODAY()>=start&&TODAY()<=end;
+      const base=t.date||(inWeek?TODAY():start);
+      setDate(t,addDays(base,7*k)); S.cur=addDays(S.cur,7*k);
+    });
+  });
   $('#prev').onclick=()=>shift(-1);
   $('#next').onclick=()=>shift(1);
   $('#todayBtn').onclick=()=>{S.cur=TODAY(); save(); render();};
