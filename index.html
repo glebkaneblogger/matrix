@@ -331,7 +331,7 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
 .actstart{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
 .abtn{display:flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--paper);border-radius:10px;padding:8px 12px;font-weight:500;font-size:14px}
 .abtn:hover{border-color:var(--ink)}
-.abtn.meal{--ac:#D9822B} .abtn.rest{--ac:var(--plan)} .abtn.sport{--ac:#C93D7E}
+.abtn.meal{--ac:#D9822B} .abtn.rest{--ac:var(--plan)} .abtn.sport{--ac:#C93D7E} .abtn.morning{--ac:#E0A100}
 .abtn .dt{width:8px;height:8px;border-radius:50%;background:var(--ac)}
 .abtn.man{color:var(--muted);font-size:13px}
 .actrow{display:flex;align-items:center;gap:10px;padding:0 0 10px;margin-bottom:10px;border-bottom:1px solid var(--line)}
@@ -339,16 +339,17 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
 .actrow .at{font:700 22px/1 var(--display);color:var(--ac)}
 .actrow .al{font-size:12px;color:var(--muted)}
 .actrow .ghost{padding:8px 12px;font-size:14px;border-radius:10px}
-.actrow.meal{--ac:#D9822B} .actrow.rest{--ac:var(--plan)} .actrow.sport{--ac:#C93D7E}
+.actrow.meal{--ac:#D9822B} .actrow.rest{--ac:var(--plan)} .actrow.sport{--ac:#C93D7E} .actrow.morning{--ac:#E0A100}
 .act{display:flex;align-items:center;gap:6px;font-size:12px;line-height:1.3;padding:4px 7px;border-radius:7px;background:color-mix(in srgb,var(--ac) 12%,var(--paper));border-left:3px solid var(--ac);text-align:left;width:100%;border-top:0;border-right:0;border-bottom:0;color:var(--ink)}
-.act.meal{--ac:#D9822B} .act.rest{--ac:var(--plan)} .act.sport{--ac:#C93D7E}
+.act.meal{--ac:#D9822B} .act.rest{--ac:var(--plan)} .act.sport{--ac:#C93D7E} .act.morning{--ac:#E0A100}
 .act .am{margin-left:auto;color:var(--muted);white-space:nowrap}
 .act.live .am{color:var(--ac);font-weight:700}
 .dayv .act{font-size:14px;padding:8px 10px}
 .asum{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;color:var(--muted);margin-top:6px}
 .asum b{color:var(--ink);font-weight:600}
 .atypes{display:flex;gap:8px;margin-bottom:12px}
-.atypes .opt{flex:1;text-align:center;padding:11px 6px}
+.atypes{flex-wrap:wrap}
+.atypes .opt{flex:1 1 40%;text-align:center;padding:11px 6px}
 .stats.s3{grid-template-columns:repeat(3,minmax(0,1fr))}
 @media (max-width:620px){.stats.s3{grid-template-columns:1fr 1fr}.atypes{flex-wrap:wrap}.actstart{gap:6px}.abtn{padding:7px 9px;font-size:13px;gap:5px}}
 .arow2{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
@@ -357,10 +358,39 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
 .wkdays{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;align-items:end}
 .wkdays .wdc{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;color:var(--muted)}
 .wkdays .bars{height:70px;width:100%;display:flex;align-items:flex-end;justify-content:center;gap:3px}
-.wkdays .bars i{width:28%;max-width:12px;border-radius:3px 3px 0 0;background:var(--ac);min-height:2px}
-.wkdays .bars i.meal{--ac:#D9822B} .wkdays .bars i.rest{--ac:var(--plan)} .wkdays .bars i.sport{--ac:#C93D7E}
+.wkdays .bars i{width:20%;max-width:11px;border-radius:3px 3px 0 0;background:var(--ac);min-height:2px}
+.wkdays .bars i.meal{--ac:#D9822B} .wkdays .bars i.rest{--ac:var(--plan)} .wkdays .bars i.sport{--ac:#C93D7E} .wkdays .bars i.morning{--ac:#E0A100}
 .wkdays .bars i.zero{opacity:.25}
 @media (max-width:620px){.arow2{grid-template-columns:1fr 1fr}.arow2 label:first-child{grid-column:1/-1}}
+.tab .tbadge{min-width:18px;height:18px;border-radius:9px;background:var(--do);color:#fff;font:700 11px/18px var(--body);padding:0 5px;text-align:center}
+.tab .tbadge:empty{display:none}
+.subtop{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
+.subtop .primary{flex:0 0 auto}
+.subtop .sh{font-size:13px;color:var(--muted)}
+.sublist{display:flex;flex-direction:column;gap:6px;margin-top:12px}
+.srow{display:flex;align-items:center;gap:10px;background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.srow .sav{flex:none;width:34px;height:34px;border-radius:10px;display:grid;place-items:center;color:#fff;font:700 15px/1 var(--display)}
+.srow .smain{flex:1;min-width:0;border:0;background:none;text-align:left;padding:0;display:flex;flex-direction:column;gap:2px}
+.srow .smain b{font-weight:600;font-size:15px;word-break:break-word}
+.srow .smain span{font-size:12px;color:var(--muted);word-break:break-word}
+.srow .sdue{flex:none;font-size:12px;font-weight:600;padding:4px 9px;border-radius:999px;white-space:nowrap}
+.sdue.bad{background:color-mix(in srgb,var(--do) 15%,var(--paper));color:var(--do)}
+.sdue.mid{background:color-mix(in srgb,var(--deleg) 18%,var(--paper));color:color-mix(in srgb,var(--deleg) 80%,var(--ink))}
+.sdue.ok{background:var(--bg);color:var(--muted)}
+.srow .spay{flex:none;padding:7px 11px;font-size:13px;border-radius:10px}
+.srow.off{opacity:.65}
+.suboff{margin-top:16px}
+.suboff summary{cursor:pointer;color:var(--muted);font-size:14px}
+.sform{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
+.sform label{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--muted)}
+.sform .full{grid-column:1/-1}
+.sform input,.sform select{border:1px solid var(--line);border-radius:10px;padding:9px 10px;background:var(--bg);font:inherit;color:var(--ink);min-width:0}
+.chipsrow{display:flex;flex-wrap:wrap;gap:6px}
+.chipsrow button{border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:6px 11px;font-size:13px}
+.chipsrow button:hover{border-color:var(--ink)}
+#subModal .qfoot{flex-wrap:wrap}
+.act.subm{--ac:var(--do)}
+@media (max-width:620px){.srow{flex-wrap:wrap}.srow .smain{flex-basis:calc(100% - 44px)}.srow .sdue{margin-left:44px}.srow .spay{margin-left:auto}#subStats .stat b{font-size:17px}}
 .wday .proc{font-size:11px;color:var(--muted);border-top:1px dashed var(--line);padding-top:4px;margin-top:2px}
 
 /* leak journal */
@@ -452,7 +482,8 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
       <button class="tab" role="tab" id="tab3"><span class="n">3</span>Расписание</button>
       <button class="tab" role="tab" id="tab5"><span class="n">4</span>Идеи</button>
       <button class="tab" role="tab" id="tab4"><span class="n">5</span>Архив</button>
-      <button class="tab" role="tab" id="tab6"><span class="n">6</span>Жизнь</button>
+      <button class="tab" role="tab" id="tab7"><span class="n">6</span>Подписки<span class="tbadge" id="subBadge"></span></button>
+      <button class="tab" role="tab" id="tab6"><span class="n">7</span>Жизнь</button>
     </div>
   </header>
 
@@ -510,6 +541,8 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
       <span style="--kc:#D9822B"><i></i>Еда</span>
       <span style="--kc:var(--plan)"><i></i>Отдых</span>
       <span style="--kc:#C93D7E"><i></i>Тренировки</span>
+      <span style="--kc:#E0A100"><i></i>Утро</span>
+      <span style="--kc:var(--do)"><i></i>Оплата подписки</span>
     </div>
   </section>
 
@@ -522,6 +555,17 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
       </div>
     </div>
     <div class="board" id="board"></div>
+  </section>
+
+  <!-- 7. Subscriptions -->
+  <section id="view7" hidden>
+    <div class="subtop">
+      <button class="primary" id="subAdd" type="button">+ Подписка</button>
+      <span class="sh">Отмечайте оплату кнопкой «Оплатил» — дата следующей оплаты сдвинется сама.</span>
+    </div>
+    <div class="stats" id="subStats"></div>
+    <div class="sublist" id="subList"></div>
+    <div id="subOff"></div>
   </section>
 
   <!-- 6. Life table -->
@@ -565,6 +609,30 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
     <input type="file" id="impFile" accept=".json,application/json" hidden>
     <input type="file" id="icsFile" accept=".ics,text/calendar" hidden>
   </details>
+</div>
+
+<div class="modal" id="subModal" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="smTitle">
+    <div class="qtop"><span class="qtask" id="smInfo"></span><button class="qx" id="smClose" type="button" aria-label="Закрыть">×</button></div>
+    <h2 id="smTitle">Новая подписка</h2>
+    <div class="sform">
+      <label class="full">Название<input id="smName" placeholder="Например: YouTube Premium" autocomplete="off"></label>
+      <label>Стоимость<input id="smPrice" type="number" min="0" step="0.01" inputmode="decimal" placeholder="299"></label>
+      <label>Валюта<select id="smCur"></select></label>
+      <label class="full">Как часто платить<select id="smPer"></select></label>
+      <label>Следующая оплата<input id="smDate" type="date"></label>
+      <label>Через сколько дней<input id="smDays" type="number" min="0" max="3650" inputmode="numeric"></label>
+      <div class="full chipsrow" id="smQuick"></div>
+      <label class="full">Заметка<input id="smNote" placeholder="Например: списывается с карты Т-Банка" autocomplete="off"></label>
+    </div>
+    <p class="qhint" id="smHint"></p>
+    <div class="qfoot">
+      <button class="ghost" id="smOff" type="button">Отменить подписку</button>
+      <button class="ghost danger" id="smDel" type="button">Удалить</button>
+      <span class="grow"></span>
+      <button class="primary" id="smSave" type="button">Сохранить</button>
+    </div>
+  </div>
 </div>
 
 <div class="modal" id="actModal" hidden>
@@ -667,13 +735,14 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
   let S={tasks:[],events:[],ideas:[],leaks:[],days:{},ideaFilter:'open',tab:1,view:'week',cur:TODAY(),invCollapsed:false,showDone:true};
   let sel=null;
   let TM={id:null, acc:0, start:null, paused:false}; // active timer
-  let AT=null; // активность: {type:'meal'|'rest'|'sport', start:ms}
+  let AT=null; // активность: {type:'meal'|'rest'|'sport'|'morning', start:ms}
   try{const raw=localStorage.getItem(KEY); if(raw){const d=JSON.parse(raw); if(d&&Array.isArray(d.tasks)) S=Object.assign(S,d);}}catch(e){}
   if(!Array.isArray(S.events)) S.events=[];
   if(!Array.isArray(S.ideas)) S.ideas=[];
   if(!S.days||typeof S.days!=='object') S.days={};
   if(!Array.isArray(S.leaks)) S.leaks=[];
   if(!Array.isArray(S.acts)) S.acts=[];
+  if(!Array.isArray(S.subs)) S.subs=[];
   if(S._act&&S._act.type&&S._act.start) AT=S._act;
   if(S._timer&&S._timer.id){ TM=S._timer; if(TM.start) TM.start=TM.start; } // resume timer across reloads
   S.tab=1; S.focus=null; // при открытии всегда начинаем с матрицы на сегодня
@@ -729,7 +798,7 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
   /* ---------- render ---------- */
   function render(){
     const v=S.tab;
-    [1,2,3,4,5,6].forEach(i=>{$('#view'+i).hidden=v!==i; $('#tab'+i).setAttribute('aria-selected',v===i);});
+    [1,2,3,4,5,6,7].forEach(i=>{$('#view'+i).hidden=v!==i; $('#tab'+i).setAttribute('aria-selected',v===i);});
     document.body.classList.toggle('picking',!!sel);
     if(v===1) renderMatrix();
     if(v===2) renderKinds();
@@ -738,7 +807,9 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
     renderFocusBar();
     if(v===5) renderIdeas();
     if(v===6) renderLife();
-    $('#addForm').hidden=v===6;
+    if(v===7) renderSubs();
+    $('#addForm').hidden=v===6||v===7;
+    $('#subBadge').textContent=S.subs.filter(x=>x.status!=='off'&&daysTo(x.next)<=3).length||'';
     renderBar();
     renderInv();
     document.querySelector('.bar').hidden=(S.tab>=4&&!sel&&!AT);
@@ -859,6 +930,7 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
       col.append(h);
       b.e.forEach(e=>col.append(evRow(e)));
       sorted(b.t).forEach(t=>col.append(chip(t,'sched')));
+      subsOn(k).forEach(x=>col.append(subMark(x)));
       actsOn(k).forEach(a=>col.append(actChip(a,true)));
       if(AT&&k===ymd(new Date(AT.start))) col.append(liveChip());
       const dr=S.days[k];
@@ -890,6 +962,7 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
     const f2=el('i'); f2.style.width=Math.min(100-Math.min(100,b.fact/DAY_LIMIT*100),b.plan/DAY_LIMIT*100)+'%';
     lb.append(f1,f2);
     v.append(lb, el('div','loadtxt', loadText(b)));
+    const sd=subsOn(k); if(sd.length){ v.append(el('h3',null,'Оплаты подписок')); const ls=el('div','list'); sd.forEach(x=>ls.append(subMark(x,true))); v.append(ls); }
     if(b.e.length){ v.append(el('h3',null,'События')); const l=el('div','list'); b.e.forEach(e=>l.append(evRow(e))); v.append(l); }
     const tops=sorted(b.t.filter(t=>t.top)), rest=sorted(b.t.filter(t=>!t.top));
     v.append(el('h3',null,'Главное на день'));
@@ -897,13 +970,13 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
     v.append(el('h3',null,'Остальные задачи'));
     const lr=el('div','list'); if(!rest.length) empty(lr,'Пусто.'); rest.forEach(t=>lr.append(chip(t,'sched'))); v.append(lr);
     const as=actsOn(k), sm=actSum(k), live=AT&&k===ymd(new Date(AT.start));
-    v.append(el('h3',null,'Еда, отдых и тренировки'));
+    v.append(el('h3',null,'Режим дня'));
     const la=el('div','list');
     as.forEach(a=>la.append(actChip(a)));
     if(live) la.append(liveChip());
-    if(!as.length&&!live) empty(la,'Пока ничего. Включите таймер «Приём пищи», «Отдых» или «Тренировка» над календарём.');
+    if(!as.length&&!live) empty(la,'Пока ничего. Включите таймер над календарём: утро, еда, отдых или тренировка.');
     v.append(la);
-    if(as.length){ const su=el('div','asum'); su.append(el('span',null,'🍽 еда: '),el('b',null,sm.meal?fmtMin(sm.meal)+' ('+sm.meals+')':'—'),el('span',null,' · ☕ отдых: '),el('b',null,sm.rest?fmtMin(sm.rest):'—'),el('span',null,' · 💪 тренировки: '),el('b',null,sm.sport?fmtMin(sm.sport)+(sm.sports>1?' ('+sm.sports+')':''):'—')); v.append(su); }
+    if(as.length){ const su=el('div','asum'); ATYPES.filter(t=>sm[t]).forEach((t,i)=>{ if(i) su.append(el('span',null,' · ')); su.append(el('span',null,ACT[t].icon+' '+ACT[t].lower+': '),el('b',null,fmtMin(sm[t])+(sm.cnt[t]>1?' ('+sm.cnt[t]+')':''))); }); v.append(su); }
     v.append(dayReview(k));
     const p=el('button','plus','+ Задача на этот день'); p.type='button';
     p.onclick=e=>{e.stopPropagation(); if(sel) return v.click(); inlineAdd(p,{date:k},render);};
@@ -1021,8 +1094,12 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
     items.forEach(t=>l.append(chip(t,cfg.mode)));
   }
   /* ---------- еда и отдых ---------- */
-  const ACT={meal:{name:'Приём пищи',short:'Еда',icon:'🍽',def:30},rest:{name:'Отдых',short:'Отдых',icon:'☕',def:15},sport:{name:'Тренировка',short:'Тренировка',icon:'💪',def:60}};
-  const ATYPES=['meal','rest','sport'];
+  const ACT={
+    meal:{name:'Приём пищи',short:'Еда',icon:'🍽',def:30,color:'#D9822B',lower:'еда'},
+    rest:{name:'Отдых',short:'Отдых',icon:'☕',def:15,color:'var(--plan)',lower:'отдых'},
+    sport:{name:'Тренировка',short:'Тренировка',icon:'💪',def:60,color:'#C93D7E',lower:'тренировки'},
+    morning:{name:'Утренняя рутина',short:'Утро',icon:'🌅',def:30,color:'#E0A100',lower:'утро'}};
+  const ATYPES=['morning','meal','rest','sport'];
   const hhmm=d=>pad(d.getHours())+':'+pad(d.getMinutes());
   function actElapsed(){ return AT?Math.floor((Date.now()-AT.start)/1000):0; }
   function actStart(type){
@@ -1078,7 +1155,7 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
     b.append(ACT[AT.type].icon+' '+ACT[AT.type].short+' с '+hhmm(new Date(AT.start)), el('span','am',fmtSec(actElapsed())));
     return b;
   }
-  function actSum(k){ const a=actsOn(k), sum=t=>a.filter(x=>x.type===t).reduce((s,x)=>s+x.mins,0), cnt=t=>a.filter(x=>x.type===t).length; return {meal:sum('meal'), rest:sum('rest'), sport:sum('sport'), n:a.length, meals:cnt('meal'), sports:cnt('sport')}; }
+  function actSum(k){ const a=actsOn(k), r={n:a.length,cnt:{}}; ATYPES.forEach(t=>{const l=a.filter(x=>x.type===t); r[t]=l.reduce((s,x)=>s+x.mins,0); r.cnt[t]=l.length;}); return r; }
 
   let AM=null; // редактируемая запись
   function openAct(a,day){
@@ -1505,7 +1582,7 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
     fb.append(btn('Сегодня','',()=>stopFocus()));
   }
 
-  function go(n){if(n>2) S.focus=null; S.tab=n; $('#addInput').placeholder=n===5?'Новая идея':'Новая задача'; sel=null; save(); render(); window.scrollTo({top:0});}
+  function go(n){if(n>2) S.focus=null; S.tab=n; setTimeout(()=>{const t=document.querySelector('header .tab[aria-selected="true"]'); if(t&&t.scrollIntoView) t.scrollIntoView({inline:'nearest',block:'nearest'});},0); $('#addInput').placeholder=n===5?'Новая идея':'Новая задача'; sel=null; save(); render(); window.scrollTo({top:0});}
 
   /* ---------- static targets ---------- */
   document.querySelectorAll('[data-target]').forEach(node=>{
@@ -1534,6 +1611,7 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
   $('#tab4').onclick=()=>go(4);
   $('#tab5').onclick=()=>go(5);
   $('#tab6').onclick=()=>go(6);
+  $('#tab7').onclick=()=>go(7);
   document.querySelectorAll('#scale button').forEach(b=>b.onclick=()=>{S.view=b.dataset.v; save(); render();});
   function shift(k){
     if(S.view==='day') S.cur=addDays(S.cur,k);
@@ -1545,6 +1623,7 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
   $('#next').onclick=()=>shift(1);
   $('#todayBtn').onclick=()=>{S.cur=TODAY(); save(); render();};
   document.addEventListener('keydown',e=>{
+    if(e.key==='Escape'&&SM){closeSub(); return;}
     if(e.key==='Escape'&&AM){closeAct(); return;}
     if(e.key==='Escape'&&Z){closeQuiz(); return;}
     if(e.key==='Escape'&&I){saveIdea(); return;}
@@ -1558,7 +1637,7 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
 
   /* ---------- export / import ---------- */
   $('#expBtn').onclick=()=>{
-    const blob=new Blob([JSON.stringify({version:2,exported:new Date().toISOString(),tasks:S.tasks,ideas:S.ideas,leaks:S.leaks,days:S.days,acts:S.acts},null,2)],{type:'application/json'});
+    const blob=new Blob([JSON.stringify({version:2,exported:new Date().toISOString(),tasks:S.tasks,ideas:S.ideas,leaks:S.leaks,days:S.days,acts:S.acts,subs:S.subs},null,2)],{type:'application/json'});
     const a=el('a'); a.href=URL.createObjectURL(blob); a.download='zadachi-'+TODAY()+'.json';
     document.body.append(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),1000);
     status('Копия сохранена в файл: задачи, архив, идеи и журнал. Загрузите его на другом устройстве, чтобы перенести всё.');
@@ -1577,12 +1656,13 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
         const leaksN=Array.isArray(d.leaks)?d.leaks.filter(L=>L&&L.id&&!S.leaks.some(x=>x.id===L.id)):[];
         const daysN=d.days&&typeof d.days==='object'?Object.keys(d.days).filter(k=>!S.days[k]):[];
         const actsN=Array.isArray(d.acts)?d.acts.filter(a=>a&&a.id&&!S.acts.some(x=>x.id===a.id)):[];
-        const total=fresh.length+ideasN.length+leaksN.length+daysN.length+actsN.length;
+        const subsN=Array.isArray(d.subs)?d.subs.filter(x=>x&&x.id&&!S.subs.some(y=>y.id===x.id)):[];
+        const total=fresh.length+ideasN.length+leaksN.length+daysN.length+actsN.length+subsN.length;
         if(!total){ status('В файле нет ничего нового: все задачи из него уже есть.'); e.target.value=''; return; }
-        const parts=[]; if(fresh.length) parts.push('задач: '+fresh.length); if(actsN.length) parts.push('записей еды/отдыха: '+actsN.length); if(ideasN.length) parts.push('идей: '+ideasN.length); if(leaksN.length) parts.push('утечек: '+leaksN.length); if(daysN.length) parts.push('итогов дня: '+daysN.length);
+        const parts=[]; if(fresh.length) parts.push('задач: '+fresh.length); if(actsN.length) parts.push('записей режима дня: '+actsN.length); if(subsN.length) parts.push('подписок: '+subsN.length); if(ideasN.length) parts.push('идей: '+ideasN.length); if(leaksN.length) parts.push('утечек: '+leaksN.length); if(daysN.length) parts.push('итогов дня: '+daysN.length);
         if(!confirm('Добавить из файла '+parts.join(', ')+'? Текущие данные останутся, повторы пропускаются.')){ e.target.value=''; return; }
         fresh.forEach(t=>S.tasks.push(newTask(String(t.text||''),t)));
-        ideasN.forEach(i=>S.ideas.push(i)); leaksN.forEach(L=>S.leaks.push(L)); daysN.forEach(k=>S.days[k]=d.days[k]); actsN.forEach(a=>S.acts.push(a));
+        ideasN.forEach(i=>S.ideas.push(i)); leaksN.forEach(L=>S.leaks.push(L)); daysN.forEach(k=>S.days[k]=d.days[k]); actsN.forEach(a=>S.acts.push(a)); subsN.forEach(x=>S.subs.push(x));
         save(); render();
         const skipped=d.tasks.length-fresh.length;
         status('Добавлено: '+parts.join(', ')+'.'+(skipped?' Уже были и пропущены: '+skipped+'.':''));
@@ -1714,6 +1794,118 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
   $('#lBirth').addEventListener('change',e=>{ const v=e.target.value; if(/^\d{4}-\d{2}-\d{2}$/.test(v)&&v<=TODAY()){ S.birth=v; save(); renderLife(); } });
   $('#lYears').addEventListener('change',e=>{ S.lifeYears=+e.target.value||70; save(); renderLife(); });
 
+  /* ---------- подписки ---------- */
+  const CURS=['₽','$','€','₸','₴','Br'];
+  const PER={month:{name:'в месяц',label:'Каждый месяц',m:1},year:{name:'в год',label:'Каждый год',m:1/12},week:{name:'в неделю',label:'Каждую неделю',m:52/12},once:{name:'разово',label:'Разово, без продления',m:0}};
+  const money=(v,c)=>(Math.round(v*100)/100).toLocaleString('ru-RU',{maximumFractionDigits:2})+' '+(c||'₽');
+  const sumByCur=(list,round)=>{const m={}; list.forEach(([v,c])=>{ if(v>0) m[c]=(m[c]||0)+v; }); const parts=Object.entries(m).map(([c,v])=>money(round?Math.round(v):v,c)); return parts.length?parts.join(' + '):'—';};
+  const daysTo=k=>Math.round((P(k)-P(TODAY()))/864e5);
+  const plural=(n,a,b,c)=>{n=Math.abs(n)%100; const n1=n%10; if(n>10&&n<20) return c; if(n1>1&&n1<5) return b; if(n1===1) return a; return c;};
+  const dueText=n=>n<0?'просрочена на '+(-n)+' '+plural(n,'день','дня','дней'):(n===0?'сегодня':(n===1?'завтра':'через '+n+' '+plural(n,'день','дня','дней')));
+  const dueLvl=n=>n<=1?'bad':(n<=7?'mid':'ok');
+  const longDate=k=>{const d=P(k); return d.getDate()+' '+MON_G[d.getMonth()]+(d.getFullYear()!==new Date().getFullYear()?' '+d.getFullYear():'');};
+  const SUBCOL=['#2F62D2','#0D8577','#6A45D1','#C93D7E','#D9822B','#3E7C2B','#B5452F','#2D7FA6'];
+  const subColor=n=>{let h=0; for(const ch of String(n)) h=(h*31+ch.charCodeAt(0))>>>0; return SUBCOL[h%SUBCOL.length];};
+  function addPeriod(k,per){
+    const d=P(k);
+    if(per==='year') d.setFullYear(d.getFullYear()+1);
+    else if(per==='week') d.setDate(d.getDate()+7);
+    else { const day=d.getDate(); d.setDate(1); d.setMonth(d.getMonth()+1); d.setDate(Math.min(day,new Date(d.getFullYear(),d.getMonth()+1,0).getDate())); }
+    return ymd(d);
+  }
+  // сколько раз подписка спишется в ближайшие N дней (просроченные тоже считаются)
+  function occ(x,days){ if(x.period==='once') return daysTo(x.next)<=days?1:0; let k=x.next,n=0,g=0; while(daysTo(k)<=days&&g<60){n++; k=addPeriod(k,x.period); g++;} return n; }
+  const subsOn=k=>S.subs.filter(x=>x.status!=='off'&&x.next===k);
+  function subMark(x,full){
+    const b=el('button','act subm'); b.type='button';
+    b.append('💳 '+x.name, el('span','am',money(x.price,x.cur)));
+    b.title='Оплата подписки: '+x.name+' · '+money(x.price,x.cur);
+    b.onclick=e=>{e.stopPropagation(); if(sel) return; openSub(x);};
+    return b;
+  }
+  function subRow(x){
+    const off=x.status==='off', n=daysTo(x.next), r=el('div','srow'+(off?' off':''));
+    const av=el('span','sav',(String(x.name||'?').trim()[0]||'?').toUpperCase()); av.style.background=subColor(x.name);
+    const main=el('button','smain'); main.type='button';
+    main.append(el('b',null,x.name));
+    const meta=[money(x.price,x.cur)+' '+PER[x.period].name];
+    if(!off) meta.push((x.period==='once'?'оплатить до ':'следующая оплата ')+longDate(x.next));
+    if(x.paid&&x.paid.length) meta.push('оплачено '+x.paid.length+' '+plural(x.paid.length,'раз','раза','раз'));
+    if(x.note) meta.push(x.note);
+    main.append(el('span',null,meta.join(' · ')));
+    main.onclick=()=>openSub(x);
+    r.append(av,main);
+    if(!off){ r.append(el('span','sdue '+dueLvl(n),dueText(n))); r.append(btn('Оплатил','ghost spay',()=>paySub(x))); }
+    else r.append(btn('Вернуть','ghost spay',()=>{ x.status='on'; if(daysTo(x.next)<0) x.next=TODAY(); save(); render(); }));
+    return r;
+  }
+  function paySub(x){
+    const base=daysTo(x.next)>=0?x.next:TODAY();
+    const nx=x.period==='once'?null:addPeriod(base,x.period);
+    if(!confirm('Отметить оплату «'+x.name+'» — '+money(x.price,x.cur)+'?'+(nx?' Следующая оплата: '+longDate(nx)+'.':' Разовая подписка уйдёт в завершённые.'))) return;
+    (x.paid=x.paid||[]).push({date:TODAY(),amount:x.price,cur:x.cur});
+    if(nx) x.next=nx; else x.status='off';
+    save(); render();
+  }
+  function renderSubs(){
+    const act=S.subs.filter(x=>x.status!=='off').sort((a,b)=>a.next.localeCompare(b.next)||a.name.localeCompare(b.name));
+    const off=S.subs.filter(x=>x.status==='off');
+    const st=$('#subStats'); st.innerHTML=''; st.hidden=!act.length;
+    if(act.length){
+      const nx=act[0], from30=addDays(TODAY(),-30);
+      const paid30=[]; S.subs.forEach(x=>(x.paid||[]).forEach(p=>{ if(p.date>=from30) paid30.push([p.amount,p.cur]); }));
+      [[daysTo(nx.next)<0?'просрочена':dueText(daysTo(nx.next)),'ближайшая: '+nx.name+' · '+money(nx.price,nx.cur)+(daysTo(nx.next)<0?' · срок был '+longDate(nx.next):'')],
+       [sumByCur(act.map(x=>[x.price*occ(x,7),x.cur])),'к оплате за 7 дней'],
+       [sumByCur(act.map(x=>[x.price*occ(x,30),x.cur])),'к оплате за 30 дней'],
+       [sumByCur(act.map(x=>[x.price*PER[x.period].m,x.cur]),true),'в среднем в месяц · '+act.length+' '+plural(act.length,'подписка','подписки','подписок')+(paid30.length?' · оплачено за 30 дн. '+sumByCur(paid30):'')]]
+        .forEach(([v,l])=>{const c=el('div','stat'); c.append(el('b',null,v),el('span',null,l)); st.append(c);});
+    }
+    const list=$('#subList'); list.innerHTML='';
+    if(!act.length) empty(list,'Подписок пока нет. Нажмите «+ Подписка»: название, стоимость и когда следующая оплата.');
+    act.forEach(x=>list.append(subRow(x)));
+    const ob=$('#subOff'); ob.innerHTML='';
+    if(off.length){
+      const d=el('details','suboff'); d.append(el('summary',null,'Отменённые и завершённые · '+off.length));
+      const l=el('div','sublist'); off.forEach(x=>l.append(subRow(x))); d.append(l); ob.append(d);
+    }
+  }
+  let SM=null;
+  function setSubDate(k){ $('#smDate').value=k; $('#smDays').value=Math.max(0,daysTo(k)); }
+  function openSub(x){
+    SM=x?{...x}:{id:null,name:'',price:'',cur:'₽',period:'month',next:addDays(TODAY(),30),note:'',status:'on',paid:[]};
+    $('#smTitle').textContent=x?x.name:'Новая подписка';
+    $('#smInfo').textContent=x?(x.status==='off'?'отменена':'подписка'):'';
+    $('#smName').value=SM.name; $('#smPrice').value=SM.price; $('#smNote').value=SM.note||'';
+    const c=$('#smCur'); c.innerHTML=''; CURS.forEach(v=>{const o=el('option',null,v); o.value=v; if(v===SM.cur) o.selected=true; c.append(o);});
+    const pr=$('#smPer'); pr.innerHTML=''; Object.entries(PER).forEach(([k,v])=>{const o=el('option',null,v.label); o.value=k; if(k===SM.period) o.selected=true; pr.append(o);});
+    setSubDate(SM.next);
+    const q=$('#smQuick'); q.innerHTML='';
+    [['через 7 дней',()=>addDays(TODAY(),7)],['через 14 дней',()=>addDays(TODAY(),14)],['через месяц',()=>addPeriod(TODAY(),'month')],['через год',()=>addPeriod(TODAY(),'year')]]
+      .forEach(([l,f])=>{const b=el('button',null,l); b.type='button'; b.onclick=()=>setSubDate(f()); q.append(b);});
+    const h=(x&&x.paid&&x.paid.length)?'Оплаты: '+x.paid.slice(-6).reverse().map(p=>longDate(p.date)+' — '+money(p.amount,p.cur)).join(', '):'';
+    $('#smHint').textContent=h;
+    $('#smDel').hidden=!x; $('#smOff').hidden=!x||x.status==='off';
+    $('#subModal').hidden=false; if(!x) setTimeout(()=>$('#smName').focus(),30);
+  }
+  function closeSub(){ SM=null; $('#subModal').hidden=true; }
+  $('#smDate').addEventListener('change',()=>{ const v=$('#smDate').value; if(/^\d{4}-\d{2}-\d{2}$/.test(v)) $('#smDays').value=Math.max(0,daysTo(v)); });
+  $('#smDays').addEventListener('input',()=>{ const n=parseInt($('#smDays').value,10); if(n>=0&&n<=3650) $('#smDate').value=addDays(TODAY(),n); });
+  $('#smSave').onclick=()=>{
+    const name=$('#smName').value.trim(), price=parseFloat(String($('#smPrice').value).replace(',','.')), next=$('#smDate').value;
+    if(!name){ $('#smHint').textContent='Укажите название подписки.'; $('#smName').focus(); return; }
+    if(!(price>=0)){ $('#smHint').textContent='Укажите стоимость числом, например 299.'; $('#smPrice').focus(); return; }
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(next)){ $('#smHint').textContent='Укажите дату следующей оплаты или через сколько дней.'; return; }
+    const rec={...SM,name,price,cur:$('#smCur').value,period:$('#smPer').value,next,note:$('#smNote').value.trim()};
+    if(SM.id){ const i=S.subs.findIndex(y=>y.id===SM.id); if(i>=0) S.subs[i]=rec; }
+    else { rec.id=uid(); rec.created=TODAY(); S.subs.push(rec); }
+    closeSub(); save(); render();
+  };
+  $('#smDel').onclick=()=>{ if(SM&&SM.id&&confirm('Удалить подписку вместе с историей оплат?')){ S.subs=S.subs.filter(y=>y.id!==SM.id); closeSub(); save(); render(); } };
+  $('#smOff').onclick=()=>{ if(!SM||!SM.id) return; const x=S.subs.find(y=>y.id===SM.id); if(x&&confirm('Отменить подписку «'+x.name+'»? Она уйдёт в отменённые, история оплат сохранится.')){ x.status='off'; closeSub(); save(); render(); } };
+  $('#smClose').onclick=closeSub;
+  $('#subModal').addEventListener('click',e=>{ if(e.target.id==='subModal') closeSub(); });
+  $('#subAdd').onclick=()=>openSub(null);
+
   /* ---------- итоги недели ---------- */
   let WK=null; // monday of shown week
   const inRange=(d,a,b)=>d&&d>=a&&d<=b;
@@ -1813,17 +2005,23 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
     if(W.topLeaks.length) sec1.append(el('div','sub','Главные утечки: '+W.topLeaks.join(', ')));
     body.append(sec1);
 
-    // еда, отдых и тренировки
+    // режим дня: утро, еда, отдых, тренировки
     if(W.acts.length){
-      const sa=el('div','wksec'); sa.append(el('h3',null,'Еда, отдых и тренировки'));
+      const sa=el('div','wksec'); sa.append(el('h3',null,'Режим дня'));
       const of=t=>W.acts.filter(a=>a.type===t), sumOf=l=>l.reduce((x,a)=>x+a.mins,0), daysOf=l=>new Set(l.map(a=>a.date)).size;
-      const meals=of('meal'), rests=of('rest'), sports=of('sport');
-      const mSum=sumOf(meals), rSum=sumOf(rests), sSum=sumOf(sports);
-      const mDays=daysOf(meals), rDays=daysOf(rests), sDays=daysOf(sports);
-      const st2=el('div','stats s3');
-      [[meals.length?fmtMin(mSum):'—','на еду · '+meals.length+' приёмов'],
-       [rests.length?fmtMin(rSum):'—','на отдых · '+rests.length+' раз'],
-       [sports.length?fmtMin(sSum):'—','на тренировки · '+sports.length+' раз'],
+      const meals=of('meal'), rests=of('rest'), sports=of('sport'), morns=of('morning');
+      const mSum=sumOf(meals), rSum=sumOf(rests), sSum=sumOf(sports), uSum=sumOf(morns);
+      const mDays=daysOf(meals), rDays=daysOf(rests), sDays=daysOf(sports), uDays=daysOf(morns);
+      // среднее время начала утренней рутины (первая запись дня)
+      const firstMorn={}; morns.forEach(a=>{ if(!firstMorn[a.date]||a.time<firstMorn[a.date]) firstMorn[a.date]=a.time; });
+      const fm=Object.values(firstMorn).map(t=>{const [h,m]=t.split(':').map(Number); return h*60+m;});
+      const avgStart=fm.length?Math.round(fm.reduce((x,y)=>x+y,0)/fm.length):null;
+      const st2=el('div','stats');
+      [[morns.length?fmtMin(uSum):'—','на утреннюю рутину · '+morns.length+' '+plural(morns.length,'раз','раза','раз')],
+       [meals.length?fmtMin(mSum):'—','на еду · '+meals.length+' '+plural(meals.length,'приём','приёма','приёмов')],
+       [rests.length?fmtMin(rSum):'—','на отдых · '+rests.length+' '+plural(rests.length,'раз','раза','раз')],
+       [sports.length?fmtMin(sSum):'—','на тренировки · '+sports.length+' '+plural(sports.length,'раз','раза','раз')],
+       [uDays+' из 7','дней с рутиной'+(avgStart!=null?' · начало ≈ '+pad(Math.floor(avgStart/60))+':'+pad(avgStart%60):'')],
        [meals.length?fmtMin(Math.round(mSum/meals.length)):'—','в среднем на приём пищи'],
        [rDays?fmtMin(Math.round(rSum/rDays)):'—','отдыха в день (по '+rDays+' дн.)'],
        [sDays+' из 7','дней с тренировкой'+(sports.length?' · в среднем '+fmtMin(Math.round(sSum/sports.length)):'')]]
@@ -1838,7 +2036,7 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
       });
       sa.append(days);
       const lgd=el('div','wklegend'); lgd.style.marginTop='6px';
-      [['еда','#D9822B'],['отдых','var(--plan)'],['тренировки','#C93D7E']].forEach(([l,c])=>{const x=el('span',null,l); x.style.setProperty('--c',c); lgd.append(x);});
+      ATYPES.forEach(t=>{const x=el('span',null,ACT[t].lower); x.style.setProperty('--c',ACT[t].color); lgd.append(x);});
       if(mDays<7&&mDays>0) lgd.append(el('span',null,'еда отмечена в '+mDays+' из 7 дней'));
       sa.append(lgd);
       body.append(sa);
