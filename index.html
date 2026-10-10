@@ -540,9 +540,6 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
   <section id="view6" hidden>
     <div class="ideabar">
       <button class="primary" id="newIns" type="button">+ Новый инсайт</button>
-      <div class="seg" id="insFilter">
-        <button data-v="open">Активные</button><button data-v="used">Применённые</button><button data-v="all">Все</button>
-      </div>
     </div>
     <div class="board" id="board2"></div>
   </section>
@@ -699,7 +696,7 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
   const fmtEst=m=>m>720?'12+ ч':fmtMin(m);
   const fmtMin=m=>m<60?m+' мин':(Math.round(m/6)/10+' ч').replace('.',',');
 
-  let S={tasks:[],events:[],ideas:[],insights:[],insFilter:'open',leaks:[],days:{},ideaFilter:'open',tab:1,view:'week',cur:TODAY(),invCollapsed:false,showDone:true};
+  let S={tasks:[],events:[],ideas:[],insights:[],leaks:[],days:{},ideaFilter:'open',tab:1,view:'week',cur:TODAY(),invCollapsed:false,showDone:true};
   let sel=null;
   let TM={id:null, acc:0, start:null, paused:false}; // active timer
   let AT=null; // активность: {type:'meal'|'rest'|'sport'|'morning', start:ms}
@@ -1288,7 +1285,7 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
   const BOARDS={
     idea:{key:'ideas',fkey:'ideaFilter',board:'#board',filter:'#ideaFilter',one:'Идея',fresh:'Новая идея',used:'В работу',usedTag:'в работе',
           ph:'Описание: в чём суть, зачем, с чего начать',emptyUsed:'Использованных идей пока нет.',empty:'Пока пусто. Нажмите «+ Новая идея» — заголовок, описание, и стикер появится на доске.',del:'Удалить идею?'},
-    ins:{key:'insights',fkey:'insFilter',board:'#board2',filter:'#insFilter',one:'Инсайт',fresh:'Новый инсайт',used:'Применил',usedTag:'применён',
+    ins:{key:'insights',fkey:null,board:'#board2',filter:null,one:'Инсайт',fresh:'Новый инсайт',used:'Применил',usedTag:'применён',
           ph:'Что понял, откуда это и как применить',emptyUsed:'Применённых инсайтов пока нет.',empty:'Пока пусто. Нажмите «+ Новый инсайт» — заголовок, описание, и стикер появится на доске.',del:'Удалить инсайт?'}
   };
   let I=null, IB='idea'; // редактируемый стикер и его доска
@@ -1322,11 +1319,11 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
   $('#ideaModal').addEventListener('click',e=>{ if(e.target.id==='ideaModal') saveIdea(); });
   $('#newIdea').onclick=()=>openIdea(null,'','idea');
   $('#newIns').onclick=()=>openIdea(null,'','ins');
-  Object.values(BOARDS).forEach(B=>document.querySelectorAll(B.filter+' button').forEach(b=>b.onclick=()=>{S[B.fkey]=b.dataset.v; save(); render();}));
+  Object.values(BOARDS).filter(B=>B.filter).forEach(B=>document.querySelectorAll(B.filter+' button').forEach(b=>b.onclick=()=>{S[B.fkey]=b.dataset.v; save(); render();}));
 
   function renderBoard(kind){
-    const B=BOARDS[kind], f=S[B.fkey]||'open';
-    document.querySelectorAll(B.filter+' button').forEach(b=>b.setAttribute('aria-selected',b.dataset.v===f));
+    const B=BOARDS[kind], f=B.fkey?(S[B.fkey]||'open'):'all'; // у инсайтов фильтра нет — показываем все
+    if(B.filter) document.querySelectorAll(B.filter+' button').forEach(b=>b.setAttribute('aria-selected',b.dataset.v===f));
     const list=S[B.key].filter(i=>f==='all'||(f==='used'?i.used:!i.used))
       .sort((a,b)=>((b.pin?1:0)-(a.pin?1:0))||b.at.localeCompare(a.at));
     const board=$(B.board); board.innerHTML='';
