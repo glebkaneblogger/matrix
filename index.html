@@ -209,40 +209,6 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
 .colors button{width:30px;height:30px;border-radius:50%;border:2px solid transparent;background:var(--c)}
 .colors button.on{border-color:var(--ink);transform:scale(1.1)}
 
-/* life table */
-.life{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:18px 16px}
-.life h2{margin:0;text-align:center;font:700 24px/1.15 var(--display)}
-.life .lsub{margin:4px 0 14px;text-align:center;font-size:13px;color:var(--muted)}
-.lctl{display:flex;flex-wrap:wrap;gap:10px;align-items:end;justify-content:center;margin-bottom:16px}
-.lctl label{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--muted)}
-.lctl input,.lctl select{border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:8px 10px;font:inherit;color:var(--ink);min-width:150px}
-.lgrid{display:flex;flex-direction:column;gap:2px;max-width:940px;margin:0 auto}
-.lrow{display:flex;align-items:center;gap:6px}
-.lrow.gap5{margin-top:5px}
-.lrow .ly{flex:none;width:22px;text-align:right;font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
-.lcells{flex:1;display:grid;grid-template-columns:repeat(52,minmax(0,1fr));gap:2px}
-.lcells i{display:block;aspect-ratio:1;border:1px solid var(--line);border-radius:1.5px;background:transparent}
-.lcells i.l{background:var(--do);border-color:var(--do)}
-.lcells i.now{background:var(--ink);border-color:var(--ink);box-shadow:0 0 0 2px color-mix(in srgb,var(--do) 45%,transparent);animation:pulse 1.6s ease infinite}
-.lcells i.q{margin-left:0}
-.lfoot{max-width:940px;margin:16px auto 0}
-.lbar{height:10px;border-radius:5px;background:var(--line);overflow:hidden}
-.lbar i{display:block;height:100%;background:var(--do);border-radius:5px}
-.lstat{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 18px;margin-top:10px}
-.lstat .big{font-size:17px}
-.lstat .big b{font-weight:600}
-.lstat .lg{display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--muted)}
-.lstat .lg span::before{content:'';display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px;border:1px solid var(--line)}
-.lstat .lg .a::before{background:var(--do);border-color:var(--do)}
-.lstat .lg .c::before{background:var(--ink);border-color:var(--ink)}
-.lnums{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:12px}
-.lnums div{background:var(--bg);border-radius:10px;padding:10px}
-.lnums b{display:block;font:700 18px/1.1 var(--display)}
-.lnums span{font-size:12px;color:var(--muted)}
-.lempty{text-align:center;color:var(--muted);padding:30px 10px}
-@media (max-width:620px){.life{padding:14px 8px}.life h2{font-size:20px}.lcells{gap:1px}.lgrid{gap:1px}.lrow{gap:3px}.lrow .ly{width:16px;font-size:9px}.lnums{grid-template-columns:1fr 1fr 1fr}.lnums b{font-size:15px}
-  header .seg{overflow-x:auto;max-width:100%;-webkit-overflow-scrolling:touch;scrollbar-width:none}}
-
 /* weekly report */
 .hleft{display:flex;align-items:center;gap:10px}
 .wkbtn{border:1px solid var(--line);background:var(--paper);border-radius:10px;padding:6px 10px;font-size:13px;font-weight:600;white-space:nowrap}
@@ -485,7 +451,7 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
       <button class="tab" role="tab" id="tab5"><span class="n">4</span>Идеи</button>
       <button class="tab" role="tab" id="tab4"><span class="n">5</span>Архив</button>
       <button class="tab" role="tab" id="tab7"><span class="n">6</span>Подписки</button>
-      <button class="tab" role="tab" id="tab6"><span class="n">7</span>Жизнь</button>
+      <button class="tab" role="tab" id="tab6"><span class="n">7</span>Инсайты</button>
     </div>
   </header>
 
@@ -570,17 +536,15 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
     <div id="subOff"></div>
   </section>
 
-  <!-- 6. Life table -->
+  <!-- 6. Insights -->
   <section id="view6" hidden>
-    <div class="life">
-      <h2>Таблица жизни</h2>
-      <p class="lsub" id="lSub">Одна клетка — одна неделя, одна строка — один год.</p>
-      <div class="lctl">
-        <label>Дата рождения<input type="date" id="lBirth"></label>
-        <label>Горизонт<select id="lYears"><option value="60">60 лет</option><option value="65">65 лет</option><option value="70">70 лет</option><option value="75">75 лет</option><option value="80">80 лет</option><option value="90">90 лет</option></select></label>
+    <div class="ideabar">
+      <button class="primary" id="newIns" type="button">+ Новый инсайт</button>
+      <div class="seg" id="insFilter">
+        <button data-v="open">Активные</button><button data-v="used">Применённые</button><button data-v="all">Все</button>
       </div>
-      <div id="lBody"></div>
     </div>
+    <div class="board" id="board2"></div>
   </section>
 
   <!-- 4. Archive -->
@@ -735,13 +699,14 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
   const fmtEst=m=>m>720?'12+ ч':fmtMin(m);
   const fmtMin=m=>m<60?m+' мин':(Math.round(m/6)/10+' ч').replace('.',',');
 
-  let S={tasks:[],events:[],ideas:[],leaks:[],days:{},ideaFilter:'open',tab:1,view:'week',cur:TODAY(),invCollapsed:false,showDone:true};
+  let S={tasks:[],events:[],ideas:[],insights:[],insFilter:'open',leaks:[],days:{},ideaFilter:'open',tab:1,view:'week',cur:TODAY(),invCollapsed:false,showDone:true};
   let sel=null;
   let TM={id:null, acc:0, start:null, paused:false}; // active timer
   let AT=null; // активность: {type:'meal'|'rest'|'sport'|'morning', start:ms}
   try{const raw=localStorage.getItem(KEY); if(raw){const d=JSON.parse(raw); if(d&&Array.isArray(d.tasks)) S=Object.assign(S,d);}}catch(e){}
   if(!Array.isArray(S.events)) S.events=[];
   if(!Array.isArray(S.ideas)) S.ideas=[];
+  if(!Array.isArray(S.insights)) S.insights=[];
   if(!S.days||typeof S.days!=='object') S.days={};
   if(!Array.isArray(S.leaks)) S.leaks=[];
   if(!Array.isArray(S.acts)) S.acts=[];
@@ -808,10 +773,10 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
     if(v===3) renderSchedule();
     if(v===4) renderArchive();
     renderFocusBar();
-    if(v===5) renderIdeas();
-    if(v===6) renderLife();
+    if(v===5) renderBoard('idea');
+    if(v===6) renderBoard('ins');
     if(v===7) renderSubs();
-    $('#addForm').hidden=v===6||v===7;
+    $('#addForm').hidden=v===7;
     renderBar();
     renderInv();
     document.querySelector('.bar').hidden=(S.tab>=4&&!sel&&!AT);
@@ -1318,16 +1283,23 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
   $('#qClose').onclick=closeQuiz;
   $('#quiz').addEventListener('click',e=>{ if(e.target.id==='quiz') closeQuiz(); });
 
-  /* ---------- ideas board ---------- */
+  /* ---------- доски со стикерами: идеи и инсайты ---------- */
   const SC=['#FFE88A','#BFE6A6','#AFD8F2','#F6B9C8','#E2CDF6','#FFD2A6'];
-  let I=null; // редактируемая идея
-  function openIdea(idea,preset){
-    I=idea||{id:uid(),name:preset||'',desc:'',color:SC[S.ideas.length%SC.length],at:TODAY(),used:false,pin:false,isNew:true};
-    $('#iTitle').textContent=idea?'Идея':'Новая идея';
-    $('#iKind').textContent=idea?('добавлена '+dateLabel(idea.at)):'';
-    $('#iName').value=I.name; $('#iDesc').value=I.desc;
-    $('#iDel').hidden=!idea; $('#iUsed').hidden=!idea;
-    $('#iUsed').textContent=I.used?'Вернуть на доску':'В работу';
+  const BOARDS={
+    idea:{key:'ideas',fkey:'ideaFilter',board:'#board',filter:'#ideaFilter',one:'Идея',fresh:'Новая идея',used:'В работу',usedTag:'в работе',
+          ph:'Описание: в чём суть, зачем, с чего начать',emptyUsed:'Использованных идей пока нет.',empty:'Пока пусто. Нажмите «+ Новая идея» — заголовок, описание, и стикер появится на доске.',del:'Удалить идею?'},
+    ins:{key:'insights',fkey:'insFilter',board:'#board2',filter:'#insFilter',one:'Инсайт',fresh:'Новый инсайт',used:'Применил',usedTag:'применён',
+          ph:'Что понял, откуда это и как применить',emptyUsed:'Применённых инсайтов пока нет.',empty:'Пока пусто. Нажмите «+ Новый инсайт» — заголовок, описание, и стикер появится на доске.',del:'Удалить инсайт?'}
+  };
+  let I=null, IB='idea'; // редактируемый стикер и его доска
+  function openIdea(item,preset,kind){
+    IB=kind||IB; const B=BOARDS[IB], list=S[B.key];
+    I=item||{id:uid(),name:preset||'',desc:'',color:SC[list.length%SC.length],at:TODAY(),used:false,pin:false,isNew:true};
+    $('#iTitle').textContent=item?B.one:B.fresh;
+    $('#iKind').textContent=item?('добавлен'+(IB==='idea'?'а':'')+' '+dateLabel(item.at)):'';
+    $('#iName').value=I.name; $('#iDesc').value=I.desc; $('#iDesc').placeholder=B.ph;
+    $('#iDel').hidden=!item; $('#iUsed').hidden=!item;
+    $('#iUsed').textContent=I.used?'Вернуть на доску':B.used;
     const c=$('#iColors'); c.innerHTML='';
     SC.forEach(col=>{const b=el('button',I.color===col?'on':''); b.type='button'; b.style.setProperty('--c',col); b.setAttribute('aria-label','Цвет стикера');
       b.onclick=()=>{I.color=col; openColors();}; c.append(b);});
@@ -1340,27 +1312,25 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
     I.name=$('#iName').value.trim(); I.desc=$('#iDesc').value.trim();
     if(!I.name&&!I.desc){ closeIdea(); render(); return; }
     if(!I.name) I.name=I.desc.split('\n')[0].slice(0,60);
-    if(I.isNew){ delete I.isNew; S.ideas.unshift(I); }
+    if(I.isNew){ delete I.isNew; S[BOARDS[IB].key].unshift(I); }
     closeIdea(); save(); render();
   }
   $('#iClose').onclick=()=>{saveIdea();};
   $('#iSave').onclick=saveIdea;
-  $('#iDel').onclick=()=>{ if(confirm('Удалить идею?')){ S.ideas=S.ideas.filter(x=>x.id!==I.id); closeIdea(); save(); render(); } };
+  $('#iDel').onclick=()=>{ const B=BOARDS[IB]; if(confirm(B.del)){ S[B.key]=S[B.key].filter(x=>x.id!==I.id); closeIdea(); save(); render(); } };
   $('#iUsed').onclick=()=>{ I.used=!I.used; saveIdea(); };
   $('#ideaModal').addEventListener('click',e=>{ if(e.target.id==='ideaModal') saveIdea(); });
-  $('#newIdea').onclick=()=>openIdea(null);
-  document.querySelectorAll('#ideaFilter button').forEach(b=>b.onclick=()=>{S.ideaFilter=b.dataset.v; save(); render();});
+  $('#newIdea').onclick=()=>openIdea(null,'','idea');
+  $('#newIns').onclick=()=>openIdea(null,'','ins');
+  Object.values(BOARDS).forEach(B=>document.querySelectorAll(B.filter+' button').forEach(b=>b.onclick=()=>{S[B.fkey]=b.dataset.v; save(); render();}));
 
-  function renderIdeas(){
-    document.querySelectorAll('#ideaFilter button').forEach(b=>b.setAttribute('aria-selected',b.dataset.v===S.ideaFilter));
-    const f=S.ideaFilter;
-    const list=S.ideas.filter(i=>f==='all'||(f==='used'?i.used:!i.used))
+  function renderBoard(kind){
+    const B=BOARDS[kind], f=S[B.fkey]||'open';
+    document.querySelectorAll(B.filter+' button').forEach(b=>b.setAttribute('aria-selected',b.dataset.v===f));
+    const list=S[B.key].filter(i=>f==='all'||(f==='used'?i.used:!i.used))
       .sort((a,b)=>((b.pin?1:0)-(a.pin?1:0))||b.at.localeCompare(a.at));
-    const board=$('#board'); board.innerHTML='';
-    if(!list.length){
-      const e=el('div','ideas-empty',f==='used'?'Использованных идей пока нет.':'Пока пусто. Нажмите «+ Новая идея» — заголовок, описание, и стикер появится на доске.');
-      board.append(e); return;
-    }
+    const board=$(B.board); board.innerHTML='';
+    if(!list.length){ board.append(el('div','ideas-empty',f==='used'?B.emptyUsed:B.empty)); return; }
     list.forEach((i,n)=>{
       const c=el('button','sticky'+(i.used?' used':'')+(i.pin?' pinned':'')); c.type='button';
       c.style.setProperty('--sc',i.color||SC[0]);
@@ -1369,8 +1339,8 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
       pin.onclick=e=>{e.stopPropagation(); i.pin=!i.pin; save(); render();};
       c.append(pin, el('div','st',i.name));
       if(i.desc) c.append(el('div','sd',i.desc));
-      c.append(el('div','sdate',(i.used?'в работе · ':'')+dateLabel(i.at)));
-      c.onclick=()=>openIdea(i);
+      c.append(el('div','sdate',(i.used?B.usedTag+' · ':'')+dateLabel(i.at)));
+      c.onclick=()=>openIdea(i,'',kind);
       board.append(c);
     });
   }
@@ -1584,7 +1554,7 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
     fb.append(btn('Сегодня','',()=>stopFocus()));
   }
 
-  function go(n){if(n>2) S.focus=null; S.tab=n; setTimeout(()=>{const t=document.querySelector('header .tab[aria-selected="true"]'); if(t&&t.scrollIntoView) t.scrollIntoView({inline:'nearest',block:'nearest'});},0); $('#addInput').placeholder=n===5?'Новая идея':'Новая задача'; sel=null; save(); render(); window.scrollTo({top:0});}
+  function go(n){if(n>2) S.focus=null; S.tab=n; setTimeout(()=>{const t=document.querySelector('header .tab[aria-selected="true"]'); if(t&&t.scrollIntoView) t.scrollIntoView({inline:'nearest',block:'nearest'});},0); $('#addInput').placeholder=n===5?'Новая идея':(n===6?'Новый инсайт':'Новая задача'); sel=null; save(); render(); window.scrollTo({top:0});}
 
   /* ---------- static targets ---------- */
   document.querySelectorAll('[data-target]').forEach(node=>{
@@ -1600,7 +1570,8 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
 
   function addTop(){
     const i=$('#addInput'), v=i.value.trim(); if(!v){i.focus(); return;}
-    if(S.tab===5){ openIdea(null,v); i.value=''; return; }
+    if(S.tab===5){ openIdea(null,v,'idea'); i.value=''; return; }
+    if(S.tab===6){ openIdea(null,v,'ins'); i.value=''; return; }
     S.tasks.push(newTask(v,S.focus&&(S.tab===1||S.tab===2)?{date:S.focus}:undefined)); i.value=''; save(); render(); i.focus();
   }
   $('#addBtn').addEventListener('click',addTop);
@@ -1639,7 +1610,7 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
 
   /* ---------- export / import ---------- */
   $('#expBtn').onclick=()=>{
-    const blob=new Blob([JSON.stringify({version:2,exported:new Date().toISOString(),tasks:S.tasks,ideas:S.ideas,leaks:S.leaks,days:S.days,acts:S.acts,subs:S.subs},null,2)],{type:'application/json'});
+    const blob=new Blob([JSON.stringify({version:2,exported:new Date().toISOString(),tasks:S.tasks,ideas:S.ideas,insights:S.insights,leaks:S.leaks,days:S.days,acts:S.acts,subs:S.subs},null,2)],{type:'application/json'});
     const a=el('a'); a.href=URL.createObjectURL(blob); a.download='zadachi-'+TODAY()+'.json';
     document.body.append(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),1000);
     status('Копия сохранена в файл: задачи, архив, идеи и журнал. Загрузите его на другом устройстве, чтобы перенести всё.');
@@ -1659,12 +1630,13 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
         const daysN=d.days&&typeof d.days==='object'?Object.keys(d.days).filter(k=>!S.days[k]):[];
         const actsN=Array.isArray(d.acts)?d.acts.filter(a=>a&&a.id&&!S.acts.some(x=>x.id===a.id)):[];
         const subsN=Array.isArray(d.subs)?d.subs.filter(x=>x&&x.id&&!S.subs.some(y=>y.id===x.id)):[];
-        const total=fresh.length+ideasN.length+leaksN.length+daysN.length+actsN.length+subsN.length;
+        const insN=Array.isArray(d.insights)?d.insights.filter(i=>i&&i.id&&!S.insights.some(x=>x.id===i.id)):[];
+        const total=fresh.length+insN.length+ideasN.length+leaksN.length+daysN.length+actsN.length+subsN.length;
         if(!total){ status('В файле нет ничего нового: все задачи из него уже есть.'); e.target.value=''; return; }
-        const parts=[]; if(fresh.length) parts.push('задач: '+fresh.length); if(actsN.length) parts.push('записей режима дня: '+actsN.length); if(subsN.length) parts.push('подписок: '+subsN.length); if(ideasN.length) parts.push('идей: '+ideasN.length); if(leaksN.length) parts.push('утечек: '+leaksN.length); if(daysN.length) parts.push('итогов дня: '+daysN.length);
+        const parts=[]; if(fresh.length) parts.push('задач: '+fresh.length); if(insN.length) parts.push('инсайтов: '+insN.length); if(actsN.length) parts.push('записей режима дня: '+actsN.length); if(subsN.length) parts.push('подписок: '+subsN.length); if(ideasN.length) parts.push('идей: '+ideasN.length); if(leaksN.length) parts.push('утечек: '+leaksN.length); if(daysN.length) parts.push('итогов дня: '+daysN.length);
         if(!confirm('Добавить из файла '+parts.join(', ')+'? Текущие данные останутся, повторы пропускаются.')){ e.target.value=''; return; }
         fresh.forEach(t=>S.tasks.push(newTask(String(t.text||''),t)));
-        ideasN.forEach(i=>S.ideas.push(i)); leaksN.forEach(L=>S.leaks.push(L)); daysN.forEach(k=>S.days[k]=d.days[k]); actsN.forEach(a=>S.acts.push(a)); subsN.forEach(x=>S.subs.push(x));
+        ideasN.forEach(i=>S.ideas.push(i)); insN.forEach(i=>S.insights.push(i)); leaksN.forEach(L=>S.leaks.push(L)); daysN.forEach(k=>S.days[k]=d.days[k]); actsN.forEach(a=>S.acts.push(a)); subsN.forEach(x=>S.subs.push(x));
         save(); render();
         const skipped=d.tasks.length-fresh.length;
         status('Добавлено: '+parts.join(', ')+'.'+(skipped?' Уже были и пропущены: '+skipped+'.':''));
@@ -1748,53 +1720,6 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
       if(d>until||n>=cnt) return; n++; push(d);
     }
   }
-
-  /* ---------- таблица жизни ---------- */
-  function renderLife(){
-    const bi=$('#lBirth'), ys=$('#lYears');
-    if(S.birth&&bi.value!==S.birth) bi.value=S.birth;
-    ys.value=String(S.lifeYears||70);
-    const body=$('#lBody'); body.innerHTML='';
-    const years=S.lifeYears||70;
-    $('#lSub').textContent='Красным — прожитые недели, тёмная — текущая. Горизонт таблицы — '+years+' лет.';
-    if(!S.birth){ body.append(el('div','lempty','Укажите дату рождения — таблица построится от неё.')); return; }
-    const birth=P(S.birth), now=new Date(); now.setHours(12,0,0,0);
-    const DAY=864e5;
-    let lived=0, cur=null;
-    const grid=el('div','lgrid');
-    for(let y=0;y<years;y++){
-      const ys0=new Date(birth.getFullYear()+y,birth.getMonth(),birth.getDate());
-      const row=el('div','lrow'+(y>0&&y%5===0?' gap5':''));
-      row.append(el('span','ly',(y%5===0&&y>0)?String(y):''));
-      const cells=el('div','lcells');
-      for(let w=0;w<52;w++){
-        const ws=new Date(ys0.getTime()+w*7*DAY), we=new Date(ws.getTime()+7*DAY);
-        const c=el('i');
-        if(we<=now){ c.className='l'; lived++; }
-        else if(ws<=now&&now<we){ c.className='now'; cur={y,w,ws}; }
-        c.title='Возраст '+y+', неделя '+(w+1)+' · с '+ws.getDate()+' '+MON_G[ws.getMonth()]+' '+ws.getFullYear();
-        cells.append(c);
-      }
-      row.append(cells); grid.append(row);
-    }
-    body.append(grid);
-    const total=years*52, ageDays=Math.floor((now-birth)/DAY);
-    const ageY=cur?cur.y:Math.floor(ageDays/365.25), ageW=cur?cur.w:0;
-    const foot=el('div','lfoot');
-    const bar=el('div','lbar'), fill=el('i'); fill.style.width=Math.min(100,lived/total*100)+'%'; bar.append(fill); foot.append(bar);
-    const st=el('div','lstat');
-    const big=el('div','big'); big.append('Прожито недель: ', el('b',null,lived.toLocaleString('ru-RU')+' из '+total.toLocaleString('ru-RU')), ' • '+(Math.round(lived/total*1000)/10).toString().replace('.',',')+'%');
-    const lg=el('div','lg'); lg.append(el('span','a','прожитые недели'), el('span','c','текущая неделя'), el('span',null,'будущие недели'));
-    st.append(big,lg); foot.append(st);
-    const nums=el('div','lnums');
-    const left=Math.max(0,total-lived-(cur?1:0));
-    [[ageY+' лет '+ageW+' нед.','возраст'],[left.toLocaleString('ru-RU'),'недель до '+years],[String(Math.round(left/52*10)/10).replace('.',',')+' лет','осталось по горизонту']]
-      .forEach(([v,l])=>{const d=el('div'); d.append(el('b',null,v),el('span',null,l)); nums.append(d);});
-    foot.append(nums);
-    body.append(foot);
-  }
-  $('#lBirth').addEventListener('change',e=>{ const v=e.target.value; if(/^\d{4}-\d{2}-\d{2}$/.test(v)&&v<=TODAY()){ S.birth=v; save(); renderLife(); } });
-  $('#lYears').addEventListener('change',e=>{ S.lifeYears=+e.target.value||70; save(); renderLife(); });
 
   /* ---------- подписки ---------- */
   const CURS=['₽','$','€','₸','₴','Br'];
