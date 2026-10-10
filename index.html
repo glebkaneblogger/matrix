@@ -362,8 +362,6 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
 .wkdays .bars i.meal{--ac:#D9822B} .wkdays .bars i.rest{--ac:var(--plan)} .wkdays .bars i.sport{--ac:#C93D7E} .wkdays .bars i.morning{--ac:#E0A100}
 .wkdays .bars i.zero{opacity:.25}
 @media (max-width:620px){.arow2{grid-template-columns:1fr 1fr}.arow2 label:first-child{grid-column:1/-1}}
-.tab .tbadge{min-width:18px;height:18px;border-radius:9px;background:var(--do);color:#fff;font:700 11px/18px var(--body);padding:0 5px;text-align:center}
-.tab .tbadge:empty{display:none}
 .subtop{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
 .subtop .primary{flex:0 0 auto}
 .subtop .sh{font-size:13px;color:var(--muted)}
@@ -389,7 +387,11 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
 .chipsrow button{border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:6px 11px;font-size:13px}
 .chipsrow button:hover{border-color:var(--ink)}
 #subModal .qfoot{flex-wrap:wrap}
-.act.subm{--ac:var(--do)}
+.act.subm{--ac:var(--muted)}
+.srow.paid .smain b{text-decoration:line-through;color:var(--muted)}
+.srow.paid{opacity:.6;background:var(--bg)}
+.srow.paid .sav{filter:grayscale(1);opacity:.6}
+.subdiv{margin:14px 2px 2px;font-size:12px;font-weight:600;color:var(--muted)}
 @media (max-width:620px){.srow{flex-wrap:wrap}.srow .smain{flex-basis:calc(100% - 44px)}.srow .sdue{margin-left:44px}.srow .spay{margin-left:auto}#subStats .stat b{font-size:17px}}
 .wday .proc{font-size:11px;color:var(--muted);border-top:1px dashed var(--line);padding-top:4px;margin-top:2px}
 
@@ -482,7 +484,7 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
       <button class="tab" role="tab" id="tab3"><span class="n">3</span>Расписание</button>
       <button class="tab" role="tab" id="tab5"><span class="n">4</span>Идеи</button>
       <button class="tab" role="tab" id="tab4"><span class="n">5</span>Архив</button>
-      <button class="tab" role="tab" id="tab7"><span class="n">6</span>Подписки<span class="tbadge" id="subBadge"></span></button>
+      <button class="tab" role="tab" id="tab7"><span class="n">6</span>Подписки</button>
       <button class="tab" role="tab" id="tab6"><span class="n">7</span>Жизнь</button>
     </div>
   </header>
@@ -542,7 +544,7 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
       <span style="--kc:var(--plan)"><i></i>Отдых</span>
       <span style="--kc:#C93D7E"><i></i>Тренировки</span>
       <span style="--kc:#E0A100"><i></i>Утро</span>
-      <span style="--kc:var(--do)"><i></i>Оплата подписки</span>
+      <span style="--kc:var(--muted)"><i></i>Оплата подписки</span>
     </div>
   </section>
 
@@ -561,7 +563,7 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
   <section id="view7" hidden>
     <div class="subtop">
       <button class="primary" id="subAdd" type="button">+ Подписка</button>
-      <span class="sh">Отмечайте оплату кнопкой «Оплатил» — дата следующей оплаты сдвинется сама.</span>
+      <span class="sh">Оплатили — нажмите «Оплатил», подписка станет неактивной. Когда узнаете следующую дату, нажмите на подписку и укажите её.</span>
     </div>
     <div class="stats" id="subStats"></div>
     <div class="sublist" id="subList"></div>
@@ -627,6 +629,7 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
     </div>
     <p class="qhint" id="smHint"></p>
     <div class="qfoot">
+      <button class="ghost" id="smUnpay" type="button">Отменить отметку «Оплачено»</button>
       <button class="ghost" id="smOff" type="button">Отменить подписку</button>
       <button class="ghost danger" id="smDel" type="button">Удалить</button>
       <span class="grow"></span>
@@ -809,7 +812,6 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
     if(v===6) renderLife();
     if(v===7) renderSubs();
     $('#addForm').hidden=v===6||v===7;
-    $('#subBadge').textContent=S.subs.filter(x=>x.status!=='off'&&daysTo(x.next)<=3).length||'';
     renderBar();
     renderInv();
     document.querySelector('.bar').hidden=(S.tab>=4&&!sel&&!AT);
@@ -1802,7 +1804,7 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
   const daysTo=k=>Math.round((P(k)-P(TODAY()))/864e5);
   const plural=(n,a,b,c)=>{n=Math.abs(n)%100; const n1=n%10; if(n>10&&n<20) return c; if(n1>1&&n1<5) return b; if(n1===1) return a; return c;};
   const dueText=n=>n<0?'просрочена на '+(-n)+' '+plural(n,'день','дня','дней'):(n===0?'сегодня':(n===1?'завтра':'через '+n+' '+plural(n,'день','дня','дней')));
-  const dueLvl=n=>n<=1?'bad':(n<=7?'mid':'ok');
+  const dueLvl=n=>n<0?'bad':(n<=3?'mid':'ok');
   const longDate=k=>{const d=P(k); return d.getDate()+' '+MON_G[d.getMonth()]+(d.getFullYear()!==new Date().getFullYear()?' '+d.getFullYear():'');};
   const SUBCOL=['#2F62D2','#0D8577','#6A45D1','#C93D7E','#D9822B','#3E7C2B','#B5452F','#2D7FA6'];
   const subColor=n=>{let h=0; for(const ch of String(n)) h=(h*31+ch.charCodeAt(0))>>>0; return SUBCOL[h%SUBCOL.length];};
@@ -1813,9 +1815,7 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
     else { const day=d.getDate(); d.setDate(1); d.setMonth(d.getMonth()+1); d.setDate(Math.min(day,new Date(d.getFullYear(),d.getMonth()+1,0).getDate())); }
     return ymd(d);
   }
-  // сколько раз подписка спишется в ближайшие N дней (просроченные тоже считаются)
-  function occ(x,days){ if(x.period==='once') return daysTo(x.next)<=days?1:0; let k=x.next,n=0,g=0; while(daysTo(k)<=days&&g<60){n++; k=addPeriod(k,x.period); g++;} return n; }
-  const subsOn=k=>S.subs.filter(x=>x.status!=='off'&&x.next===k);
+  const subsOn=k=>S.subs.filter(x=>(x.status||'on')==='on'&&x.next===k);
   function subMark(x,full){
     const b=el('button','act subm'); b.type='button';
     b.append('💳 '+x.name, el('span','am',money(x.price,x.cur)));
@@ -1824,48 +1824,52 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
     return b;
   }
   function subRow(x){
-    const off=x.status==='off', n=daysTo(x.next), r=el('div','srow'+(off?' off':''));
+    const st=x.status||'on', n=daysTo(x.next), r=el('div','srow'+(st==='off'?' off':'')+(st==='paid'?' paid':''));
     const av=el('span','sav',(String(x.name||'?').trim()[0]||'?').toUpperCase()); av.style.background=subColor(x.name);
     const main=el('button','smain'); main.type='button';
     main.append(el('b',null,x.name));
     const meta=[money(x.price,x.cur)+' '+PER[x.period].name];
-    if(!off) meta.push((x.period==='once'?'оплатить до ':'следующая оплата ')+longDate(x.next));
-    if(x.paid&&x.paid.length) meta.push('оплачено '+x.paid.length+' '+plural(x.paid.length,'раз','раза','раз'));
+    if(st==='on') meta.push('оплатить '+longDate(x.next));
+    if(st==='paid') meta.push('оплачено '+longDate(x.paidAt||TODAY())+' · нажмите, чтобы указать следующую дату');
     if(x.note) meta.push(x.note);
     main.append(el('span',null,meta.join(' · ')));
     main.onclick=()=>openSub(x);
     r.append(av,main);
-    if(!off){ r.append(el('span','sdue '+dueLvl(n),dueText(n))); r.append(btn('Оплатил','ghost spay',()=>paySub(x))); }
+    if(st==='on'){ r.append(el('span','sdue '+dueLvl(n),dueText(n))); r.append(btn('Оплатил','ghost spay',()=>paySub(x))); }
+    else if(st==='paid') r.append(btn('Новая дата','ghost spay',()=>openSub(x)));
     else r.append(btn('Вернуть','ghost spay',()=>{ x.status='on'; if(daysTo(x.next)<0) x.next=TODAY(); save(); render(); }));
     return r;
   }
+  // оплатил → подписка становится неактивной до тех пор, пока не указана новая дата
   function paySub(x){
-    const base=daysTo(x.next)>=0?x.next:TODAY();
-    const nx=x.period==='once'?null:addPeriod(base,x.period);
-    if(!confirm('Отметить оплату «'+x.name+'» — '+money(x.price,x.cur)+'?'+(nx?' Следующая оплата: '+longDate(nx)+'.':' Разовая подписка уйдёт в завершённые.'))) return;
-    (x.paid=x.paid||[]).push({date:TODAY(),amount:x.price,cur:x.cur});
-    if(nx) x.next=nx; else x.status='off';
+    (x.paid=x.paid||[]).push({date:TODAY(),amount:x.price,cur:x.cur,due:x.next});
+    x.status='paid'; x.paidAt=TODAY();
     save(); render();
   }
   function renderSubs(){
-    const act=S.subs.filter(x=>x.status!=='off').sort((a,b)=>a.next.localeCompare(b.next)||a.name.localeCompare(b.name));
-    const off=S.subs.filter(x=>x.status==='off');
-    const st=$('#subStats'); st.innerHTML=''; st.hidden=!act.length;
-    if(act.length){
+    const st0=x=>x.status||'on';
+    const act=S.subs.filter(x=>st0(x)==='on').sort((a,b)=>a.next.localeCompare(b.next)||a.name.localeCompare(b.name));
+    const paid=S.subs.filter(x=>st0(x)==='paid').sort((a,b)=>(b.paidAt||'').localeCompare(a.paidAt||'')||a.name.localeCompare(b.name));
+    const off=S.subs.filter(x=>st0(x)==='off');
+    const live=[...act,...paid];
+    const st=$('#subStats'); st.innerHTML=''; st.hidden=!live.length;
+    if(live.length){
       const nx=act[0], from30=addDays(TODAY(),-30);
       const paid30=[]; S.subs.forEach(x=>(x.paid||[]).forEach(p=>{ if(p.date>=from30) paid30.push([p.amount,p.cur]); }));
-      [[daysTo(nx.next)<0?'просрочена':dueText(daysTo(nx.next)),'ближайшая: '+nx.name+' · '+money(nx.price,nx.cur)+(daysTo(nx.next)<0?' · срок был '+longDate(nx.next):'')],
-       [sumByCur(act.map(x=>[x.price*occ(x,7),x.cur])),'к оплате за 7 дней'],
-       [sumByCur(act.map(x=>[x.price*occ(x,30),x.cur])),'к оплате за 30 дней'],
-       [sumByCur(act.map(x=>[x.price*PER[x.period].m,x.cur]),true),'в среднем в месяц · '+act.length+' '+plural(act.length,'подписка','подписки','подписок')+(paid30.length?' · оплачено за 30 дн. '+sumByCur(paid30):'')]]
+      const dueIn=d=>sumByCur(act.filter(x=>daysTo(x.next)<=d).map(x=>[x.price,x.cur]));
+      [[nx?(daysTo(nx.next)<0?'просрочена':dueText(daysTo(nx.next))):'—', nx?'ближайшая: '+nx.name+' · '+money(nx.price,nx.cur):'неоплаченных нет'],
+       [dueIn(7),'к оплате за 7 дней'],
+       [dueIn(31),'к оплате за месяц'],
+       [sumByCur(live.map(x=>[x.price*PER[x.period].m,x.cur]),true),'в среднем в месяц · '+live.length+' '+plural(live.length,'подписка','подписки','подписок')+(paid30.length?' · оплачено за 30 дн. '+sumByCur(paid30):'')]]
         .forEach(([v,l])=>{const c=el('div','stat'); c.append(el('b',null,v),el('span',null,l)); st.append(c);});
     }
     const list=$('#subList'); list.innerHTML='';
-    if(!act.length) empty(list,'Подписок пока нет. Нажмите «+ Подписка»: название, стоимость и когда следующая оплата.');
+    if(!live.length) empty(list,'Подписок пока нет. Нажмите «+ Подписка»: название, стоимость и когда оплатить.');
     act.forEach(x=>list.append(subRow(x)));
+    if(paid.length){ list.append(el('div','subdiv','Оплачено · '+paid.length)); paid.forEach(x=>list.append(subRow(x))); }
     const ob=$('#subOff'); ob.innerHTML='';
     if(off.length){
-      const d=el('details','suboff'); d.append(el('summary',null,'Отменённые и завершённые · '+off.length));
+      const d=el('details','suboff'); d.append(el('summary',null,'Отменённые · '+off.length));
       const l=el('div','sublist'); off.forEach(x=>l.append(subRow(x))); d.append(l); ob.append(d);
     }
   }
@@ -1873,8 +1877,14 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
   function setSubDate(k){ $('#smDate').value=k; $('#smDays').value=Math.max(0,daysTo(k)); }
   function openSub(x){
     SM=x?{...x}:{id:null,name:'',price:'',cur:'₽',period:'month',next:addDays(TODAY(),30),note:'',status:'on',paid:[]};
+    const isPaid=x&&x.status==='paid';
+    if(isPaid){ // предлагаем следующую дату: через период от прошлой даты, но не раньше завтра
+      let nx=x.period==='once'?addDays(TODAY(),30):addPeriod(x.next,x.period);
+      if(daysTo(nx)<1) nx=x.period==='once'?addDays(TODAY(),30):addPeriod(TODAY(),x.period);
+      SM.next=nx;
+    }
     $('#smTitle').textContent=x?x.name:'Новая подписка';
-    $('#smInfo').textContent=x?(x.status==='off'?'отменена':'подписка'):'';
+    $('#smInfo').textContent=x?(x.status==='off'?'отменена':(isPaid?'оплачено '+longDate(x.paidAt||TODAY()):'подписка')):'';
     $('#smName').value=SM.name; $('#smPrice').value=SM.price; $('#smNote').value=SM.note||'';
     const c=$('#smCur'); c.innerHTML=''; CURS.forEach(v=>{const o=el('option',null,v); o.value=v; if(v===SM.cur) o.selected=true; c.append(o);});
     const pr=$('#smPer'); pr.innerHTML=''; Object.entries(PER).forEach(([k,v])=>{const o=el('option',null,v.label); o.value=k; if(k===SM.period) o.selected=true; pr.append(o);});
@@ -1883,8 +1893,9 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
     [['через 7 дней',()=>addDays(TODAY(),7)],['через 14 дней',()=>addDays(TODAY(),14)],['через месяц',()=>addPeriod(TODAY(),'month')],['через год',()=>addPeriod(TODAY(),'year')]]
       .forEach(([l,f])=>{const b=el('button',null,l); b.type='button'; b.onclick=()=>setSubDate(f()); q.append(b);});
     const h=(x&&x.paid&&x.paid.length)?'Оплаты: '+x.paid.slice(-6).reverse().map(p=>longDate(p.date)+' — '+money(p.amount,p.cur)).join(', '):'';
-    $('#smHint').textContent=h;
-    $('#smDel').hidden=!x; $('#smOff').hidden=!x||x.status==='off';
+    $('#smHint').textContent=(isPaid?'Укажите дату следующей оплаты и сохраните — подписка снова станет активной. ':'')+h;
+    $('#smSave').textContent=isPaid?'Сохранить новую дату':'Сохранить';
+    $('#smDel').hidden=!x; $('#smOff').hidden=!x||x.status==='off'; $('#smUnpay').hidden=!isPaid;
     $('#subModal').hidden=false; if(!x) setTimeout(()=>$('#smName').focus(),30);
   }
   function closeSub(){ SM=null; $('#subModal').hidden=true; }
@@ -1896,12 +1907,16 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
     if(!(price>=0)){ $('#smHint').textContent='Укажите стоимость числом, например 299.'; $('#smPrice').focus(); return; }
     if(!/^\d{4}-\d{2}-\d{2}$/.test(next)){ $('#smHint').textContent='Укажите дату следующей оплаты или через сколько дней.'; return; }
     const rec={...SM,name,price,cur:$('#smCur').value,period:$('#smPer').value,next,note:$('#smNote').value.trim()};
+    if(rec.status!=='off') rec.status='on'; // новая дата → подписка снова активна
     if(SM.id){ const i=S.subs.findIndex(y=>y.id===SM.id); if(i>=0) S.subs[i]=rec; }
     else { rec.id=uid(); rec.created=TODAY(); S.subs.push(rec); }
     closeSub(); save(); render();
   };
   $('#smDel').onclick=()=>{ if(SM&&SM.id&&confirm('Удалить подписку вместе с историей оплат?')){ S.subs=S.subs.filter(y=>y.id!==SM.id); closeSub(); save(); render(); } };
   $('#smOff').onclick=()=>{ if(!SM||!SM.id) return; const x=S.subs.find(y=>y.id===SM.id); if(x&&confirm('Отменить подписку «'+x.name+'»? Она уйдёт в отменённые, история оплат сохранится.')){ x.status='off'; closeSub(); save(); render(); } };
+  $('#smUnpay').onclick=()=>{ if(!SM||!SM.id) return; const x=S.subs.find(y=>y.id===SM.id); if(!x) return;
+    if(x.paid&&x.paid.length&&x.paid[x.paid.length-1].date===x.paidAt) x.paid.pop();
+    x.status='on'; delete x.paidAt; closeSub(); save(); render(); };
   $('#smClose').onclick=closeSub;
   $('#subModal').addEventListener('click',e=>{ if(e.target.id==='subModal') closeSub(); });
   $('#subAdd').onclick=()=>openSub(null);
