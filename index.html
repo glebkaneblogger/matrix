@@ -1285,7 +1285,7 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
   const BOARDS={
     idea:{key:'ideas',fkey:'ideaFilter',board:'#board',filter:'#ideaFilter',one:'Идея',fresh:'Новая идея',used:'В работу',usedTag:'в работе',
           ph:'Описание: в чём суть, зачем, с чего начать',emptyUsed:'Использованных идей пока нет.',empty:'Пока пусто. Нажмите «+ Новая идея» — заголовок, описание, и стикер появится на доске.',del:'Удалить идею?'},
-    ins:{key:'insights',fkey:null,board:'#board2',filter:null,one:'Инсайт',fresh:'Новый инсайт',used:'Применил',usedTag:'применён',
+    ins:{key:'insights',fkey:null,board:'#board2',filter:null,one:'Инсайт',fresh:'Новый инсайт',used:null,usedTag:'',
           ph:'Что понял, откуда это и как применить',emptyUsed:'Применённых инсайтов пока нет.',empty:'Пока пусто. Нажмите «+ Новый инсайт» — заголовок, описание, и стикер появится на доске.',del:'Удалить инсайт?'}
   };
   let I=null, IB='idea'; // редактируемый стикер и его доска
@@ -1295,7 +1295,7 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
     $('#iTitle').textContent=item?B.one:B.fresh;
     $('#iKind').textContent=item?('добавлен'+(IB==='idea'?'а':'')+' '+dateLabel(item.at)):'';
     $('#iName').value=I.name; $('#iDesc').value=I.desc; $('#iDesc').placeholder=B.ph;
-    $('#iDel').hidden=!item; $('#iUsed').hidden=!item;
+    $('#iDel').hidden=!item; $('#iUsed').hidden=!item||!B.used; // у инсайтов кнопки «применил» нет
     $('#iUsed').textContent=I.used?'Вернуть на доску':B.used;
     const c=$('#iColors'); c.innerHTML='';
     SC.forEach(col=>{const b=el('button',I.color===col?'on':''); b.type='button'; b.style.setProperty('--c',col); b.setAttribute('aria-label','Цвет стикера');
@@ -1329,14 +1329,15 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
     const board=$(B.board); board.innerHTML='';
     if(!list.length){ board.append(el('div','ideas-empty',f==='used'?B.emptyUsed:B.empty)); return; }
     list.forEach((i,n)=>{
-      const c=el('button','sticky'+(i.used?' used':'')+(i.pin?' pinned':'')); c.type='button';
+      const used=B.used&&i.used;
+      const c=el('button','sticky'+(used?' used':'')+(i.pin?' pinned':'')); c.type='button';
       c.style.setProperty('--sc',i.color||SC[0]);
       c.style.setProperty('--rot',((i.id.charCodeAt(0)+n)%3-1)*0.7+'deg');
       const pin=el('span','spin','📌'); pin.title=i.pin?'Открепить':'Закрепить';
       pin.onclick=e=>{e.stopPropagation(); i.pin=!i.pin; save(); render();};
       c.append(pin, el('div','st',i.name));
       if(i.desc) c.append(el('div','sd',i.desc));
-      c.append(el('div','sdate',(i.used?B.usedTag+' · ':'')+dateLabel(i.at)));
+      c.append(el('div','sdate',(used?B.usedTag+' · ':'')+dateLabel(i.at)));
       c.onclick=()=>openIdea(i,'',kind);
       board.append(c);
     });
