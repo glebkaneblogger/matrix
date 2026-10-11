@@ -303,7 +303,7 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
 .actstart{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
 .abtn{display:flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--paper);border-radius:10px;padding:8px 12px;font-weight:500;font-size:14px}
 .abtn:hover{border-color:var(--ink)}
-.abtn.meal{--ac:#D9822B} .abtn.rest{--ac:var(--plan)} .abtn.sport{--ac:#C93D7E} .abtn.morning{--ac:#E0A100}
+.abtn.meal{--ac:#D9822B} .abtn.rest{--ac:var(--plan)} .abtn.sport{--ac:#C93D7E} .abtn.morning{--ac:#E0A100} .abtn.meditate{--ac:#3E9C7F} .abtn.sleep{--ac:#3F51A3}
 .abtn .dt{width:8px;height:8px;border-radius:50%;background:var(--ac)}
 .abtn.man{color:var(--muted);font-size:13px}
 .actrow{display:flex;align-items:center;gap:10px;padding:0 0 10px;margin-bottom:10px;border-bottom:1px solid var(--line)}
@@ -311,9 +311,9 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
 .actrow .at{font:700 22px/1 var(--display);color:var(--ac)}
 .actrow .al{font-size:12px;color:var(--muted)}
 .actrow .ghost{padding:8px 12px;font-size:14px;border-radius:10px}
-.actrow.meal{--ac:#D9822B} .actrow.rest{--ac:var(--plan)} .actrow.sport{--ac:#C93D7E} .actrow.morning{--ac:#E0A100}
+.actrow.meal{--ac:#D9822B} .actrow.rest{--ac:var(--plan)} .actrow.sport{--ac:#C93D7E} .actrow.morning{--ac:#E0A100} .actrow.meditate{--ac:#3E9C7F}
 .act{display:flex;align-items:center;gap:6px;font-size:12px;line-height:1.3;padding:4px 7px;border-radius:7px;background:color-mix(in srgb,var(--ac) 12%,var(--paper));border-left:3px solid var(--ac);text-align:left;width:100%;border-top:0;border-right:0;border-bottom:0;color:var(--ink)}
-.act.meal{--ac:#D9822B} .act.rest{--ac:var(--plan)} .act.sport{--ac:#C93D7E} .act.morning{--ac:#E0A100}
+.act.meal{--ac:#D9822B} .act.rest{--ac:var(--plan)} .act.sport{--ac:#C93D7E} .act.morning{--ac:#E0A100} .act.meditate{--ac:#3E9C7F} .act.sleep{--ac:#3F51A3}
 .act .am{margin-left:auto;color:var(--muted);white-space:nowrap}
 .act.live .am{color:var(--ac);font-weight:700}
 .dayv .act{font-size:14px;padding:8px 10px}
@@ -330,8 +330,15 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
 .wkdays{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;align-items:end}
 .wkdays .wdc{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;color:var(--muted)}
 .wkdays .bars{height:70px;width:100%;display:flex;align-items:flex-end;justify-content:center;gap:3px}
+.wkdays .bars i.solo{width:46%;max-width:22px}
+.wkdays .wq{font-size:10px;color:var(--muted);line-height:1.1;text-align:center}
+.qscale{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:4px;margin-top:4px}
+.qscale button{border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:8px 0;font-weight:600;font-size:14px}
+.qscale button.on{background:#3F51A3;border-color:#3F51A3;color:#fff}
+.qhint2{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:3px}
+@media (max-width:620px){.qscale{grid-template-columns:repeat(5,minmax(0,1fr))}}
 .wkdays .bars i{width:20%;max-width:11px;border-radius:3px 3px 0 0;background:var(--ac);min-height:2px}
-.wkdays .bars i.meal{--ac:#D9822B} .wkdays .bars i.rest{--ac:var(--plan)} .wkdays .bars i.sport{--ac:#C93D7E} .wkdays .bars i.morning{--ac:#E0A100}
+.wkdays .bars i.meal{--ac:#D9822B} .wkdays .bars i.rest{--ac:var(--plan)} .wkdays .bars i.sport{--ac:#C93D7E} .wkdays .bars i.morning{--ac:#E0A100} .wkdays .bars i.meditate{--ac:#3E9C7F} .wkdays .bars i.sleep{--ac:#3F51A3}
 .wkdays .bars i.zero{opacity:.25}
 @media (max-width:620px){.arow2{grid-template-columns:1fr 1fr}.arow2 label:first-child{grid-column:1/-1}}
 .subtop{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
@@ -519,7 +526,9 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
       <span style="--kc:#D9822B"><i></i>Еда</span>
       <span style="--kc:var(--plan)"><i></i>Отдых</span>
       <span style="--kc:#C93D7E"><i></i>Тренировки</span>
+      <span style="--kc:#3F51A3"><i></i>Сон</span>
       <span style="--kc:#E0A100"><i></i>Утро</span>
+      <span style="--kc:#3E9C7F"><i></i>Медитация</span>
       <span style="--kc:var(--muted)"><i></i>Оплата подписки</span>
     </div>
   </section>
@@ -582,6 +591,26 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
     <input type="file" id="impFile" accept=".json,application/json" hidden>
     <input type="file" id="icsFile" accept=".ics,text/calendar" hidden>
   </details>
+</div>
+
+<div class="modal" id="sleepModal" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="slTitle">
+    <div class="qtop"><span class="qtask" id="slInfo"></span><button class="qx" id="slClose" type="button" aria-label="Закрыть">×</button></div>
+    <h2 id="slTitle">Сон</h2>
+    <p class="qhint">Сколько спали в ночь перед этим днём и как выспались.</p>
+    <div class="sform">
+      <label>День (когда проснулись)<input type="date" id="slDate"></label>
+      <label>Сколько спал, часов<input id="slHours" inputmode="decimal" placeholder="например, 7,5" autocomplete="off"></label>
+      <div class="full chipsrow" id="slQuick"></div>
+      <label class="full">Качество сна<span class="qscale" id="slQ"></span><span class="qhint2"><span>1 — разбитый</span><span>10 — отлично выспался</span></span></label>
+    </div>
+    <p class="qhint" id="slHint"></p>
+    <div class="qfoot">
+      <button class="ghost danger" id="slDel" type="button">Удалить</button>
+      <span class="grow"></span>
+      <button class="primary" id="slSave" type="button">Сохранить</button>
+    </div>
+  </div>
 </div>
 
 <div class="modal" id="subModal" hidden>
@@ -956,7 +985,7 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
     if(live) la.append(liveChip());
     if(!as.length&&!live) empty(la,'Пока ничего. Включите таймер над календарём: утро, еда, отдых или тренировка.');
     v.append(la);
-    if(as.length){ const su=el('div','asum'); ATYPES.filter(t=>sm[t]).forEach((t,i)=>{ if(i) su.append(el('span',null,' · ')); su.append(el('span',null,ACT[t].icon+' '+ACT[t].lower+': '),el('b',null,fmtMin(sm[t])+(sm.cnt[t]>1?' ('+sm.cnt[t]+')':''))); }); v.append(su); }
+    if(as.length){ const su=el('div','asum'), parts=[]; if(sm.sleep) parts.push(['😴 сон: ',fmtHM(sm.sleep)+qTxt(sm.sleepQ)]); ATYPES.filter(t=>sm[t]).forEach(t=>parts.push([ACT[t].icon+' '+ACT[t].lower+': ',fmtMin(sm[t])+(sm.cnt[t]>1?' ('+sm.cnt[t]+')':'')])); parts.forEach(([l,v2],i)=>{ if(i) su.append(el('span',null,' · ')); su.append(el('span',null,l),el('b',null,v2)); }); v.append(su); }
     v.append(dayReview(k));
     const p=el('button','plus','+ Задача на этот день'); p.type='button';
     p.onclick=e=>{e.stopPropagation(); if(sel) return v.click(); inlineAdd(p,{date:k},render);};
@@ -1080,8 +1109,11 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
     meal:{name:'Приём пищи',short:'Еда',icon:'🍽',def:30,color:'#D9822B',lower:'еда'},
     rest:{name:'Отдых',short:'Отдых',icon:'☕',def:15,color:'var(--plan)',lower:'отдых'},
     sport:{name:'Тренировка',short:'Тренировка',icon:'💪',def:60,color:'#C93D7E',lower:'тренировки'},
-    morning:{name:'Утренняя рутина',short:'Утро',icon:'🌅',def:30,color:'#E0A100',lower:'утро'}};
-  const ATYPES=['morning','meal','rest','sport'];
+    morning:{name:'Утренняя рутина',short:'Утро',icon:'🌅',def:30,color:'#E0A100',lower:'утро'},
+    meditate:{name:'Медитация',short:'Медитация',icon:'🧘',def:15,color:'#3E9C7F',lower:'медитация'},
+    sleep:{name:'Сон',short:'Сон',icon:'😴',def:450,color:'#3F51A3',lower:'сон'}};
+  const ATYPES=['morning','meditate','meal','rest','sport']; // типы с таймером
+  const DAYTYPES=['morning','meal','rest','sport'];        // блок «Режим дня» в итогах недели
   const hhmm=d=>pad(d.getHours())+':'+pad(d.getMinutes());
   function actElapsed(){ return AT?Math.floor((Date.now()-AT.start)/1000):0; }
   function actStart(type){
@@ -1115,6 +1147,7 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
   }
   function renderActStart(){
     const box=$('#actStart'); box.innerHTML='';
+    { const b=btn('','abtn sleep',()=>openSleep(S.view==='day'?S.cur:TODAY())); b.append(el('span','dt'),'😴 Сон'); b.title='Записать, сколько спали и как выспались'; box.append(b); }
     ATYPES.forEach(k=>{
       const on=AT&&AT.type===k;
       const b=btn('','abtn '+k,()=>on?actStop():actStart(k));
@@ -1124,8 +1157,17 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
     box.append(btn('+ записать вручную','abtn man',()=>openAct(null,S.view==='day'?S.cur:TODAY())));
   }
   const actsOn=k=>S.acts.filter(a=>a.date===k).sort((a,b)=>a.time.localeCompare(b.time));
+  const qTxt=q=>q?' · '+q+'/10':'';
+  const fmtHM=m=>{m=Math.round(m); const h=Math.floor(m/60), mm=m%60; return h+' ч'+(mm?' '+mm+' мин':'');};
+  const fmtHMs=m=>{m=Math.round(m); const mm=m%60; return Math.floor(m/60)+'ч'+(mm?pad(mm):'');}; // «7ч», «6ч40»
   function actChip(a,compact){
     const b=el('button','act '+a.type); b.type='button';
+    if(a.type==='sleep'){
+      b.append(compact?'😴 '+fmtHMs(a.mins):'😴 Сон',el('span','am',compact?(a.q?a.q+'/10':''):fmtHM(a.mins)+qTxt(a.q)));
+      b.title='Сон: '+fmtHM(a.mins)+(a.q?', качество '+a.q+' из 10':'');
+      b.onclick=e=>{e.stopPropagation(); if(sel) return; openSleep(a.date);};
+      return b;
+    }
     const end=(()=>{const [h,m]=a.time.split(':').map(Number); const t=h*60+m+a.mins; return pad(Math.floor(t/60)%24)+':'+pad(t%60);})();
     b.append(compact?ACT[a.type].icon+' '+a.time:ACT[a.type].icon+' '+ACT[a.type].short+' '+a.time+'–'+end, el('span','am',fmtMin(a.mins)));
     b.title=ACT[a.type].name+' '+a.time+'–'+end+' · '+fmtMin(a.mins);
@@ -1137,7 +1179,7 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
     b.append(ACT[AT.type].icon+' '+ACT[AT.type].short+' с '+hhmm(new Date(AT.start)), el('span','am',fmtSec(actElapsed())));
     return b;
   }
-  function actSum(k){ const a=actsOn(k), r={n:a.length,cnt:{}}; ATYPES.forEach(t=>{const l=a.filter(x=>x.type===t); r[t]=l.reduce((s,x)=>s+x.mins,0); r.cnt[t]=l.length;}); return r; }
+  function actSum(k){ const a=actsOn(k), r={n:a.length,cnt:{}}; const sl=a.find(x=>x.type==='sleep'); r.sleep=sl?sl.mins:0; r.sleepQ=sl?sl.q:null; ATYPES.forEach(t=>{const l=a.filter(x=>x.type===t); r[t]=l.reduce((s,x)=>s+x.mins,0); r.cnt[t]=l.length;}); return r; }
 
   let AM=null; // редактируемая запись
   function openAct(a,day){
@@ -1620,6 +1662,7 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
   $('#next').onclick=()=>shift(1);
   $('#todayBtn').onclick=()=>{S.cur=TODAY(); save(); render();};
   document.addEventListener('keydown',e=>{
+    if(e.key==='Escape'&&SL){closeSleep(); return;}
     if(e.key==='Escape'&&SM){closeSub(); return;}
     if(e.key==='Escape'&&AM){closeAct(); return;}
     if(e.key==='Escape'&&Z){closeQuiz(); return;}
@@ -1744,6 +1787,36 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
       if(d>until||n>=cnt) return; n++; push(d);
     }
   }
+
+  /* ---------- сон ---------- */
+  let SL=null; // {date, id, q}
+  function openSleep(day){
+    const k=day||TODAY(), ex=S.acts.find(a=>a.type==='sleep'&&a.date===k);
+    SL={id:ex?ex.id:null,date:k,q:ex?ex.q||null:null};
+    $('#slInfo').textContent=ex?'запись есть — можно поправить':'';
+    $('#slDate').value=k;
+    $('#slHours').value=ex?String(Math.round(ex.mins/6)/10).replace('.',','):'';
+    $('#slHint').textContent='';
+    $('#slDel').hidden=!ex;
+    const qk=$('#slQuick'); qk.innerHTML='';
+    [6,7,7.5,8,9].forEach(h=>{const b=el('button',null,String(h).replace('.',',')+' ч'); b.type='button'; b.onclick=()=>{$('#slHours').value=String(h).replace('.',',');}; qk.append(b);});
+    drawSleepQ();
+    $('#sleepModal').hidden=false; if(!ex) setTimeout(()=>$('#slHours').focus(),30);
+  }
+  function drawSleepQ(){ const box=$('#slQ'); box.innerHTML=''; for(let i=1;i<=10;i++){ const b=el('button',SL.q===i?'on':'',String(i)); b.type='button'; b.onclick=e=>{e.preventDefault(); SL.q=SL.q===i?null:i; drawSleepQ();}; box.append(b);} }
+  function closeSleep(){ SL=null; $('#sleepModal').hidden=true; }
+  $('#slDate').addEventListener('change',()=>{ const v=$('#slDate').value; if(!/^\d{4}-\d{2}-\d{2}$/.test(v)||!SL) return; const ex=S.acts.find(a=>a.type==='sleep'&&a.date===v); if(ex&&ex.id!==SL.id){ openSleep(v); } else SL.date=v; });
+  $('#slSave').onclick=()=>{
+    const d=$('#slDate').value, mins=parseDur($('#slHours').value);
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(d)){ $('#slHint').textContent='Укажите день.'; return; }
+    if(!mins||mins<30||mins>20*60){ $('#slHint').textContent='Напишите, сколько спали: например 7,5 или «7 ч 30».'; $('#slHours').focus(); return; }
+    S.acts=S.acts.filter(a=>!(a.type==='sleep'&&(a.date===d||a.id===SL.id))); // одна запись сна на день
+    S.acts.push({id:SL.id||uid(),type:'sleep',date:d,time:'',mins,q:SL.q||null});
+    closeSleep(); save(); render();
+  };
+  $('#slDel').onclick=()=>{ if(SL&&SL.id&&confirm('Удалить запись сна?')){ S.acts=S.acts.filter(a=>a.id!==SL.id); closeSleep(); save(); render(); } };
+  $('#slClose').onclick=closeSleep;
+  $('#sleepModal').addEventListener('click',e=>{ if(e.target.id==='sleepModal') closeSleep(); });
 
   /* ---------- подписки ---------- */
   const CURS=['₽','$','€','₸','₴','Br'];
@@ -1969,8 +2042,35 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
     if(W.topLeaks.length) sec1.append(el('div','sub','Главные утечки: '+W.topLeaks.join(', ')));
     body.append(sec1);
 
+    // сон и медитация
+    { const sleeps=W.acts.filter(a=>a.type==='sleep'), meds=W.acts.filter(a=>a.type==='meditate');
+      if(sleeps.length||meds.length){
+        const ss=el('div','wksec'); ss.append(el('h3',null,'Сон и медитация'));
+        const avgS=sleeps.length?Math.round(sleeps.reduce((x,a)=>x+a.mins,0)/sleeps.length):0;
+        const qs=sleeps.filter(a=>a.q), avgQ=qs.length?Math.round(qs.reduce((x,a)=>x+a.q,0)/qs.length*10)/10:null;
+        const mSum=meds.reduce((x,a)=>x+a.mins,0), mDays=new Set(meds.map(a=>a.date)).size;
+        const st3=el('div','stats');
+        [[sleeps.length?fmtHM(avgS):'—','сна в среднем за ночь'],
+         [avgQ!=null?String(avgQ).replace('.',',')+' / 10':'—','качество сна в среднем'],
+         [sleeps.length+' из 7','ночей отмечено'+(sleeps.length?' · меньше 7 ч: '+sleeps.filter(a=>a.mins<420).length:'')],
+         [meds.length?fmtMin(mSum):'—','медитация · '+mDays+' из 7 дней']]
+          .forEach(([v,l])=>{const c=el('div','stat'); c.append(el('b',null,v),el('span',null,l)); st3.append(c);});
+        ss.append(st3);
+        if(sleeps.length){
+          const days=el('div','wkdays');
+          for(let i=0;i<7;i++){ const k=addDays(W.mon,i), a=sleeps.find(x=>x.date===k);
+            const c=el('div','wdc'), bars=el('div','bars'), bi=el('i','sleep solo'+(a?'':' zero'));
+            bi.style.height=(a?Math.min(100,a.mins/600*100):0)+'%'; bi.title=a?'Сон: '+fmtHM(a.mins)+(a.q?', качество '+a.q+'/10':''):'Сон не отмечен';
+            bars.append(bi); c.append(bars, el('span','wq',a?fmtHMs(a.mins)+(a.q?' · '+a.q:''):'—'), el('span',null,WD[i])); days.append(c); }
+          ss.append(days);
+          ss.append(el('div','sub','Высота столбика — сколько спали (шкала до 10 ч), вторая цифра — качество из 10.'));
+        }
+        body.append(ss);
+      }
+    }
+
     // режим дня: утро, еда, отдых, тренировки
-    if(W.acts.length){
+    if(W.acts.some(a=>DAYTYPES.includes(a.type))){
       const sa=el('div','wksec'); sa.append(el('h3',null,'Режим дня'));
       const of=t=>W.acts.filter(a=>a.type===t), sumOf=l=>l.reduce((x,a)=>x+a.mins,0), daysOf=l=>new Set(l.map(a=>a.date)).size;
       const meals=of('meal'), rests=of('rest'), sports=of('sport'), morns=of('morning');
@@ -1992,15 +2092,15 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
         .forEach(([v,l])=>{const c=el('div','stat'); c.append(el('b',null,v),el('span',null,l)); st2.append(c);});
       sa.append(st2);
       const days=el('div','wkdays'); let mx=1;
-      const per=[]; for(let i=0;i<7;i++){const k=addDays(W.mon,i); const v=ATYPES.map(t=>W.acts.filter(a=>a.date===k&&a.type===t).reduce((x,a)=>x+a.mins,0)); per.push(v); mx=Math.max(mx,...v);}
+      const per=[]; for(let i=0;i<7;i++){const k=addDays(W.mon,i); const v=DAYTYPES.map(t=>W.acts.filter(a=>a.date===k&&a.type===t).reduce((x,a)=>x+a.mins,0)); per.push(v); mx=Math.max(mx,...v);}
       per.forEach((v,i)=>{
         const c=el('div','wdc'), bars=el('div','bars');
-        ATYPES.forEach((t,j)=>{const bi=el('i',t+(v[j]?'':' zero')); bi.style.height=(v[j]/mx*100)+'%'; bi.title=ACT[t].name+': '+(v[j]?fmtMin(v[j]):'—'); bars.append(bi);});
+        DAYTYPES.forEach((t,j)=>{const bi=el('i',t+(v[j]?'':' zero')); bi.style.height=(v[j]/mx*100)+'%'; bi.title=ACT[t].name+': '+(v[j]?fmtMin(v[j]):'—'); bars.append(bi);});
         c.append(bars, el('span',null,WD[i])); days.append(c);
       });
       sa.append(days);
       const lgd=el('div','wklegend'); lgd.style.marginTop='6px';
-      ATYPES.forEach(t=>{const x=el('span',null,ACT[t].lower); x.style.setProperty('--c',ACT[t].color); lgd.append(x);});
+      DAYTYPES.forEach(t=>{const x=el('span',null,ACT[t].lower); x.style.setProperty('--c',ACT[t].color); lgd.append(x);});
       if(mDays<7&&mDays>0) lgd.append(el('span',null,'еда отмечена в '+mDays+' из 7 дней'));
       sa.append(lgd);
       body.append(sa);
