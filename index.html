@@ -3,7 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#E9EDF2">
+<meta name="theme-color" content="#E9EDF2" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#12161C" media="(prefers-color-scheme: dark)">
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Задачи">
 <title>Планировщик задач</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2318202C'/%3E%3Crect x='11' y='11' width='19' height='19' rx='4.5' fill='%23D2402F'/%3E%3Crect x='34' y='11' width='19' height='19' rx='4.5' fill='%232F62D2'/%3E%3Crect x='11' y='34' width='19' height='19' rx='4.5' fill='%23C98A06'/%3E%3Crect x='34' y='34' width='19' height='19' rx='4.5' fill='%238A94A3'/%3E%3Cpath d='M15.5 20.8l3.6 3.6 6.6-7.2' fill='none' stroke='%23fff' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -463,13 +469,67 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
   .stool .today{height:36px;padding:0 7px;font-size:13px}
   #scale button{padding:6px 8px;font-size:13px}
 }
+.vh{position:fixed;left:-200px;top:0;width:1px;height:1px;opacity:0;pointer-events:none}
+/* ---------- телефон: нижнее меню, компактные панели ---------- */
+.mnav{display:none}
+.hmob{display:none}
+.toast{position:fixed;left:50%;top:calc(12px + env(safe-area-inset-top,0px));transform:translateX(-50%);z-index:80;max-width:min(92vw,520px);background:var(--ink);color:var(--bg);font-size:14px;line-height:1.35;padding:10px 14px;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+.more-list{display:flex;flex-direction:column;gap:6px}
+.more-list .mi{display:flex;align-items:center;gap:12px;width:100%;text-align:left;border:1px solid var(--line);background:var(--bg);border-radius:12px;padding:13px 14px;font-size:16px;font-weight:500;color:var(--ink)}
+.more-list .mi svg{flex:none;width:22px;height:22px}
+.more-list .mi.on{border-color:var(--ink)}
+.more-sec{margin-top:16px}
+.more-sec h3{margin:0 0 6px;font:700 14px/1.2 var(--display)}
+.more-sec p{margin:0 0 8px;font-size:13px;color:var(--muted)}
+.more-sec .drow{display:flex;flex-wrap:wrap;gap:8px}
+.more-sec .drow .ghost{flex:1 1 45%;padding:12px;font-size:15px}
+@media (max-width:760px){
+  html{-webkit-tap-highlight-color:transparent}
+  .wrap{padding:calc(10px + env(safe-area-inset-top,0px)) 12px calc(150px + env(safe-area-inset-bottom,0px))}
+  header{margin-bottom:10px;align-items:center}
+  header .seg,#weekBtn{display:none}
+  .hdesk{display:none}
+  .hmob{display:inline}
+  h1{font-size:20px}
+  /* поля ввода 16px — иначе iPhone приближает страницу при фокусе */
+  input,select,textarea{font-size:16px !important}
+  .add{margin-bottom:10px}
+  .add input{padding:11px 12px}
+  .chip{font-size:14px;padding:9px 10px}
+  .col .chip{flex-wrap:wrap}
+  .col .chip .t{flex:1 1 0}
+  .col .chip .meta{flex-basis:100%;margin-left:0;padding-left:15px}
+  .col{padding:10px 8px}
+  .mnav{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:40;background:color-mix(in srgb,var(--paper) 94%,transparent);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid var(--line);padding:4px 4px calc(4px + env(safe-area-inset-bottom,0px))}
+  .mnav button{flex:1;border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0 4px;font-size:11px;font-weight:500;color:var(--muted)}
+  .mnav button svg{width:24px;height:24px}
+  .mnav button.on{color:var(--ink)}
+  .mnav button.on svg{stroke-width:2.2}
+  .bar{bottom:calc(58px + env(safe-area-inset-bottom,0px));padding:8px 12px;max-height:62vh;overflow-y:auto;border-top:1px solid var(--line);box-shadow:0 -8px 24px rgba(0,0,0,.06)}
+  .bar.editing .inv{display:none}
+  .editrow{gap:6px}
+  .editrow .ghost{padding:10px 12px;font-size:15px}
+  .bar input.edit{padding:11px 12px}
+  .inv-head{margin:0}
+  .inv:not(.collapsed) .inv-head{margin-bottom:6px}
+  .inv .list{max-height:30vh}
+  details.data{display:none}
+  .actstart{flex-wrap:nowrap;overflow-x:auto;margin:0 -12px 10px;padding:2px 12px;scrollbar-width:none}
+  .actstart::-webkit-scrollbar{display:none}
+  .actstart .abtn{flex:none}
+  .stool{margin-bottom:10px}
+  .wday{padding:10px}
+  .wday .plus{padding:8px 0}
+  .dayv{padding:12px}
+  .modal .sheet{max-height:calc(100% - 40px)}
+}
 @media (prefers-reduced-motion:reduce){*{transition:none !important}}
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
-    <div class="hleft"><h1>Задачи</h1><button class="wkbtn" id="weekBtn" type="button">📊 Итоги недели</button></div>
+    <div class="hleft"><h1><span class="hdesk">Задачи</span><span class="hmob" id="hmob">Задачи</span></h1><button class="wkbtn" id="weekBtn" type="button">📊 Итоги недели</button></div>
     <div class="seg" role="tablist">
       <button class="tab" role="tab" id="tab1"><span class="n">1</span>Матрица</button>
       <button class="tab" role="tab" id="tab2"><span class="n">2</span>Тип</button>
@@ -593,16 +653,16 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
   </section>
 
   <details class="data">
-    <summary>Данные и календарь</summary>
+    <summary>Синхронизация и календарь</summary>
+    <p class="note">Перенос между телефоном и компьютером: на одном устройстве «Скачать копию», на другом «Загрузить копию». Записи сливаются: совпадающие не трогаются, при расхождении берётся более свежая правка, удаления тоже переносятся.</p>
     <div class="drow">
-      <button class="ghost" id="expBtn">Скачать копию задач</button>
-      <button class="ghost" id="impBtn">Импорт задач (.json)</button>
+      <button class="ghost" id="expBtn">Скачать копию</button>
+      <button class="ghost" id="impBtn">Загрузить копию</button>
+      <button class="ghost" id="undoImp">Вернуть как было до загрузки</button>
       <button class="ghost" id="icsBtn">Загрузить календарь (.ics)</button>
       <button class="ghost" id="icsClear">Убрать события календаря</button>
     </div>
     <p class="status" id="status">Все задачи хранятся только в этом браузере на этом устройстве.</p>
-    <input type="file" id="impFile" accept=".json,application/json" hidden>
-    <input type="file" id="icsFile" accept=".ics,text/calendar" hidden>
   </details>
 </div>
 
@@ -718,6 +778,31 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
     <div class="qfoot" id="qFoot"></div>
   </div>
 </div>
+<div class="toast" id="toast" hidden></div>
+<!-- поля выбора файла вне скрытых блоков: iPhone не открывает выбор файла у полей с display:none -->
+<input type="file" id="impFile" class="vh" tabindex="-1" aria-hidden="true">
+<input type="file" id="icsFile" class="vh" accept=".ics,text/calendar" tabindex="-1" aria-hidden="true">
+<nav class="mnav" id="mnav" aria-label="Разделы">
+  <button type="button" data-go="1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"/></svg>Матрица</button>
+  <button type="button" data-go="2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="4" width="7" height="16" rx="1.5"/><rect x="13.5" y="4" width="7" height="16" rx="1.5"/></svg>Тип</button>
+  <button type="button" data-go="3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/></svg>Расписание</button>
+  <button type="button" data-go="5"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2V16h5v-.1c0-.8.4-1.5 1-2A6 6 0 0 0 12 3z"/></svg>Идеи</button>
+  <button type="button" data-go="more"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="5.5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="18.5" cy="12" r="1.3"/></svg>Ещё</button>
+</nav>
+
+<div class="modal" id="moreModal" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-label="Ещё">
+    <div class="qtop"><span class="qtask">Разделы и данные</span><button class="qx" id="moreClose" type="button" aria-label="Закрыть">×</button></div>
+    <div class="more-list">
+      <button type="button" class="mi" data-go="6"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l2.5 5.5L20 9.3l-4 4 1 5.7-5-2.8-5 2.8 1-5.7-4-4 5.5-.8z"/></svg>Инсайты</button>
+      <button type="button" class="mi" data-go="7"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10.5h18M7 15h4"/></svg>Подписки</button>
+      <button type="button" class="mi" data-go="4"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="4" width="17" height="5" rx="1.5"/><path d="M5 9v9.5a1.5 1.5 0 0 0 1.5 1.5h11a1.5 1.5 0 0 0 1.5-1.5V9M10 13h4"/></svg>Архив</button>
+      <button type="button" class="mi" data-go="week"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Итоги недели</button>
+    </div>
+    <div id="moreBody"></div>
+  </div>
+</div>
+
 <div class="bar"><div class="in">
   <div class="actrow" id="actRow" hidden></div>
   <div class="editrow" id="editRow" hidden></div>
@@ -779,14 +864,41 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
   if(S._act&&S._act.type&&S._act.start) AT=S._act;
   if(S._timer&&S._timer.id){ TM=S._timer; if(TM.start) TM.start=TM.start; } // resume timer across reloads
   S.tab=1; S.focus=null; // при открытии всегда начинаем с матрицы на сегодня
+  if(!S.del||typeof S.del!=='object') S.del={};
   function saveTimer(){ S._timer={id:TM.id,acc:TM.acc,start:TM.start,paused:TM.paused}; S._act=AT; }
-  function save(){try{saveTimer(); localStorage.setItem(KEY,JSON.stringify(S));}catch(e){status('Не удалось сохранить: хранилище браузера переполнено или отключено.');}}
+  // Синхронизация через файл: при каждом сохранении помечаем изменённые записи временем правки (u),
+  // а удалённые — в S.del. При загрузке файла это позволяет слить две копии без потерь.
+  const SYNC_COLS=['tasks','ideas','insights','leaks','acts','subs'];
+  let SNAP=null;
+  const fp=o=>{ const c=Object.assign({},o); delete c.u; return JSON.stringify(c); };
+  function track(){
+    const now=Date.now(); if(!S.del||typeof S.del!=='object') S.del={};
+    const snap={};
+    SYNC_COLS.forEach(c=>{ const prev=SNAP&&SNAP[c], m=new Map();
+      (S[c]||[]).forEach(it=>{ if(!it||!it.id) return; const f=fp(it); if(prev&&prev.get(it.id)!==f) it.u=now; m.set(it.id,f); });
+      if(prev) prev.forEach((f,id)=>{ if(!m.has(id)) S.del[c+':'+id]=now; });
+      snap[c]=m; });
+    const prevD=SNAP&&SNAP.days, md=new Map();
+    Object.keys(S.days||{}).forEach(k=>{ const d=S.days[k]; if(!d||typeof d!=='object') return; const f=fp(d); if(prevD&&prevD.get(k)!==f) d.u=now; md.set(k,fp(d)); });
+    if(prevD) prevD.forEach((f,k)=>{ if(!md.has(k)) S.del['days:'+k]=now; });
+    snap.days=md;
+    // повторно снимаем отпечатки после проставления u не нужно: fp не учитывает u
+    SNAP=snap;
+    // старые «надгробия» (больше года) можно забыть
+    const old=now-365*864e5; Object.keys(S.del).forEach(k=>{ if(S.del[k]<old) delete S.del[k]; });
+  }
+  function save(){try{saveTimer(); track(); localStorage.setItem(KEY,JSON.stringify(S));}catch(e){status('Не удалось сохранить: хранилище браузера переполнено или отключено.');}}
   const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+  try{ track(); }catch(e){}
   const $=s=>document.querySelector(s);
   const el=(tag,cls,txt)=>{const e=document.createElement(tag); if(cls)e.className=cls; if(txt!=null)e.textContent=txt; return e;};
   const sorted=l=>l.slice().sort((a,b)=>(a.done-b.done)||((b.top?1:0)-(a.top?1:0))||(ORDER.indexOf(a.quad)-ORDER.indexOf(b.quad)));
   const newTask=(text,extra)=>Object.assign({id:uid(),text,quad:null,kind:null,date:null,done:false,top:false,est:0},extra||{});
-  function status(t){$('#status').textContent=t; $('details.data').open=true;}
+  let toastT=null;
+  function status(t){
+    $('#status').textContent=t;
+    const ts=$('#toast'); ts.textContent=t; ts.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>{ts.hidden=true;},4500);
+  }
   function empty(box,txt){box.append(el('span','empty',txt));}
 
   /* ---------- chips ---------- */
@@ -843,6 +955,8 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
     if(v===3) renderSchedule();
     if(v===4) renderArchive();
     renderFocusBar();
+    $('#hmob').textContent={1:'Матрица',2:'Тип задач',3:'Расписание',4:'Архив',5:'Идеи',6:'Инсайты',7:'Подписки'}[v]||'Задачи';
+    document.querySelectorAll('#mnav [data-go]').forEach(b=>b.classList.toggle('on',b.dataset.go===String(v)||(b.dataset.go==='more'&&[4,6,7].includes(v))));
     if(v===5) renderBoard('idea');
     if(v===6) renderBoard('ins');
     if(v===7) renderSubs();
@@ -1074,6 +1188,7 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
   function renderBar(){
     const bar=$('#editRow'); bar.innerHTML='';
     bar.hidden=!sel;
+    document.querySelector('.bar').classList.toggle('editing',!!sel);
     if(!sel) return;
     const t=S.tasks.find(x=>x.id===sel); if(!t){sel=null; bar.hidden=true; return;}
     const i=el('input','edit'); i.value=t.text; i.setAttribute('aria-label','Текст задачи');
@@ -1123,13 +1238,16 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
     2:{sub:'без типа',      test:t=>!t.kind&&(S.focus?inFocus(t):!t.done),          clear:t=>{t.kind=null;}, mode:'kind',  hint:'Нажмите на задачу, затем на столбец'},
     3:{sub:'без даты',      test:t=>!t.date&&!t.done, clear:t=>setDate(t,null), mode:'sched', hint:'Нажмите на задачу, затем на день'}
   };
+  const phoneUI=()=>window.matchMedia('(max-width:760px)').matches;
+  const invColl=()=>phoneUI()?S.invOpenM!==true:!!S.invCollapsed;
   function renderInv(){
     if(S.focus&&(S.tab===1||S.tab===2)){ /* в разборе дня инвентарь показывает задачи этого дня */ }
     $('#inv').hidden=S.tab>=4; if(S.tab>=4) return;
     const cfg=INV[S.tab], items=sorted((S.focus&&S.tab<=2?S.tasks:live()).filter(cfg.test));
-    $('#inv').classList.toggle('collapsed',!!S.invCollapsed);
-    $('#invTog').textContent=S.invCollapsed?'Развернуть':'Свернуть';
-    $('#invSub').textContent=cfg.sub+(items.length?' · '+items.length:'')+(items.length&&!S.invCollapsed?'. '+cfg.hint:'');
+    const coll=invColl();
+    $('#inv').classList.toggle('collapsed',coll);
+    $('#invTog').textContent=coll?'Развернуть':'Свернуть';
+    $('#invSub').textContent=cfg.sub+(items.length?' · '+items.length:'')+(items.length&&!coll?'. '+cfg.hint:'');
     const l=$('#invList'); l.innerHTML='';
     if(!items.length) empty(l,'Пусто. Новые задачи будут появляться здесь.');
     items.forEach(t=>l.append(chip(t,cfg.mode)));
@@ -1665,7 +1783,7 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
   $('#addBtn').addEventListener('click',addTop);
   $('#addInput').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault(); addTop();}});
   makeTarget($('#invList'),t=>INV[S.tab].clear(t));
-  $('#invTog').onclick=()=>{S.invCollapsed=!S.invCollapsed; save(); renderInv();};
+  $('#invTog').onclick=()=>{ if(phoneUI()) S.invOpenM=!(S.invOpenM===true); else S.invCollapsed=!S.invCollapsed; save(); renderInv(); };
   $('#tab1').onclick=()=>go(1);
   $('#tab2').onclick=()=>go(2);
   $('#tab3').onclick=()=>go(3);
@@ -1705,41 +1823,146 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
     }
   });
 
-  /* ---------- export / import ---------- */
-  $('#expBtn').onclick=()=>{
-    const blob=new Blob([JSON.stringify({version:2,exported:new Date().toISOString(),tasks:S.tasks,ideas:S.ideas,insights:S.insights,leaks:S.leaks,days:S.days,acts:S.acts,subs:S.subs},null,2)],{type:'application/json'});
-    const a=el('a'); a.href=URL.createObjectURL(blob); a.download='zadachi-'+TODAY()+'.json';
-    document.body.append(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),1000);
-    status('Копия сохранена в файл: задачи, архив, идеи и журнал. Загрузите его на другом устройстве, чтобы перенести всё.');
+  /* ---------- синхронизация через файл: экспорт / импорт со слиянием ---------- */
+  const BKEY=KEY+'-backup';
+  const isPhone=()=>window.matchMedia('(max-width:760px)').matches||window.matchMedia('(pointer:coarse)').matches;
+  function exportData(){
+    save();
+    const now=new Date(), stamp=TODAY()+'-'+pad(now.getHours())+pad(now.getMinutes());
+    const data={version:3,exported:now.toISOString(),device:isPhone()?'телефон':'компьютер',
+      tasks:S.tasks,ideas:S.ideas,insights:S.insights,leaks:S.leaks,days:S.days,acts:S.acts,subs:S.subs,del:S.del};
+    const json=JSON.stringify(data), name='zadachi-'+stamp+'.json';
+    // на телефоне — через «Поделиться»: можно сохранить в «Файлы», отправить в Telegram или AirDrop
+    const download=()=>{
+      const a=el('a'); a.href=URL.createObjectURL(new Blob([json],{type:'application/json'})); a.download=name;
+      document.body.append(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),1500);
+      status('Копия сохранена: '+name+'. Загрузите её на другом устройстве — записи сольются, ничего не пропадёт.');
+    };
+    try{
+      const file=new File([json],name,{type:'application/json'});
+      if(window.matchMedia('(pointer:coarse)').matches&&navigator.canShare&&navigator.canShare({files:[file]})){
+        navigator.share({files:[file],title:'Копия задач'})
+          .then(()=>status('Копия отправлена. Загрузите её на другом устройстве — записи сольются.'))
+          .catch(err=>{ if(err&&err.name==='AbortError') return; download(); });
+        return;
+      }
+    }catch(e){}
+    download();
+  }
+  // Слияние: по каждой записи побеждает более поздняя правка; удаление побеждает, если оно позже последней правки.
+  // «Двойники» — одна и та же запись, заведённая на двух устройствах по отдельности (разные id): склеиваются, а не дублируются.
+  const nrm=v=>String(v||'').trim().toLowerCase().replace(/ё/g,'е').replace(/\s+/g,' ');
+  const NKEY={
+    tasks:x=>x.text?nrm(x.text)+'|'+(x.date||''):null,
+    ideas:x=>x.name?nrm(x.name):null, insights:x=>x.name?nrm(x.name):null,
+    leaks:x=>x.name?nrm(x.name):null, subs:x=>x.name?nrm(x.name):null,
+    acts:x=>(!x.type||!x.date)?null:(x.type==='sleep'?'sleep|'+x.date:[x.type,x.date,x.time||'',x.mins||0].join('|'))
   };
+  const fpi=o=>{ const c=Object.assign({},o); delete c.u; delete c.id; return JSON.stringify(c); };
+  const isClosed=t=>!!(t&&(t.arch||t.done));
+  // какая версия записи остаётся: 'x' — из файла, 'm' — своя,
+  // 'keep' — обе старые (без времени правки) и неясно, что свежее: оставляем свою и ставим ей время, чтобы второе устройство её приняло
+  function pick(c,m,x){
+    const mu=m.u||0, xu=x.u||0;
+    if(xu||mu) return xu>mu?'x':'m';
+    if(c==='tasks'&&isClosed(x)!==isClosed(m)) return isClosed(x)?'x':'m'; // закрытая задача главнее открытой
+    return 'keep';
+  }
+  function mergeData(base,d){
+    const out=JSON.parse(JSON.stringify(base)), inc=JSON.parse(JSON.stringify(d||{}));
+    const st={added:0,updated:0,removed:0,linked:0,kept:0}, remap={}, NOW=Date.now();
+    const del=Object.assign({},out.del||{});
+    Object.entries(inc.del||{}).forEach(([k,t])=>{ if(typeof t==='number'&&!(del[k]>=t)) del[k]=t; });
+    SYNC_COLS.forEach(c=>{
+      const mine=new Map((out[c]||[]).filter(x=>x&&x.id).map(x=>[x.id,x]));
+      const list=(Array.isArray(inc[c])?inc[c]:[]).filter(x=>x&&x.id);
+      const incIds=new Set(list.map(x=>x.id)), key=NKEY[c], pool=new Map();
+      if(key) mine.forEach((m,id)=>{ if(incIds.has(id)) return; const t=del[c+':'+id]; if(t&&t>=(m.u||0)) return; const k=key(m); if(k&&!pool.has(k)) pool.set(k,id); });
+      list.forEach(x=>{
+        const tomb=del[c+':'+x.id]||0, xu=x.u||0;
+        if(tomb&&tomb>=xu) return;
+        const val=c==='tasks'?newTask(String(x.text||''),x):x;
+        const m=mine.get(x.id);
+        if(!m&&key){
+          const k=key(x), tid=k&&pool.get(k);
+          if(tid&&mine.has(tid)){
+            pool.delete(k);
+            // общий id — меньший из двух; если неясно, какая версия свежее, берём ту, чей id остаётся (так оба устройства придут к одному)
+            const tw=mine.get(tid), id=tid<x.id?tid:x.id, pk=pick(c,tw,x), takeX=pk==='keep'?id===x.id:pk==='x', w=takeX?val:tw;
+            mine.delete(tid); mine.set(id,Object.assign({},w,{id}));
+            if(tid!==id) remap[tid]=id; if(x.id!==id) remap[x.id]=id;
+            if(tid!==id||(takeX&&fpi(tw)!==fpi(x))) st.linked++;
+            return;
+          }
+        }
+        if(!m){ mine.set(x.id,val); st.added++; return; }
+        if(fp(m)===fp(x)) return;
+        const p=pick(c,m,x);
+        if(p==='x'){ mine.set(x.id,val); st.updated++; } else if(p==='keep'){ mine.set(x.id,Object.assign({},m,{u:NOW})); st.kept++; }
+      });
+      mine.forEach((x,id)=>{ const t=del[c+':'+id]; if(t&&t>=(x.u||0)){ mine.delete(id); st.removed++; } });
+      out[c]=[...mine.values()];
+    });
+    // журнал утечек в днях ссылается на id — переводим склеенные на общий id
+    const rl=o=>{ if(o&&Array.isArray(o.leaks)) o.leaks=[...new Set(o.leaks.map(i=>remap[i]||i))]; };
+    out.days=out.days&&typeof out.days==='object'?out.days:{};
+    const idays=inc.days&&typeof inc.days==='object'?inc.days:{};
+    if(Object.keys(remap).length){ Object.values(out.days).forEach(rl); Object.values(idays).forEach(rl); }
+    Object.entries(idays).forEach(([k,x])=>{
+      if(!x||typeof x!=='object') return;
+      const tomb=del['days:'+k]||0, xu=x.u||0; if(tomb&&tomb>=xu) return;
+      const m=out.days[k];
+      if(!m){ out.days[k]=x; st.added++; return; }
+      if(fp(m)===fp(x)) return;
+      const p=pick('days',m,x);
+      if(p==='x'){ out.days[k]=x; st.updated++; } else if(p==='keep'){ out.days[k]=Object.assign({},m,{u:NOW}); st.kept++; }
+    });
+    Object.keys(out.days).forEach(k=>{ const t=del['days:'+k]; if(t&&t>=(out.days[k].u||0)){ delete out.days[k]; st.removed++; } });
+    out.del=del;
+    return {out,st,remap};
+  }
+  function importText(text){
+    let d; try{ d=JSON.parse(text); }catch(e){ d=null; }
+    if(!d||!Array.isArray(d.tasks)){ status('Это не файл копии задач. Нужен .json, сохранённый кнопкой «Скачать копию».'); return; }
+    save();
+    const cur={}; SYNC_COLS.forEach(c=>cur[c]=S[c]); cur.days=S.days; cur.del=S.del;
+    const {out,st,remap}=mergeData(cur,d);
+    if(!st.added&&!st.updated&&!st.removed&&!st.linked&&!st.kept){ status('Всё уже совпадает: в файле нет ничего нового.'); return; }
+    const parts=(f)=>{ const a=[]; if(st.added) a.push((f?'добавлено ':'добавится ')+st.added); if(st.updated) a.push((f?'обновлено ':'обновится ')+st.updated);
+      if(st.linked) a.push((f?'склеено одинаковых ':'одинаковых склеится ')+st.linked); if(st.removed) a.push((f?'удалено ':'удалится ')+st.removed);
+      if(st.kept){ const one=st.kept%10===1&&st.kept%100!==11; a.push('в '+st.kept+(one?' старой записи':' старых записях')+(f?' версии расходились — оставлена здешняя':' версии расходятся — останется здешняя')); }
+      return a.join(', '); };
+    const from=d.device?' (с устройства: '+d.device+(d.exported?', '+new Date(d.exported).toLocaleString('ru-RU',{day:'numeric',month:'long',hour:'2-digit',minute:'2-digit'}):'')+')':'';
+    if(!confirm('Слить данные из файла'+from+'? Записей: '+parts(false)+'. Совпадающие записи не трогаются, одинаковые не задваиваются, при расхождении берётся более свежая правка. Текущее состояние сохранится — его можно будет вернуть.')) return;
+    try{ localStorage.setItem(BKEY,JSON.stringify({at:Date.now(),state:cur})); }catch(e){}
+    SYNC_COLS.forEach(c=>S[c]=out[c]); S.days=out.days; S.del=out.del;
+    if(TM.id&&remap[TM.id]) TM.id=remap[TM.id];
+    sel=null;
+    SNAP=null; track(); // новый снимок, чтобы слитые записи не получили «свежую» отметку времени
+    save(); render(); typeof renderMore==="function"&&renderMore(); syncUndo();
+    status('Готово: '+parts(true)+'. Если что-то не так — «Вернуть как было до загрузки».');
+  }
+  function undoImport(){
+    let b=null; try{ b=JSON.parse(localStorage.getItem(BKEY)||'null'); }catch(e){}
+    if(!b||!b.state){ status('Нет сохранённого состояния до загрузки.'); return; }
+    if(!confirm('Вернуть данные к состоянию до последней загрузки файла ('+new Date(b.at).toLocaleString('ru-RU',{day:'numeric',month:'long',hour:'2-digit',minute:'2-digit'})+')?')) return;
+    SYNC_COLS.forEach(c=>S[c]=b.state[c]||[]); S.days=b.state.days||{}; S.del=b.state.del||{};
+    SNAP=null; track(); save(); render(); typeof renderMore==="function"&&renderMore();
+    try{ localStorage.removeItem(BKEY); }catch(e){}
+    syncUndo(); typeof renderMore==="function"&&renderMore();
+    status('Вернул данные к состоянию до загрузки.');
+  }
+  const hasBackup=()=>{ try{ return !!localStorage.getItem(BKEY); }catch(e){ return false; } };
+  const syncUndo=()=>{ $('#undoImp').hidden=!hasBackup(); };
+  syncUndo();
+  $('#expBtn').onclick=exportData;
   $('#impBtn').onclick=()=>$('#impFile').click();
+  $('#undoImp').onclick=undoImport;
   $('#impFile').addEventListener('change',e=>{
     const f=e.target.files&&e.target.files[0]; if(!f) return;
     const r=new FileReader();
-    r.onload=()=>{
-      try{
-        const d=JSON.parse(String(r.result)); if(!d||!Array.isArray(d.tasks)) throw 0;
-        // слияние: добавляем только то, чего ещё нет (по id), текущие данные не трогаем
-        const have=new Set(S.tasks.map(t=>t.id));
-        const fresh=d.tasks.filter(t=>t&&t.id&&!have.has(t.id));
-        const ideasN=Array.isArray(d.ideas)?d.ideas.filter(i=>i&&i.id&&!S.ideas.some(x=>x.id===i.id)):[];
-        const leaksN=Array.isArray(d.leaks)?d.leaks.filter(L=>L&&L.id&&!S.leaks.some(x=>x.id===L.id)):[];
-        const daysN=d.days&&typeof d.days==='object'?Object.keys(d.days).filter(k=>!S.days[k]):[];
-        const actsN=Array.isArray(d.acts)?d.acts.filter(a=>a&&a.id&&!S.acts.some(x=>x.id===a.id)):[];
-        const subsN=Array.isArray(d.subs)?d.subs.filter(x=>x&&x.id&&!S.subs.some(y=>y.id===x.id)):[];
-        const insN=Array.isArray(d.insights)?d.insights.filter(i=>i&&i.id&&!S.insights.some(x=>x.id===i.id)):[];
-        const total=fresh.length+insN.length+ideasN.length+leaksN.length+daysN.length+actsN.length+subsN.length;
-        if(!total){ status('В файле нет ничего нового: все задачи из него уже есть.'); e.target.value=''; return; }
-        const parts=[]; if(fresh.length) parts.push('задач: '+fresh.length); if(insN.length) parts.push('инсайтов: '+insN.length); if(actsN.length) parts.push('записей режима дня: '+actsN.length); if(subsN.length) parts.push('подписок: '+subsN.length); if(ideasN.length) parts.push('идей: '+ideasN.length); if(leaksN.length) parts.push('утечек: '+leaksN.length); if(daysN.length) parts.push('итогов дня: '+daysN.length);
-        if(!confirm('Добавить из файла '+parts.join(', ')+'? Текущие данные останутся, повторы пропускаются.')){ e.target.value=''; return; }
-        fresh.forEach(t=>S.tasks.push(newTask(String(t.text||''),t)));
-        ideasN.forEach(i=>S.ideas.push(i)); insN.forEach(i=>S.insights.push(i)); leaksN.forEach(L=>S.leaks.push(L)); daysN.forEach(k=>S.days[k]=d.days[k]); actsN.forEach(a=>S.acts.push(a)); subsN.forEach(x=>S.subs.push(x));
-        save(); render();
-        const skipped=d.tasks.length-fresh.length;
-        status('Добавлено: '+parts.join(', ')+'.'+(skipped?' Уже были и пропущены: '+skipped+'.':''));
-      }catch(err){ status('Это не файл копии задач. Нужен .json с задачами — например, скачанный кнопкой «Скачать копию задач».'); }
-      e.target.value='';
-    };
+    r.onload=()=>{ importText(String(r.result)); e.target.value=''; };
+    r.onerror=()=>status('Не удалось открыть файл.');
     r.readAsText(f);
   });
 
@@ -2173,6 +2396,58 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
   $('#wkNext').onclick=()=>{ if(WK<monday(TODAY())){WK=addDays(WK,7); renderWeekReport();} };
   $('#weekModal').addEventListener('click',e=>{ if(e.target.id==='weekModal') closeWeek(); });
   document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&WK) closeWeek(); });
+
+  /* ---------- телефон: нижнее меню и «Ещё» ---------- */
+  let installEvt=null;
+  const standalone=()=>window.matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
+  const isIOS=()=>/iphone|ipad|ipod/i.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+  function renderMore(){
+    const box=$('#moreBody'); if(!box) return; box.innerHTML='';
+    document.querySelectorAll('#moreModal .mi[data-go]').forEach(b=>b.classList.toggle('on',b.dataset.go===String(S.tab)));
+    const sync=el('div','more-sec'); sync.append(el('h3',null,'Синхронизация с другим устройством'));
+    sync.append(el('p',null,'На одном устройстве «Скачать копию», на другом «Загрузить копию». Записи сливаются: совпадающие не трогаются, при расхождении берётся более свежая правка, удаления тоже переносятся.'));
+    const r=el('div','drow'); r.append(btn('Скачать копию','ghost',()=>exportData()), btn('Загрузить копию','ghost',()=>$('#impFile').click()));
+    if(hasBackup()) r.append(btn('Вернуть как было до загрузки','ghost',()=>undoImport()));
+    sync.append(r); box.append(sync);
+    if(!standalone()){
+      const ins=el('div','more-sec'); ins.append(el('h3',null,'Установить как приложение'));
+      if(installEvt){ ins.append(el('p',null,'Откроется на весь экран с иконкой, будет работать и без интернета.')); const d=el('div','drow'); d.append(btn('Установить','ghost',()=>{ installEvt.prompt(); installEvt.userChoice.finally(()=>{installEvt=null; renderMore();}); })); ins.append(d); }
+      else if(isIOS()) ins.append(el('p',null,'В Safari нажмите «Поделиться» (квадрат со стрелкой) → «На экран „Домой“» → «Добавить». Приложение хранит данные отдельно от Safari: после установки один раз загрузите в него свою копию.'));
+      else ins.append(el('p',null,'Меню браузера (⋮) → «Установить приложение» или «Добавить на главный экран».'));
+      box.append(ins);
+    }
+    const cal=el('div','more-sec'); cal.append(el('h3',null,'Календарь'));
+    const c=el('div','drow'); c.append(btn('Загрузить календарь (.ics)','ghost',()=>$('#icsFile').click())); if(S.events.length) c.append(btn('Убрать события','ghost',()=>$('#icsClear').click()));
+    cal.append(c); box.append(cal);
+  }
+  function openMore(){ renderMore(); $('#moreModal').hidden=false; }
+  function closeMore(){ $('#moreModal').hidden=true; }
+  document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>{
+    const g=b.dataset.go;
+    if(g==='more') return openMore();
+    closeMore();
+    if(g==='week') return openWeek();
+    go(+g);
+  }));
+  $('#moreClose').onclick=closeMore;
+  $('#moreModal').addEventListener('click',e=>{ if(e.target.id==='moreModal') closeMore(); });
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&!$('#moreModal').hidden) closeMore(); });
+  window.addEventListener('beforeinstallprompt',e=>{ e.preventDefault(); installEvt=e; if(!$('#moreModal').hidden) renderMore(); });
+
+  // свайп влево/вправо по расписанию листает день/неделю/месяц
+  (function swipe(){
+    const z=$('#sched'); let x0=null,y0=null,t0=0;
+    z.addEventListener('touchstart',e=>{ if(e.touches.length!==1) return; x0=e.touches[0].clientX; y0=e.touches[0].clientY; t0=Date.now(); },{passive:true});
+    z.addEventListener('touchend',e=>{
+      if(x0==null) return; const t=e.changedTouches[0], dx=t.clientX-x0, dy=t.clientY-y0; x0=null;
+      if(Date.now()-t0<600&&Math.abs(dx)>70&&Math.abs(dy)<45) shift(dx<0?1:-1);
+    },{passive:true});
+  })();
+
+  // офлайн-режим и установка (работает только на https — то есть на сайте, не в локальном файле)
+  if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost')) window.addEventListener('load',()=>navigator.serviceWorker.register('/sw.js').catch(()=>{}));
+  // просим браузер не чистить данные при нехватке места (для установленного приложения обычно разрешает сам)
+  try{ if(navigator.storage&&navigator.storage.persist) navigator.storage.persisted().then(p=>{ if(!p) navigator.storage.persist(); }).catch(()=>{}); }catch(e){}
 
   render();
 
