@@ -136,6 +136,19 @@ body.picking .wkmove:not([hidden]),body.dragging .wkmove:not([hidden]){display:f
 .whead .dn{font:700 18px/1 var(--display)}
 .is-today .whead .dn{background:var(--ink);color:var(--bg);border-radius:7px;padding:3px 6px}
 .load{font-size:11px;color:var(--muted);margin-left:auto}
+.wleft{font-size:11px;font-weight:600;padding:2px 7px;border-radius:999px;background:var(--ink);color:var(--bg);white-space:nowrap}
+.wleft.ok{background:color-mix(in srgb,var(--ops) 16%,var(--paper));color:var(--ops)}
+.wleft.late{background:color-mix(in srgb,var(--warn) 14%,var(--paper));color:var(--warn)}
+.dleft{font-size:13px;font-weight:600;margin:0 0 6px}
+.dleft span{color:var(--muted);font-weight:400}
+.tpick{display:flex;flex-wrap:wrap;align-items:center;gap:4px}
+.tpick .tpl{font-size:13px;color:var(--muted);margin-right:2px}
+.tpick .tq{border:1px solid var(--line);background:var(--paper);border-radius:8px;padding:7px 9px;font-size:13px;font-weight:500;color:var(--ink)}
+.tpick .tq.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.tpick .tmin{width:66px;border:1px solid var(--line);border-radius:8px;padding:7px 8px;background:var(--paper);font:inherit;font-size:13px;color:var(--ink)}
+.sheet .tpick{gap:6px}
+.sheet .tpick .tq{padding:11px 13px;font-size:14px;background:var(--bg)}
+.sheet .tpick .tmin{width:96px;padding:10px;font-size:14px;background:var(--bg)}
 .load.over-l{color:var(--warn);font-weight:600}
 .ev{display:flex;gap:6px;font-size:12.5px;line-height:1.3;color:var(--muted);padding:5px 7px;border:1px dotted var(--event);border-radius:7px}
 .ev b{font-weight:500;color:var(--ink);word-break:break-word}
@@ -732,7 +745,23 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
   const addDays=(s,k)=>{const d=P(s);d.setDate(d.getDate()+k);return ymd(d);};
   const monday=s=>{const d=P(s);d.setDate(d.getDate()-((d.getDay()+6)%7));return ymd(d);};
   const TODAY=()=>ymd(new Date());
-  const fmtEst=m=>m>720?'12+ ч':fmtMin(m);
+  const fmtEst=m=>m===780?'12+ ч':(m<60?m+' мин':(m%60?Math.floor(m/60)+' ч '+(m%60)+' мин':(m/60)+' ч'));
+  // быстрые варианты времени + своё значение в минутах
+  const QUICK=[15,30,60,120,240,480];
+  const qLabel=m=>m<60?m+'м':(m%60?fmtMin(m).replace(' ч','ч'):(m/60)+'ч');
+  function timePicker(cur,onSet,o){
+    o=o||{}; const w=el('div','tpick'), list=o.quick||QUICK;
+    if(o.label) w.append(el('span','tpl',o.label));
+    list.forEach(m=>w.append(btn(qLabel(m),'tq'+(cur===m?' on':''),()=>onSet(m))));
+    const i=el('input','tmin'); i.type='number'; i.min='1'; i.max='1440'; i.inputMode='numeric'; i.placeholder='своё';
+    i.setAttribute('aria-label','Своё время в минутах');
+    if(cur&&!list.includes(cur)) i.value=cur;
+    const apply=()=>{ const v=parseInt(i.value,10); if(v>0&&v<=1440) onSet(v); else i.focus(); };
+    i.addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); apply(); } });
+    w.append(i, el('span','tpl','мин'), btn('ОК','tq',apply));
+    if(o.clear&&cur) { const x=btn('×','tq',()=>onSet(0)); x.title='Убрать время'; w.append(x); }
+    return w;
+  }
   const fmtMin=m=>m<60?m+' мин':(Math.round(m/6)/10+' ч').replace('.',',');
 
   let S={tasks:[],events:[],ideas:[],insights:[],leaks:[],days:{},ideaFilter:'open',tab:1,view:'week',cur:TODAY(),invCollapsed:false,showDone:true};
@@ -933,7 +962,10 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
       const col=el('div','wday'); if(k===today) col.classList.add('is-today'); if(k<today) col.classList.add('past');
       if(!b.t.length&&!b.e.length&&!actsOn(k).length) col.classList.add('empty-day');
       const h=el('button','whead'); h.type='button';
-      h.append(el('span','wd',WD[i]),el('span','dn',d.getDate()),loadLabel(b));
+      const open=b.t.filter(t=>!t.done).length, tot=b.t.length;
+      h.append(el('span','wd',WD[i]),el('span','dn',d.getDate()));
+      if(tot) h.append(el('span','wleft'+(open?(k<today?' late':''):' ok'),open?'осталось '+open:'✓ всё'));
+      h.append(loadLabel(b));
       h.setAttribute('aria-label','Открыть день: '+WD_FULL[d.getDay()]+', '+d.getDate()+' '+MON_G[d.getMonth()]);
       h.addEventListener('click',e=>{ if(sel) return; e.stopPropagation(); S.cur=k; S.view='day'; save(); render(); window.scrollTo({top:0}); });
       col.append(h);
@@ -965,6 +997,7 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
       cl.append(el('span','cs','в матрице '+q+' из '+all.length+' · с типом '+kd+' из '+all.length));
       v.append(cl);
     }
+    if(b.t.length){ const open=b.t.filter(t=>!t.done).length, dl=el('div','dleft',open?'Осталось задач: '+open:'Все задачи закрыты ✓'); dl.append(el('span',null,' · всего '+b.t.length+', закрыто '+(b.t.length-open))); v.append(dl); }
     // load
     const lb=el('div','loadbar'+(b.load>DAY_LIMIT?' over-l':''));
     const f1=el('i','done'); f1.style.width=Math.min(100,b.fact/DAY_LIMIT*100)+'%';
@@ -1074,10 +1107,7 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
       bar.append(tmBox);
       bar.append(btn('Завершить или убрать…','ghost on',()=>openQuiz(t)));
       bar.append(btn('★ Главное','ghost'+(t.top?' on':''),()=>{t.top=!t.top; save(); render();}));
-      const s=el('select'); s.setAttribute('aria-label','Сколько времени займёт');
-      EST.forEach(([v,l])=>{const o=el('option',null,l); o.value=v; if((t.est||0)===v) o.selected=true; s.append(o);});
-      s.onchange=()=>{t.est=+s.value; save(); render();};
-      bar.append(s);
+      bar.append(timePicker(t.est||0,v=>{t.est=v; save(); render();},{label:'Время:',clear:true}));
       if(t.date&&t.date<TODAY()) bar.append(btn('На сегодня','ghost',()=>{setDate(t,TODAY()); sel=null; save(); render();}));
       // перенос на неделю вперёд прямо из нижней панели — удобно на телефоне
       if(S.tab===3) bar.append(btn('На неделю вперёд ›','ghost',()=>{ const nd=addDays(t.date||TODAY(),7); setDate(t,nd); S.cur=nd; sel=null; save(); render(); }));
@@ -1306,8 +1336,8 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
     if(step==='actual'){
       $('#qTitle').textContent=t.est?'Сколько заняло на самом деле?':'Сколько времени заняла задача?';
       if(!t.est) $('#qHint').textContent='Время заранее не было указано.';
-      box.classList.add('grid');
-      EST.filter(([v])=>v>0).forEach(([v,l])=>box.append(opt(l,()=>answer('actual',()=>{Z.a.actual=v; if(t.est) Z.a.inEst=v<=t.est;}))));
+      box.append(timePicker(null,v=>answer('actual',()=>{Z.a.actual=v; if(t.est) Z.a.inEst=v<=t.est;}),{quick:[15,30,45,60,90,120,180,240,360,480,720]}));
+      if(!t.est) $('#qHint').textContent='Время заранее не было указано. Выберите или впишите минуты.'; else $('#qHint').textContent='Выберите вариант или впишите своё время в минутах.';
     }
     if(step==='reason'){
       $('#qTitle').textContent='Почему не сделал?';
