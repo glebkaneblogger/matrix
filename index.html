@@ -43,13 +43,14 @@ button{cursor:pointer}
 :focus-visible{outline:2px solid var(--plan);outline-offset:2px}
 [hidden]{display:none !important}
 
-.wrap{max-width:1100px;margin:0 auto;padding:18px 14px 240px}
+.wrap{max-width:1100px;margin:0 auto;padding:18px 14px max(240px,calc(var(--barh,0px) + 40px))}
 header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:16px}
 h1{font:700 22px/1.1 var(--display);margin:0;letter-spacing:-.01em}
 .seg{display:flex;background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:3px}
 .seg button{border:0;background:none;padding:7px 12px;border-radius:9px;font-weight:500;color:var(--muted);display:flex;gap:7px;align-items:center;white-space:nowrap}
 .seg button[aria-selected="true"]{background:var(--ink);color:var(--bg)}
 .seg button:disabled{opacity:.4;cursor:not-allowed}
+header .seg button{padding:7px 10px}
 .tab .n{font:700 11px/1 var(--display);width:20px;height:20px;border-radius:50%;display:grid;place-items:center;border:1.5px solid currentColor}
 
 .add{display:flex;gap:8px;margin-bottom:14px}
@@ -470,10 +471,112 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
   #scale button{padding:6px 8px;font-size:13px}
 }
 .vh{position:fixed;left:-200px;top:0;width:1px;height:1px;opacity:0;pointer-events:none}
+/* ---------- цели: майнд-карта ---------- */
+.gbar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:12px}
+.gbar:empty{display:none}
+.gchip{display:flex;align-items:center;gap:7px;border:1px solid var(--line);background:var(--paper);border-radius:999px;padding:7px 12px;font-weight:500;max-width:100%}
+.gchip i{flex:none;width:10px;height:10px;border-radius:50%;background:var(--gc)}
+.gchip .gn{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gchip .gp{flex:none;font-size:12px;color:var(--muted)}
+.gchip.on{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.gchip.ach .gn{text-decoration:line-through;opacity:.7}
+.gsep{font-size:12px;color:var(--muted);margin:0 2px 0 8px}
+.gempty{background:var(--paper);border:1px dashed var(--line);border-radius:14px;padding:18px;color:var(--muted);font-size:14px;max-width:600px}
+.gempty b{color:var(--ink)}
+.mm{overflow-x:auto;padding:6px 2px 24px;--wire:color-mix(in srgb,var(--ink) 24%,transparent)}
+.mmb{display:flex;align-items:center}
+.mmk{display:flex;flex-direction:column;position:relative;margin-left:44px}
+.mmk::before{content:'';position:absolute;left:-44px;top:50%;width:22px;border-top:2px solid var(--wire)}
+.mmk>.mmb{position:relative;padding:6px 0}
+.mmk>.mmb::before{content:'';position:absolute;left:-22px;top:50%;width:22px;border-top:2px solid var(--bc,var(--wire))}
+.mmk>.mmb::after{content:'';position:absolute;left:-22px;top:0;bottom:0;border-left:2px solid var(--wire)}
+.mmk>.mmb:first-child::after{top:50%}
+.mmk>.mmb:last-child::after{bottom:50%}
+.mmk>.mmb:only-child::after{display:none}
+.mmk>.mmb.addb::before{border-top:2px dashed var(--wire)}
+.mmn{flex:none;width:270px;background:var(--paper);border:1px solid var(--line);border-left:4px solid var(--bc,var(--line));border-radius:12px;padding:10px 12px 6px}
+.mmn.full{background:color-mix(in srgb,var(--bc) 8%,var(--paper))}
+.mmn.root{width:250px;background:var(--gc);border:0;color:#fff;border-radius:18px;padding:16px 16px 8px;box-shadow:0 10px 26px color-mix(in srgb,var(--gc) 30%,transparent)}
+.root .gname{display:block;width:100%;border:0;background:none;color:inherit;text-align:left;padding:0;font:700 17px/1.25 var(--display);word-break:break-word}
+.root .gnote{font-size:13px;opacity:.88;margin-top:6px;white-space:pre-wrap;word-break:break-word}
+.root .gdue{font-size:12.5px;opacity:.88;margin-top:6px}
+.gprog{height:6px;border-radius:3px;background:rgba(255,255,255,.28);margin-top:12px;overflow:hidden}
+.gprog i{display:block;height:100%;background:#fff;border-radius:3px}
+.gstat,.gnext{font-size:12.5px;margin-top:6px;opacity:.94;word-break:break-word}
+.gnext{opacity:.85}
+.nh{display:flex;align-items:flex-start;gap:8px}
+.ck{flex:none;width:22px;height:22px;border-radius:50%;border:2px solid var(--bc);background:none;color:#fff;font-size:12px;font-weight:700;line-height:1;display:grid;place-items:center;padding:0;margin-top:1px}
+.ck.on{background:var(--bc)}
+.nn{flex:1;min-width:0;border:0;background:none;padding:0;text-align:left;font-weight:600;font-size:15px;line-height:1.3;word-break:break-word}
+.np{flex:none;font-size:12px;color:var(--muted);padding-top:2px}
+.gtl{display:flex;flex-direction:column;gap:4px;margin-top:8px}
+.gt{display:flex;align-items:flex-start;gap:7px;width:100%;border:1px solid transparent;background:var(--bg);border-radius:8px;padding:6px 8px;text-align:left;font-size:13.5px;line-height:1.3}
+.gt .s{flex:none;width:16px;text-align:center;color:var(--muted);font-size:13px}
+.gt .x{flex:1;min-width:0;word-break:break-word}
+.gt .dt{flex:none;font-size:11.5px;color:var(--muted);padding-top:1px;white-space:nowrap}
+.gt .dt.late{color:var(--warn);font-weight:600}
+.gt.done .x{text-decoration:line-through;opacity:.55}
+.gt.done .s{color:var(--ops);font-weight:700}
+.gt[aria-pressed="true"]{background:var(--sel);color:var(--selText);border-color:var(--sel)}
+.gt[aria-pressed="true"] .s,.gt[aria-pressed="true"] .dt{color:inherit}
+.root .gt{background:rgba(255,255,255,.16);color:#fff}
+.root .gt .s,.root .gt .dt{color:rgba(255,255,255,.85)}
+.nf{display:flex;align-items:center;gap:2px;margin:6px 0 0 -6px}
+.nb{border:0;background:none;color:var(--muted);font-size:13px;font-weight:500;padding:5px 7px;border-radius:7px}
+.nb:hover{background:var(--bg);color:var(--ink)}
+.nb.more{font-size:17px;line-height:1;padding:3px 9px 6px}
+.root .nb{color:rgba(255,255,255,.9)}
+.root .nb:hover{background:rgba(255,255,255,.18);color:#fff}
+.gadd{border:1.5px dashed var(--line);background:none;border-radius:10px;padding:8px 12px;color:var(--muted);font-weight:500;font-size:14px;white-space:nowrap}
+.gadd:hover{border-color:var(--ink);color:var(--ink)}
+input.gin{width:250px;margin:0;background:var(--paper)}
+.nh input.gin{width:auto;flex:1;min-width:0}
+.gbtn{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.opt.danger{color:var(--warn)}
+.gmenu{display:flex;flex-direction:column;gap:6px}
+.gmrow{display:flex;align-items:center;gap:10px;margin-top:10px;font-size:14px;color:var(--muted)}
+.gmrow input{border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:var(--bg)}
+.gtsearch{display:flex;gap:8px;margin:12px 0 10px}
+.gtsearch .ti{flex:1;min-width:0}
+.gtsearch .primary{flex:none;padding:0 16px}
+.gtbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin-bottom:10px}
+.gtbar .gtc{font-size:13px;color:var(--muted)}
+.gtlist{display:flex;flex-direction:column;gap:5px;max-height:50vh;overflow:auto;padding:1px}
+.gpick{display:flex;align-items:flex-start;gap:10px;width:100%;border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:9px 10px;text-align:left;font-size:14px;line-height:1.3}
+.gpick .bx{flex:none;width:20px;height:20px;border-radius:6px;border:2px solid var(--line);display:grid;place-items:center;font-size:12px;font-weight:700;margin-top:-1px}
+.gpick.on{border-color:var(--ink)}
+.gpick.on .bx{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.gpick .x{flex:1;min-width:0;word-break:break-word}
+.gpick.dn .x{text-decoration:line-through;opacity:.6}
+.gpick .m{flex:none;max-width:45%;font-size:12px;color:var(--muted);text-align:right}
+.gnlist{display:flex;flex-direction:column;gap:4px;max-height:52vh;overflow:auto;padding:1px}
+.gnrow{display:flex;align-items:center;gap:8px;width:100%;border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:9px 12px 9px calc(12px + var(--d,0)*18px);text-align:left;font-size:14px}
+.gnrow i{flex:none;width:10px;height:10px;border-radius:50%}
+.gnrow.g{font-weight:700;margin-top:6px}
+.gnrow.g:first-child{margin-top:0}
+.gnrow.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.gnnew{display:flex;gap:8px;margin-top:10px}
+.gnnew .ti{flex:1;min-width:0}
+@media (max-width:760px){
+  .mm{overflow:visible;padding:0 0 16px}
+  .mmb{display:block}
+  .mmk{margin-left:14px}
+  .mmk::before{display:none}
+  .mmk>.mmb{padding:8px 0 0 20px}
+  .mmk>.mmb::before{left:0;top:30px;width:20px}
+  .mmk>.mmb::after{left:0;top:0;bottom:0}
+  .mmk>.mmb:first-child::after{top:0}
+  .mmk>.mmb:last-child::after,.mmk>.mmb:only-child::after{display:block;bottom:auto;height:31px}
+  .mmn,.mmn.root{width:auto}
+  input.gin{width:100%}
+  .gt{padding:8px 9px;font-size:14px}
+  .nb{padding:7px 8px;font-size:14px}
+  .gpick .m{max-width:40%}
+}
 /* ---------- телефон: нижнее меню, компактные панели ---------- */
 .mnav{display:none}
 .hmob{display:none}
-.toast{position:fixed;left:50%;top:calc(12px + env(safe-area-inset-top,0px));transform:translateX(-50%);z-index:80;max-width:min(92vw,520px);background:var(--ink);color:var(--bg);font-size:14px;line-height:1.35;padding:10px 14px;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+.toast{position:fixed;left:50%;top:calc(12px + env(safe-area-inset-top,0px));transform:translateX(-50%);z-index:80;width:max-content;max-width:min(92vw,520px);background:var(--ink);color:var(--bg);font-size:14px;line-height:1.35;padding:10px 14px;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
 .more-list{display:flex;flex-direction:column;gap:6px}
 .more-list .mi{display:flex;align-items:center;gap:12px;width:100%;text-align:left;border:1px solid var(--line);background:var(--bg);border-radius:12px;padding:13px 14px;font-size:16px;font-weight:500;color:var(--ink)}
 .more-list .mi svg{flex:none;width:22px;height:22px}
@@ -485,7 +588,7 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
 .more-sec .drow .ghost{flex:1 1 45%;padding:12px;font-size:15px}
 @media (max-width:760px){
   html{-webkit-tap-highlight-color:transparent}
-  .wrap{padding:calc(10px + env(safe-area-inset-top,0px)) 12px calc(150px + env(safe-area-inset-bottom,0px))}
+  .wrap{padding:calc(10px + env(safe-area-inset-top,0px)) 12px calc(max(150px,var(--barh,0px) + 80px) + env(safe-area-inset-bottom,0px))}
   header{margin-bottom:10px;align-items:center}
   header .seg,#weekBtn{display:none}
   .hdesk{display:none}
@@ -501,7 +604,7 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
   .col .chip .meta{flex-basis:100%;margin-left:0;padding-left:15px}
   .col{padding:10px 8px}
   .mnav{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:40;background:color-mix(in srgb,var(--paper) 94%,transparent);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid var(--line);padding:4px 4px calc(4px + env(safe-area-inset-bottom,0px))}
-  .mnav button{flex:1;border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0 4px;font-size:11px;font-weight:500;color:var(--muted)}
+  .mnav button{flex:1;min-width:0;border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0 4px;font-size:10.5px;letter-spacing:-.01em;font-weight:500;color:var(--muted)}
   .mnav button svg{width:24px;height:24px}
   .mnav button.on{color:var(--ink)}
   .mnav button.on svg{stroke-width:2.2}
@@ -534,10 +637,11 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
       <button class="tab" role="tab" id="tab1"><span class="n">1</span>Матрица</button>
       <button class="tab" role="tab" id="tab2"><span class="n">2</span>Тип</button>
       <button class="tab" role="tab" id="tab3"><span class="n">3</span>Расписание</button>
-      <button class="tab" role="tab" id="tab5"><span class="n">4</span>Идеи</button>
-      <button class="tab" role="tab" id="tab4"><span class="n">5</span>Архив</button>
-      <button class="tab" role="tab" id="tab7"><span class="n">6</span>Подписки</button>
-      <button class="tab" role="tab" id="tab6"><span class="n">7</span>Инсайты</button>
+      <button class="tab" role="tab" id="tab8"><span class="n">4</span>Цели</button>
+      <button class="tab" role="tab" id="tab5"><span class="n">5</span>Идеи</button>
+      <button class="tab" role="tab" id="tab4"><span class="n">6</span>Архив</button>
+      <button class="tab" role="tab" id="tab7"><span class="n">7</span>Подписки</button>
+      <button class="tab" role="tab" id="tab6"><span class="n">8</span>Инсайты</button>
     </div>
   </header>
 
@@ -604,6 +708,12 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
       <span style="--kc:#3E9C7F"><i></i>Медитация</span>
       <span style="--kc:var(--muted)"><i></i>Оплата подписки</span>
     </div>
+  </section>
+
+  <!-- 8. Goals -->
+  <section id="view8" hidden>
+    <div class="gbar" id="gBar"></div>
+    <div id="gMap"></div>
   </section>
 
   <!-- 5. Ideas -->
@@ -778,6 +888,54 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
     <div class="qfoot" id="qFoot"></div>
   </div>
 </div>
+<div class="modal" id="goalModal" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="gmTitle">
+    <div class="qtop"><span class="qtask" id="gmSub"></span><button class="qx" id="gmClose" type="button" aria-label="Закрыть">×</button></div>
+    <h2 id="gmTitle">Цель</h2>
+    <input class="ti" id="gmName" placeholder="Например: 10 новых клиентов агентства до конца года" autocomplete="off">
+    <textarea id="gmNote" placeholder="Зачем это и как пойму, что цель достигнута"></textarea>
+    <label class="gmrow">Срок <input type="date" id="gmDue"></label>
+    <div class="colors" id="gmColors"></div>
+    <div class="qfoot">
+      <button class="ghost" id="gmDel" type="button">Удалить</button>
+      <button class="ghost" id="gmDone" type="button">Цель достигнута ✓</button>
+      <button class="primary" id="gmSave" type="button">Сохранить</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="nmModal" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="nmTitle">
+    <div class="qtop"><span class="qtask">Этап</span><button class="qx" id="nmClose" type="button" aria-label="Закрыть">×</button></div>
+    <h2 id="nmTitle"></h2>
+    <div class="gmenu" id="nmBody" style="margin-top:12px"></div>
+  </div>
+</div>
+
+<div class="modal" id="gtModal" hidden>
+  <div class="sheet wide" role="dialog" aria-modal="true" aria-labelledby="gtTitle">
+    <div class="qtop"><span class="qtask" id="gtSub"></span><button class="qx" id="gtClose" type="button" aria-label="Закрыть">×</button></div>
+    <h2 id="gtTitle">Задачи этапа</h2>
+    <div class="gtsearch"><input class="ti" id="gtQ" placeholder="Найти задачу или вписать новую" autocomplete="off" enterkeyhint="done"><button class="primary" id="gtNew" type="button" hidden>Создать</button></div>
+    <div class="gtbar">
+      <div class="seg" id="gtF"><button type="button" data-v="open">Незавершённые</button><button type="button" data-v="done">Завершённые</button><button type="button" data-v="all">Все</button></div>
+      <span class="gtc" id="gtCount"></span>
+    </div>
+    <div class="gtlist" id="gtList"></div>
+    <div class="qfoot"><button class="primary" id="gtOk" type="button">Готово</button></div>
+  </div>
+</div>
+
+<div class="modal" id="gnModal" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="gnTitle">
+    <div class="qtop"><span class="qtask" id="gnSub"></span><button class="qx" id="gnClose" type="button" aria-label="Закрыть">×</button></div>
+    <h2 id="gnTitle">К какой цели?</h2>
+    <p class="qhint">Выберите цель или её этап.</p>
+    <div class="gnlist" id="gnList"></div>
+    <div class="qfoot" id="gnFoot"></div>
+  </div>
+</div>
+
 <div class="toast" id="toast" hidden></div>
 <!-- поля выбора файла вне скрытых блоков: iPhone не открывает выбор файла у полей с display:none -->
 <input type="file" id="impFile" class="vh" tabindex="-1" aria-hidden="true">
@@ -786,6 +944,7 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
   <button type="button" data-go="1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"/></svg>Матрица</button>
   <button type="button" data-go="2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="4" width="7" height="16" rx="1.5"/><rect x="13.5" y="4" width="7" height="16" rx="1.5"/></svg>Тип</button>
   <button type="button" data-go="3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/></svg>Расписание</button>
+  <button type="button" data-go="8"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/></svg>Цели</button>
   <button type="button" data-go="5"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2V16h5v-.1c0-.8.4-1.5 1-2A6 6 0 0 0 12 3z"/></svg>Идеи</button>
   <button type="button" data-go="more"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="5.5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="18.5" cy="12" r="1.3"/></svg>Ещё</button>
 </nav>
@@ -861,6 +1020,8 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
   if(!Array.isArray(S.leaks)) S.leaks=[];
   if(!Array.isArray(S.acts)) S.acts=[];
   if(!Array.isArray(S.subs)) S.subs=[];
+  if(!Array.isArray(S.goals)) S.goals=[];
+  if(!Array.isArray(S.gnodes)) S.gnodes=[];
   if(S._act&&S._act.type&&S._act.start) AT=S._act;
   if(S._timer&&S._timer.id){ TM=S._timer; if(TM.start) TM.start=TM.start; } // resume timer across reloads
   S.tab=1; S.focus=null; // при открытии всегда начинаем с матрицы на сегодня
@@ -868,7 +1029,7 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
   function saveTimer(){ S._timer={id:TM.id,acc:TM.acc,start:TM.start,paused:TM.paused}; S._act=AT; }
   // Синхронизация через файл: при каждом сохранении помечаем изменённые записи временем правки (u),
   // а удалённые — в S.del. При загрузке файла это позволяет слить две копии без потерь.
-  const SYNC_COLS=['tasks','ideas','insights','leaks','acts','subs'];
+  const SYNC_COLS=['tasks','ideas','insights','leaks','acts','subs','goals','gnodes'];
   let SNAP=null;
   const fp=o=>{ const c=Object.assign({},o); delete c.u; return JSON.stringify(c); };
   function track(){
@@ -948,23 +1109,26 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
   /* ---------- render ---------- */
   function render(){
     const v=S.tab;
-    [1,2,3,4,5,6,7].forEach(i=>{$('#view'+i).hidden=v!==i; $('#tab'+i).setAttribute('aria-selected',v===i);});
+    [1,2,3,4,5,6,7,8].forEach(i=>{$('#view'+i).hidden=v!==i; $('#tab'+i).setAttribute('aria-selected',v===i);});
     document.body.classList.toggle('picking',!!sel);
     if(v===1) renderMatrix();
     if(v===2) renderKinds();
     if(v===3) renderSchedule();
     if(v===4) renderArchive();
     renderFocusBar();
-    $('#hmob').textContent={1:'Матрица',2:'Тип задач',3:'Расписание',4:'Архив',5:'Идеи',6:'Инсайты',7:'Подписки'}[v]||'Задачи';
+    $('#hmob').textContent={1:'Матрица',2:'Тип задач',3:'Расписание',4:'Архив',5:'Идеи',6:'Инсайты',7:'Подписки',8:'Цели'}[v]||'Задачи';
     document.querySelectorAll('#mnav [data-go]').forEach(b=>b.classList.toggle('on',b.dataset.go===String(v)||(b.dataset.go==='more'&&[4,6,7].includes(v))));
     if(v===5) renderBoard('idea');
     if(v===6) renderBoard('ins');
     if(v===7) renderSubs();
+    if(v===8) renderGoals();
     $('#addForm').hidden=v===7;
     renderBar();
     renderInv();
     document.querySelector('.bar').hidden=(S.tab>=4&&!sel&&!AT);
     renderActRow();
+    // запас снизу под нижнюю панель, чтобы всё можно было прокрутить выше неё
+    requestAnimationFrame(()=>{ const br=document.querySelector('.bar'); document.documentElement.style.setProperty('--barh',(br.hidden?0:br.offsetHeight)+'px'); });
   }
 
   // Матрица — рабочий стол на сегодня: только несделанные задачи без даты или с датой не позже сегодня
@@ -1198,6 +1362,7 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
     const hardDelete=()=>{ if(confirm('Удалить задачу без следа? В архив она не попадёт.')){ S.tasks=S.tasks.filter(x=>x.id!==t.id); sel=null; save(); render(); } };
     if(t.arch||t.done){
       bar.append(btn('Вернуть в работу','ghost',()=>{restore(t); sel=null; save(); render();}));
+      bar.append(goalBtn(t));
       bar.append(el('span','grow'));
       bar.append(btn('Удалить без следа','ghost danger',hardDelete));
     } else {
@@ -1222,6 +1387,7 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
       bar.append(tmBox);
       bar.append(btn('Завершить или убрать…','ghost on',()=>openQuiz(t)));
       bar.append(btn('★ Главное','ghost'+(t.top?' on':''),()=>{t.top=!t.top; save(); render();}));
+      bar.append(goalBtn(t));
       bar.append(timePicker(t.est||0,v=>{t.est=v; save(); render();},{label:'Время:',clear:true}));
       if(t.date&&t.date<TODAY()) bar.append(btn('На сегодня','ghost',()=>{setDate(t,TODAY()); sel=null; save(); render();}));
       // перенос на неделю вперёд прямо из нижней панели — удобно на телефоне
@@ -1232,6 +1398,8 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
     bar.append(btn('Готово','ghost',()=>{sel=null; render();}));
   }
 
+  // кнопка цели в нижней панели: показывает, к какой цели привязана задача, и открывает выбор
+  function goalBtn(t){ const loc=gLoc(t.goal); const b=btn(loc?'◎ '+gPath(loc):'◎ К цели…','ghost gbtn',()=>openGN(t)); b.title=loc?'Цель задачи — поменять или убрать':'Привязать задачу к цели или этапу'; return b; }
   /* ---------- inventory: tasks not yet placed on the current tab ---------- */
   const INV={
     1:{sub:'не в матрице',  test:t=>!t.quad&&inMatrix(t),          clear:t=>{t.quad=null;}, mode:'plain', hint:'Нажмите на задачу, затем на клетку'},
@@ -1760,7 +1928,293 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
     fb.append(btn('Сегодня','',()=>stopFocus()));
   }
 
-  function go(n){if(n>2) S.focus=null; S.tab=n; setTimeout(()=>{const t=document.querySelector('header .tab[aria-selected="true"]'); if(t&&t.scrollIntoView) t.scrollIntoView({inline:'nearest',block:'nearest'});},0); $('#addInput').placeholder=n===5?'Новая идея':(n===6?'Новый инсайт':'Новая задача'); sel=null; save(); render(); window.scrollTo({top:0});}
+  function go(n){if(n>2) S.focus=null; S.tab=n; setTimeout(()=>{const t=document.querySelector('header .tab[aria-selected="true"]'); if(t&&t.scrollIntoView) t.scrollIntoView({inline:'nearest',block:'nearest'});},0); $('#addInput').placeholder=n===5?'Новая идея':(n===6?'Новый инсайт':(n===8?'Новая цель':'Новая задача')); sel=null; save(); render(); window.scrollTo({top:0});}
+
+  /* ---------- цели: цель → этапы → задачи (майнд-карта) ---------- */
+  const GCOL=['#2F62D2','#0D8577','#C98A06','#6A45D1','#D2402F','#C93D7E','#3E9C7F','#5F6B7B'];
+  const BRC=['#2F62D2','#0D8577','#C98A06','#6A45D1','#D2402F','#C93D7E','#3E9C7F'];
+  let GIDX=null, GADD=null, GREN=null;
+  const tDone=t=>!!(t.done||(t.arch&&t.arch.done));
+  const tGone=t=>!!(t.arch&&!t.arch.done);
+  // этапы хранятся отдельными записями (S.gnodes) — так при синхронизации правки разных этапов не затирают друг друга
+  const gKids=(g,pid)=>S.gnodes.filter(n=>n.goal===g.id&&n.parent===pid).sort((a,b)=>(a.ord||0)-(b.ord||0));
+  const gSub=(g,id)=>{ const out=[id]; for(let i=0;i<out.length;i++) gKids(g,out[i]).forEach(n=>out.push(n.id)); return out; };
+  const gTasks=id=>(GIDX?GIDX[id]:S.tasks.filter(t=>t.goal===id))||[];
+  function gLoc(id){ if(!id) return null; const g=S.goals.find(x=>x.id===id); if(g) return {g,n:null};
+    const n=S.gnodes.find(x=>x.id===id); const gg=n&&S.goals.find(x=>x.id===n.goal); return gg&&gSub(gg,gg.id).includes(n.id)?{g:gg,n}:null; }
+  const gPath=loc=>loc?(loc.n?loc.g.name+' › '+loc.n.name:loc.g.name):'';
+  // прогресс: каждая задача — единица; пустой этап (без задач и подэтапов) — тоже единица, закрывается галочкой
+  function gUnits(g,id,forced){
+    const ts=gTasks(id).filter(t=>!tGone(t)), ks=gKids(g,id);
+    if(id!==g.id&&!ts.length&&!ks.length) return {tot:1,dn:forced?1:0};
+    let tot=0,dn=0; ts.forEach(t=>{tot++; if(forced||tDone(t)) dn++;});
+    ks.forEach(k=>{ const u=gUnits(g,k.id,forced||!!k.done); tot+=u.tot; dn+=u.dn; });
+    return {tot,dn};
+  }
+  const gPct=u=>u.tot?Math.round(u.dn*100/u.tot):0;
+  function gAllTasks(g){ const ids=new Set(gSub(g,g.id)); return S.tasks.filter(t=>t.goal&&ids.has(t.goal)&&!tGone(t)); }
+  const sdate=k=>k===TODAY()?'сегодня':P(k).toLocaleDateString('ru-RU',{day:'numeric',month:'short'}).replace('.','');
+  const dkey=t=>t.date||'9999';
+  const gSortTasks=ts=>ts.slice().sort((a,b)=>(tDone(a)-tDone(b))||(dkey(a)<dkey(b)?-1:dkey(a)>dkey(b)?1:0));
+  function gUnlink(ids){ const s=new Set(ids); S.tasks.forEach(t=>{ if(t.goal&&s.has(t.goal)) delete t.goal; }); }
+  function gNewGoal(name){ const g={id:uid(),name,note:'',due:null,color:GCOL[S.goals.length%GCOL.length],at:TODAY(),done:false}; S.goals.push(g); S.goalCur=g.id; return g; }
+  // фокус в поле этапа сразу, в том же нажатии — иначе на iPhone не появится клавиатура
+  const gFocus=()=>{ const i=document.querySelector('#gMap input.gin'); if(i){ i.focus(); if(GREN) i.select(); } };
+  function gLink(t,id){ t.goal=id; sel=null; save(); render(); status('Задача привязана: '+gPath(gLoc(id))); }
+
+  function renderGoals(){
+    const box=$('#gMap'), bar=$('#gBar'); box.innerHTML=''; bar.innerHTML='';
+    GIDX={}; S.tasks.forEach(t=>{ if(t.goal) (GIDX[t.goal]||(GIDX[t.goal]=[])).push(t); });
+    try{
+      if(!S.goals.length){
+        const e=el('div','gempty');
+        e.append(el('b',null,'Цель → этапы → задачи. '),'Впишите цель в поле сверху и нажмите «Добавить». Затем разбейте её на этапы, а в этапы добавьте задачи — уже существующие (сделанные и нет) или новые. Прогресс цели считается сам по задачам.');
+        box.append(e); return;
+      }
+      const act=S.goals.filter(g=>!g.done), ach=S.goals.filter(g=>g.done);
+      let g=S.goals.find(x=>x.id===S.goalCur); if(!g){ g=act[0]||ach[0]; S.goalCur=g.id; }
+      const gchip=x=>{ const u=gUnits(x,x.id,!!x.done), b=el('button','gchip'+(x.id===g.id?' on':'')+(x.done?' ach':'')); b.type='button';
+        b.style.setProperty('--gc',x.color||GCOL[0]); b.append(el('i'),el('span','gn',x.name),el('span','gp',x.done?'✓':gPct(u)+'%'));
+        b.onclick=()=>{ S.goalCur=x.id; GADD=GREN=null; sel=null; save(); render(); }; return b; };
+      act.forEach(x=>bar.append(gchip(x)));
+      if(ach.length){ bar.append(el('span','gsep','Достигнутые')); ach.forEach(x=>bar.append(gchip(x))); }
+      const wrap=el('div','mm'), rb=el('div','mmb rootb');
+      wrap.style.setProperty('--gc',g.color||GCOL[0]);
+      rb.append(gRootNode(g), gKidsCol(g,g.id,null));
+      wrap.append(rb); box.append(wrap);
+    } finally { GIDX=null; }
+  }
+  function gKidsCol(g,pid,bc){
+    const col=el('div','mmk');
+    gKids(g,pid).forEach((n,i)=>{
+      const c=bc||BRC[i%BRC.length], b=el('div','mmb'); b.style.setProperty('--bc',c);
+      b.append(gNode(g,n,c));
+      if(gKids(g,n.id).length||GADD===n.id) b.append(gKidsCol(g,n.id,c));
+      col.append(b);
+    });
+    if(pid===g.id||GADD===pid){
+      const a=el('div','mmb addb');
+      if(bc) a.style.setProperty('--bc',bc);
+      if(GADD===pid) a.append(gAddInput(g,pid));
+      else a.append(btn(gKids(g,pid).length?'+ этап':'+ Разбить на этапы','gadd',()=>{ GADD=pid; GREN=null; sel=null; render(); gFocus(); }));
+      col.append(a);
+    }
+    return col;
+  }
+  function gTarget(node,id){
+    node.classList.add('tgt');
+    node.addEventListener('click',e=>{
+      if(!sel) return; const b=e.target.closest('button,input,textarea');
+      if(b&&!b.classList.contains('nn')&&!b.classList.contains('gname')) return;
+      const t=S.tasks.find(x=>x.id===sel); if(t) gLink(t,id);
+    });
+    node.addEventListener('dragover',e=>{ e.preventDefault(); node.classList.add('over'); });
+    node.addEventListener('dragleave',e=>{ if(!node.contains(e.relatedTarget)) node.classList.remove('over'); });
+    node.addEventListener('drop',e=>{ e.preventDefault(); node.classList.remove('over'); setDragging(false);
+      const tid=e.dataTransfer.getData('text/plain')||sel, t=S.tasks.find(x=>x.id===tid); if(t) gLink(t,id); });
+  }
+  function gTaskRow(t){
+    const d=tDone(t), b=el('button','gt'+(d?' done':'')); b.type='button'; b.draggable=true; b.dataset.id=t.id;
+    b.setAttribute('aria-pressed',sel===t.id?'true':'false');
+    const s=el('span','s',d?'✓':'○');
+    if(!d){ s.title='Завершить или убрать…'; s.addEventListener('click',e=>{ e.stopPropagation(); openQuiz(t); }); }
+    const late=!d&&t.date&&t.date<TODAY();
+    b.append(s, el('span','x',t.text), el('span','dt'+(late?' late':''), t.date?sdate(t.date):(d?'':'без даты')));
+    b.addEventListener('click',e=>{ e.stopPropagation(); GADD=GREN=null; sel=(sel===t.id)?null:t.id; render(); });
+    b.addEventListener('dragstart',e=>{ sel=t.id; e.dataTransfer.setData('text/plain',t.id); e.dataTransfer.effectAllowed='move'; });
+    b.addEventListener('dragend',()=>{ setTimeout(()=>{ if(sel===t.id&&!$('#editRow').childElementCount) sel=null; },0); });
+    return b;
+  }
+  function gTaskList(id){
+    const ts=gSortTasks(gTasks(id).filter(t=>!tGone(t)));
+    if(!ts.length) return null;
+    const l=el('div','gtl'); ts.forEach(t=>l.append(gTaskRow(t))); return l;
+  }
+  function gRootNode(g){
+    const u=gUnits(g,g.id,!!g.done), all=gAllTasks(g), dn=all.filter(tDone).length;
+    const r=el('div','mmn root'+(g.done?' ach':'')); r.style.setProperty('--c','#fff'); gTarget(r,g.id);
+    const nm=el('button','gname',g.name); nm.type='button'; nm.title='Изменить цель';
+    nm.onclick=e=>{ if(sel) return; e.stopPropagation(); openGM(g); }; r.append(nm);
+    if(g.note) r.append(el('div','gnote',g.note));
+    if(g.due){ const left=Math.round((P(g.due)-P(TODAY()))/864e5);
+      r.append(el('div','gdue','до '+sdate(g.due)+(g.done?'':(left>0?' · осталось '+left+' дн.':(left===0?' · срок сегодня':' · срок прошёл'))))); }
+    const pb=el('div','gprog'), fi=el('i'); fi.style.width=(g.done?100:gPct(u))+'%'; pb.append(fi); r.append(pb);
+    r.append(el('div','gstat',(g.done?'Цель достигнута':gPct(u)+'%')+' · задач сделано '+dn+' из '+all.length));
+    const next=gSortTasks(all.filter(t=>!tDone(t)))[0];
+    if(next&&!g.done) r.append(el('div','gnext','Дальше: '+next.text+(next.date?' · '+sdate(next.date):'')));
+    const l=gTaskList(g.id); if(l) r.append(l);
+    const f=el('div','nf'); f.append(btn('+ задачи','nb',()=>openGT(g.id)), el('span','grow'), btn('Изменить','nb',()=>openGM(g))); r.append(f);
+    return r;
+  }
+  function gNode(g,n,c){
+    const u=gUnits(g,n.id,!!n.done), full=!!n.done||(u.tot>0&&u.dn===u.tot);
+    const card=el('div','mmn stage'+(full?' full':'')); card.style.setProperty('--bc',c); card.style.setProperty('--c',c); gTarget(card,n.id);
+    const h=el('div','nh');
+    const ck=btn(full?'✓':'','ck'+(full?' on':''),()=>{ n.done=!n.done; save(); render(); });
+    ck.title=n.done?'Снять отметку «этап завершён»':'Отметить этап завершённым'; ck.setAttribute('aria-label',ck.title); h.append(ck);
+    if(GREN===n.id) h.append(gRenameInput(n));
+    else { const nm=el('button','nn',n.name); nm.type='button'; nm.title='Переименовать';
+      nm.onclick=e=>{ if(sel) return; e.stopPropagation(); GREN=n.id; GADD=null; render(); gFocus(); }; h.append(nm); }
+    h.append(el('span','np',u.dn+'/'+u.tot)); card.append(h);
+    const l=gTaskList(n.id); if(l) card.append(l);
+    const f=el('div','nf');
+    f.append(btn('+ задачи','nb',()=>openGT(n.id)), btn('+ подэтап','nb',()=>{ GADD=n.id; GREN=null; sel=null; render(); gFocus(); }), el('span','grow'));
+    const m=btn('⋯','nb more',()=>openNM(g,n)); m.setAttribute('aria-label','Действия с этапом'); f.append(m);
+    card.append(f);
+    return card;
+  }
+  function gAddInput(g,pid){
+    const i=el('input','inline gin'); i.autocomplete='off'; i.enterKeyHint='next';
+    i.placeholder=pid===g.id?'Этап цели, Enter — следующий':'Подэтап, Enter — следующий';
+    let fin=false;
+    const add=()=>{ const v=i.value.trim(); if(!v) return false; S.gnodes.push({id:uid(),goal:g.id,parent:pid,name:v,done:false,ord:Date.now()}); save(); return true; };
+    i.addEventListener('keydown',e=>{
+      if(e.key==='Enter'){ e.preventDefault(); fin=true; if(!add()) GADD=null; render(); gFocus(); }
+      if(e.key==='Escape'){ e.stopPropagation(); fin=true; GADD=null; render(); }
+    });
+    i.addEventListener('blur',()=>{ if(fin) return; fin=true; add(); GADD=null; render(); });
+    setTimeout(()=>i.focus(),0);
+    return i;
+  }
+  function gRenameInput(n){
+    const i=el('input','inline gin'); i.value=n.name; let fin=false;
+    const done=ok=>{ if(fin) return; fin=true; const v=i.value.trim(); if(ok&&v&&v!==n.name){ n.name=v; save(); } GREN=null; render(); };
+    i.addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); done(true); } if(e.key==='Escape'){ e.stopPropagation(); done(false); } });
+    i.addEventListener('blur',()=>done(true));
+    setTimeout(()=>{ i.focus(); i.select(); },0);
+    return i;
+  }
+
+  // окно цели: название, зачем, срок, цвет
+  let GM=null;
+  function openGM(g){
+    GM=g||{id:uid(),name:'',note:'',due:null,color:GCOL[S.goals.length%GCOL.length],at:TODAY(),done:false,isNew:true};
+    $('#gmTitle').textContent=g?'Цель':'Новая цель';
+    $('#gmSub').textContent=g?('поставлена '+dateLabel(g.at)):'';
+    $('#gmName').value=GM.name; $('#gmNote').value=GM.note||''; $('#gmDue').value=GM.due||'';
+    $('#gmDel').hidden=!g; $('#gmDone').hidden=!g; $('#gmDone').textContent=GM.done?'Вернуть в работу':'Цель достигнута ✓';
+    const c=$('#gmColors'); c.innerHTML='';
+    GCOL.forEach(col=>{ const b=el('button',GM.color===col?'on':''); b.type='button'; b.style.setProperty('--c',col); b.setAttribute('aria-label','Цвет цели');
+      b.onclick=()=>{ GM.color=col; c.querySelectorAll('button').forEach((x,i)=>x.classList.toggle('on',GCOL[i]===col)); }; c.append(b); });
+    $('#goalModal').hidden=false; if(!g) setTimeout(()=>$('#gmName').focus(),30);
+  }
+  function closeGM(){ GM=null; $('#goalModal').hidden=true; }
+  $('#gmClose').onclick=closeGM;
+  $('#goalModal').addEventListener('click',e=>{ if(e.target.id==='goalModal') closeGM(); });
+  $('#gmSave').onclick=()=>{
+    const name=$('#gmName').value.trim(); if(!name){ $('#gmName').focus(); return; }
+    GM.name=name; GM.note=$('#gmNote').value.trim(); GM.due=$('#gmDue').value||null;
+    if(GM.isNew){ delete GM.isNew; S.goals.push(GM); }
+    S.goalCur=GM.id; closeGM(); save(); render();
+  };
+  $('#gmDone').onclick=()=>{ GM.done=!GM.done; if(GM.done) GM.doneAt=TODAY(); else delete GM.doneAt;
+    const nm=GM.name, d=GM.done; closeGM(); save(); render(); status(d?'Цель «'+nm+'» достигнута — она переехала в «Достигнутые».':'Цель снова в работе.'); };
+  $('#gmDel').onclick=()=>{ const g=GM;
+    if(!confirm('Удалить цель «'+g.name+'» со всеми этапами? Задачи останутся — просто отвяжутся от цели.')) return;
+    gUnlink(gSub(g,g.id)); S.gnodes=S.gnodes.filter(x=>x.goal!==g.id); S.goals=S.goals.filter(x=>x.id!==g.id); if(S.goalCur===g.id) S.goalCur=null; closeGM(); save(); render(); };
+  $('#gmName').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); $('#gmSave').click(); } });
+
+  // действия с этапом
+  let NM=null;
+  function openNM(g,n){
+    NM={g,n}; $('#nmTitle').textContent=n.name;
+    const box=$('#nmBody'); box.innerHTML='';
+    const sib=gKids(g,n.parent), i=sib.indexOf(n), parent=n.parent!==g.id?S.gnodes.find(x=>x.id===n.parent):null;
+    const move=(a,b)=>{ let x=a.ord||0, y=b.ord||0; if(x===y) y=x+1; a.ord=y; b.ord=x; };
+    const act=(label,fn,cls)=>box.append(btn(label,'opt'+(cls?' '+cls:''),()=>{ fn(); closeNM(); save(); render(); gFocus(); }));
+    act('Переименовать',()=>{ GREN=n.id; GADD=null; });
+    act('+ Подэтап',()=>{ GADD=n.id; GREN=null; });
+    if(i>0) act('↑ Выше',()=>move(n,sib[i-1]));
+    if(i<sib.length-1) act('↓ Ниже',()=>move(n,sib[i+1]));
+    if(i>0) act('→ Сделать подэтапом «'+sib[i-1].name+'»',()=>{ n.parent=sib[i-1].id; n.ord=Date.now(); });
+    if(parent) act('← На уровень выше',()=>{ const ps=gKids(g,parent.parent), nx=ps[ps.indexOf(parent)+1];
+      n.parent=parent.parent; n.ord=nx?((parent.ord||0)+(nx.ord||0))/2:(parent.ord||0)+1; });
+    const sub=gSub(g,n.id).length-1, tc=S.tasks.filter(t=>t.goal&&gSub(g,n.id).includes(t.goal)).length;
+    box.append(btn('Удалить этап','opt danger',()=>{
+      if(!confirm('Удалить этап «'+n.name+'»'+(sub?' вместе с подэтапами ('+sub+')':'')+'?'+(tc?' Задачи ('+tc+') останутся — просто отвяжутся от цели.':''))) return;
+      const ids=gSub(g,n.id); gUnlink(ids); S.gnodes=S.gnodes.filter(x=>!ids.includes(x.id)); closeNM(); save(); render(); }));
+    $('#nmModal').hidden=false;
+  }
+  function closeNM(){ NM=null; $('#nmModal').hidden=true; }
+  $('#nmClose').onclick=closeNM;
+  $('#nmModal').addEventListener('click',e=>{ if(e.target.id==='nmModal') closeNM(); });
+
+  // выбор задач для этапа: существующие (сделанные и нет) или новая
+  let GT=null, GTF='open';
+  function openGT(id){
+    const loc=gLoc(id); if(!loc) return;
+    GT={id}; sel=null; GADD=GREN=null;
+    $('#gtTitle').textContent=loc.n?'Задачи этапа':'Задачи цели';
+    $('#gtSub').textContent=gPath(loc);
+    $('#gtQ').value=''; drawGT(); $('#gtModal').hidden=false;
+    if(!isPhone()) setTimeout(()=>$('#gtQ').focus(),30);
+  }
+  function drawGT(){
+    if(!GT) return;
+    const q=nrm($('#gtQ').value), f=GTF, list=$('#gtList'); list.innerHTML='';
+    document.querySelectorAll('#gtF button').forEach(b=>b.setAttribute('aria-selected',b.dataset.v===f?'true':'false'));
+    let ts=S.tasks.filter(t=>f==='all'||(f==='done'?tDone(t):(!tDone(t)&&!tGone(t))));
+    if(q) ts=ts.filter(t=>nrm(t.text).includes(q));
+    const doneAt=t=>(t.arch&&t.arch.at)||t.date||'';
+    ts=ts.slice().sort((a,b)=>((b.goal===GT.id)-(a.goal===GT.id))||(tDone(a)-tDone(b))||(tDone(a)?(doneAt(a)<doneAt(b)?1:-1):(dkey(a)<dkey(b)?-1:dkey(a)>dkey(b)?1:0)));
+    const here=S.tasks.filter(t=>t.goal===GT.id).length;
+    $('#gtCount').textContent=here?('В этом '+(gLoc(GT.id).n?'этапе':'блоке цели')+': '+here):'';
+    const exact=q&&S.tasks.some(t=>nrm(t.text)===q);
+    $('#gtNew').hidden=!q||exact; $('#gtNew').textContent='Создать';
+    if(!ts.length) list.append(el('p','empty',q?'Ничего не нашлось. Нажмите «Создать» — появится новая задача прямо в этом этапе.':(f==='done'?'Завершённых задач пока нет.':'Задач нет. Впишите новую в поле выше.')));
+    ts.slice(0,200).forEach(t=>{
+      const on=t.goal===GT.id, d=tDone(t), loc=!on&&gLoc(t.goal);
+      const b=el('button','gpick'+(on?' on':'')+(d?' dn':'')); b.type='button';
+      b.append(el('span','bx',on?'✓':''), el('span','x',t.text));
+      const m=[]; if(tGone(t)) m.push('убрана'); else if(d) m.push('сделана'+(t.arch&&t.arch.at?' '+sdate(t.arch.at):'')); else m.push(t.date?sdate(t.date):'без даты');
+      if(loc) m.push('сейчас в «'+(loc.n?loc.n.name:loc.g.name)+'»');
+      b.append(el('span','m',m.join(' · ')));
+      b.onclick=()=>{ if(on) delete t.goal; else t.goal=GT.id; save(); drawGT(); };
+      list.append(b);
+    });
+    if(ts.length>200) list.append(el('p','empty','Показаны первые 200 — уточните поиск.'));
+  }
+  function gtCreate(){ const v=$('#gtQ').value.trim(); if(!v||!GT) return; S.tasks.push(newTask(v,{goal:GT.id})); $('#gtQ').value=''; save(); drawGT(); status('Задача создана. Она без даты — дату можно поставить в «Расписании».'); }
+  function closeGT(){ GT=null; $('#gtModal').hidden=true; render(); }
+  $('#gtQ').addEventListener('input',drawGT);
+  $('#gtQ').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); if(!$('#gtNew').hidden) gtCreate(); } });
+  $('#gtNew').onclick=gtCreate;
+  document.querySelectorAll('#gtF button').forEach(b=>b.onclick=()=>{ GTF=b.dataset.v; drawGT(); });
+  $('#gtOk').onclick=closeGT; $('#gtClose').onclick=closeGT;
+  $('#gtModal').addEventListener('click',e=>{ if(e.target.id==='gtModal') closeGT(); });
+
+  // выбор цели/этапа для задачи (из нижней панели на любой вкладке)
+  let GN=null;
+  function openGN(t){
+    GN=t; $('#gnSub').textContent=t.text;
+    const list=$('#gnList'), foot=$('#gnFoot'); list.innerHTML=''; foot.innerHTML='';
+    const cur=gLoc(t.goal);
+    const row=(label,id,d,cls,color)=>{ const b=el('button','gnrow'+(cls?' '+cls:'')+(t.goal===id?' on':'')); b.type='button'; b.style.setProperty('--d',d);
+      if(color){ const i=el('i'); i.style.background=color; b.append(i); } b.append(el('span',null,label));
+      b.onclick=()=>{ closeGN(); gLink(t,id); }; list.append(b); };
+    const gs=S.goals.filter(g=>!g.done).concat(S.goals.filter(g=>g.done));
+    gs.forEach(g=>{ row(g.name+(g.done?' (достигнута)':''),g.id,0,'g',g.color);
+      const walk=(pid,d)=>gKids(g,pid).forEach(n=>{ row(n.name,n.id,d); walk(n.id,d+1); }); walk(g.id,1); });
+    if(!gs.length) list.append(el('p','empty','Целей пока нет — создайте первую.'));
+    const ni=el('input','ti'); ni.placeholder='Новая цель'; ni.autocomplete='off';
+    const mk=()=>{ const v=ni.value.trim(); if(!v){ ni.focus(); return; } const g=gNewGoal(v); closeGN(); gLink(t,g.id); };
+    ni.addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); mk(); } });
+    const nr=el('div','gnnew'); nr.append(ni,btn('Создать','ghost',mk)); list.append(nr);
+    if(cur){ foot.append(btn('Убрать из цели','ghost',()=>{ delete t.goal; closeGN(); sel=null; save(); render(); status('Задача отвязана от цели.'); }));
+      foot.append(btn('Открыть цель','primary',()=>{ closeGN(); S.goalCur=cur.g.id; go(8); })); }
+    else foot.append(btn('Отмена','ghost',closeGN));
+    $('#gnModal').hidden=false;
+  }
+  function closeGN(){ GN=null; $('#gnModal').hidden=true; }
+  $('#gnClose').onclick=closeGN;
+  $('#gnModal').addEventListener('click',e=>{ if(e.target.id==='gnModal') closeGN(); });
+  document.addEventListener('keydown',e=>{
+    if(e.key!=='Escape') return;
+    if(!$('#gtModal').hidden){ closeGT(); e.stopImmediatePropagation(); return; }
+    if(!$('#gnModal').hidden){ closeGN(); e.stopImmediatePropagation(); return; }
+    if(!$('#nmModal').hidden){ closeNM(); e.stopImmediatePropagation(); return; }
+    if(!$('#goalModal').hidden){ closeGM(); e.stopImmediatePropagation(); return; }
+  },true);
 
   /* ---------- static targets ---------- */
   document.querySelectorAll('[data-target]').forEach(node=>{
@@ -1778,6 +2232,7 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
     const i=$('#addInput'), v=i.value.trim(); if(!v){i.focus(); return;}
     if(S.tab===5){ openIdea(null,v,'idea'); i.value=''; return; }
     if(S.tab===6){ openIdea(null,v,'ins'); i.value=''; return; }
+    if(S.tab===8){ gNewGoal(v); GADD=S.goalCur; i.value=''; save(); render(); gFocus(); return; }
     S.tasks.push(newTask(v,S.focus&&(S.tab===1||S.tab===2)?{date:S.focus}:undefined)); i.value=''; save(); render(); i.focus();
   }
   $('#addBtn').addEventListener('click',addTop);
@@ -1791,6 +2246,7 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
   $('#tab5').onclick=()=>go(5);
   $('#tab6').onclick=()=>go(6);
   $('#tab7').onclick=()=>go(7);
+  $('#tab8').onclick=()=>go(8);
   document.querySelectorAll('#scale button').forEach(b=>b.onclick=()=>{S.view=b.dataset.v; save(); render();});
   function shift(k){
     if(S.view==='day') S.cur=addDays(S.cur,k);
@@ -1830,7 +2286,7 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
     save();
     const now=new Date(), stamp=TODAY()+'-'+pad(now.getHours())+pad(now.getMinutes());
     const data={version:3,exported:now.toISOString(),device:isPhone()?'телефон':'компьютер',
-      tasks:S.tasks,ideas:S.ideas,insights:S.insights,leaks:S.leaks,days:S.days,acts:S.acts,subs:S.subs,del:S.del};
+      tasks:S.tasks,ideas:S.ideas,insights:S.insights,leaks:S.leaks,days:S.days,acts:S.acts,subs:S.subs,goals:S.goals,gnodes:S.gnodes,del:S.del};
     const json=JSON.stringify(data), name='zadachi-'+stamp+'.json';
     // на телефоне — через «Поделиться»: можно сохранить в «Файлы», отправить в Telegram или AirDrop
     const download=()=>{
