@@ -483,18 +483,22 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
 .gsep{font-size:12px;color:var(--muted);margin:0 2px 0 8px}
 .gempty{background:var(--paper);border:1px dashed var(--line);border-radius:14px;padding:18px;color:var(--muted);font-size:14px;max-width:600px}
 .gempty b{color:var(--ink)}
-.mm{overflow-x:auto;padding:6px 2px 24px;--wire:color-mix(in srgb,var(--ink) 24%,transparent)}
+/* цель справа, этапы растут влево: контейнер в rtl (так и прокрутка начинается от цели), текст внутри — обычный */
+.mm{overflow-x:auto;padding:6px 2px 24px;direction:rtl;--wire:color-mix(in srgb,var(--ink) 24%,transparent)}
+.mmn,.gadd,input.gin{direction:ltr}
+/* на компьютере карта занимает место и левее основной колонки — ветки растут влево */
+@media (min-width:761px){.mm{margin-left:calc(50% - 50vw + 12px)}}
 .mmb{display:flex;align-items:center}
-.mmk{display:flex;flex-direction:column;position:relative;margin-left:44px}
-.mmk::before{content:'';position:absolute;left:-44px;top:50%;width:22px;border-top:2px solid var(--wire)}
+.mmk{display:flex;flex-direction:column;position:relative;margin-inline-start:44px}
+.mmk::before{content:'';position:absolute;inset-inline-start:-44px;top:50%;width:22px;border-top:2px solid var(--wire)}
 .mmk>.mmb{position:relative;padding:6px 0}
-.mmk>.mmb::before{content:'';position:absolute;left:-22px;top:50%;width:22px;border-top:2px solid var(--bc,var(--wire))}
-.mmk>.mmb::after{content:'';position:absolute;left:-22px;top:0;bottom:0;border-left:2px solid var(--wire)}
+.mmk>.mmb::before{content:'';position:absolute;inset-inline-start:-22px;top:50%;width:22px;border-top:2px solid var(--bc,var(--wire))}
+.mmk>.mmb::after{content:'';position:absolute;inset-inline-start:-22px;top:0;bottom:0;border-inline-start:2px solid var(--wire)}
 .mmk>.mmb:first-child::after{top:50%}
 .mmk>.mmb:last-child::after{bottom:50%}
 .mmk>.mmb:only-child::after{display:none}
 .mmk>.mmb.addb::before{border-top:2px dashed var(--wire)}
-.mmn{flex:none;width:270px;background:var(--paper);border:1px solid var(--line);border-left:4px solid var(--bc,var(--line));border-radius:12px;padding:10px 12px 6px}
+.mmn{flex:none;width:244px;background:var(--paper);border:1px solid var(--line);border-right:4px solid var(--bc,var(--line));border-radius:12px;padding:10px 12px 6px}
 .mmn.full{background:color-mix(in srgb,var(--bc) 8%,var(--paper))}
 .mmn.root{width:250px;background:var(--gc);border:0;color:#fff;border-radius:18px;padding:16px 16px 8px;box-shadow:0 10px 26px color-mix(in srgb,var(--gc) 30%,transparent)}
 .root .gname{display:block;width:100%;border:0;background:none;color:inherit;text-align:left;padding:0;font:700 17px/1.25 var(--display);word-break:break-word}
@@ -558,13 +562,14 @@ input.gin{width:250px;margin:0;background:var(--paper)}
 .gnnew{display:flex;gap:8px;margin-top:10px}
 .gnnew .ti{flex:1;min-width:0}
 @media (max-width:760px){
-  .mm{overflow:visible;padding:0 0 16px}
+  .mm{overflow:visible;padding:0 0 16px;direction:ltr}
   .mmb{display:block}
-  .mmk{margin-left:14px}
+  .mmk{margin-inline-start:14px}
   .mmk::before{display:none}
   .mmk>.mmb{padding:8px 0 0 20px}
-  .mmk>.mmb::before{left:0;top:30px;width:20px}
-  .mmk>.mmb::after{left:0;top:0;bottom:0}
+  .mmn{border-right:1px solid var(--line);border-left:4px solid var(--bc,var(--line))}
+  .mmk>.mmb::before{inset-inline-start:0;top:30px;width:20px}
+  .mmk>.mmb::after{inset-inline-start:0;top:0;bottom:0}
   .mmk>.mmb:first-child::after{top:0}
   .mmk>.mmb:last-child::after,.mmk>.mmb:only-child::after{display:block;bottom:auto;height:31px}
   .mmn,.mmn.root{width:auto}
