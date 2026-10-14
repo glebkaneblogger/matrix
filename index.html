@@ -326,6 +326,13 @@ details.data summary{cursor:pointer;color:var(--muted);font-size:14px}
 .abtn.meal{--ac:#D9822B} .abtn.rest{--ac:var(--plan)} .abtn.sport{--ac:#C93D7E} .abtn.morning{--ac:#E0A100} .abtn.meditate{--ac:#3E9C7F} .abtn.sleep{--ac:#3F51A3}
 .abtn .dt{width:8px;height:8px;border-radius:50%;background:var(--ac)}
 .abtn.man{color:var(--muted);font-size:13px}
+.abtn.rtog{color:var(--muted);font-size:13px;border-style:dashed;background:none}
+body.routine-off .legend .rt{display:none}
+.wkrth{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;margin-top:18px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--bg)}
+.wkrth b{font:700 14px/1.2 var(--display)}
+.wkrth .rs{font-size:12px;color:var(--muted)}
+.wkrth .ghost{margin-left:auto;padding:7px 12px;font-size:13px}
+.wkrt-body>.wksec:first-child{margin-top:12px}
 .actrow{display:flex;align-items:center;gap:10px;padding:0 0 10px;margin-bottom:10px;border-bottom:1px solid var(--line)}
 .actrow .ai{font-size:20px}
 .actrow .at{font:700 22px/1 var(--display);color:var(--ac)}
@@ -705,12 +712,12 @@ input.gin{width:250px;margin:0;background:var(--paper)}
       <span class="kc-ops"><i></i>Операционные</span>
       <span><i></i>Без типа</span>
       <span><i class="e"></i>Из календаря</span>
-      <span style="--kc:#D9822B"><i></i>Еда</span>
-      <span style="--kc:var(--plan)"><i></i>Отдых</span>
-      <span style="--kc:#C93D7E"><i></i>Тренировки</span>
-      <span style="--kc:#3F51A3"><i></i>Сон</span>
-      <span style="--kc:#E0A100"><i></i>Утро</span>
-      <span style="--kc:#3E9C7F"><i></i>Медитация</span>
+      <span class="rt" style="--kc:#D9822B"><i></i>Еда</span>
+      <span class="rt" style="--kc:var(--plan)"><i></i>Отдых</span>
+      <span class="rt" style="--kc:#C93D7E"><i></i>Тренировки</span>
+      <span class="rt" style="--kc:#3F51A3"><i></i>Сон</span>
+      <span class="rt" style="--kc:#E0A100"><i></i>Утро</span>
+      <span class="rt" style="--kc:#3E9C7F"><i></i>Медитация</span>
       <span style="--kc:var(--muted)"><i></i>Оплата подписки</span>
     </div>
   </section>
@@ -1116,6 +1123,7 @@ input.gin{width:250px;margin:0;background:var(--paper)}
     const v=S.tab;
     [1,2,3,4,5,6,7,8].forEach(i=>{$('#view'+i).hidden=v!==i; $('#tab'+i).setAttribute('aria-selected',v===i);});
     document.body.classList.toggle('picking',!!sel);
+    document.body.classList.toggle('routine-off',!!S.routineOff);
     if(v===1) renderMatrix();
     if(v===2) renderKinds();
     if(v===3) renderSchedule();
@@ -1243,7 +1251,8 @@ input.gin{width:250px;margin:0;background:var(--paper)}
     for(let i=0;i<7;i++){
       const k=addDays(start,i), d=P(k), b=D(k);
       const col=el('div','wday'); if(k===today) col.classList.add('is-today'); if(k<today) col.classList.add('past');
-      if(!b.t.length&&!b.e.length&&!actsOn(k).length) col.classList.add('empty-day');
+      const dayActs=RT()?actsOn(k):[];
+      if(!b.t.length&&!b.e.length&&!dayActs.length) col.classList.add('empty-day');
       const h=el('button','whead'); h.type='button';
       const open=b.t.filter(t=>!t.done).length, tot=b.t.length;
       h.append(el('span','wd',WD[i]),el('span','dn',d.getDate()));
@@ -1255,8 +1264,8 @@ input.gin{width:250px;margin:0;background:var(--paper)}
       b.e.forEach(e=>col.append(evRow(e)));
       sorted(b.t).forEach(t=>col.append(chip(t,'sched')));
       subsOn(k).forEach(x=>col.append(subMark(x)));
-      actsOn(k).forEach(a=>col.append(actChip(a,true)));
-      if(AT&&k===ymd(new Date(AT.start))) col.append(liveChip());
+      dayActs.forEach(a=>col.append(actChip(a,true)));
+      if(RT()&&AT&&k===ymd(new Date(AT.start))) col.append(liveChip());
       const dr=S.days[k];
       if(dr&&(dr.proc!=null||dr.how)) col.append(el('div','proc','прокрастинация: '+(dr.proc?fmtMin(dr.proc):'не было')));
       const p=el('button','plus wadd','+ Задача'); p.type='button';
@@ -1294,6 +1303,7 @@ input.gin{width:250px;margin:0;background:var(--paper)}
     const lt=el('div','list'); if(!tops.length) empty(lt,'Отметьте до трёх задач звёздочкой — это главное на день.'); tops.forEach(t=>lt.append(chip(t,'sched'))); v.append(lt);
     v.append(el('h3',null,'Остальные задачи'));
     const lr=el('div','list'); if(!rest.length) empty(lr,'Пусто.'); rest.forEach(t=>lr.append(chip(t,'sched'))); v.append(lr);
+    if(RT()){
     const as=actsOn(k), sm=actSum(k), live=AT&&k===ymd(new Date(AT.start));
     v.append(el('h3',null,'Режим дня'));
     const la=el('div','list');
@@ -1302,6 +1312,7 @@ input.gin{width:250px;margin:0;background:var(--paper)}
     if(!as.length&&!live) empty(la,'Пока ничего. Включите таймер над календарём: утро, еда, отдых или тренировка.');
     v.append(la);
     if(as.length){ const su=el('div','asum'), parts=[]; if(sm.sleep) parts.push(['😴 сон: ',fmtHM(sm.sleep)+qTxt(sm.sleepQ)]); ATYPES.filter(t=>sm[t]).forEach(t=>parts.push([ACT[t].icon+' '+ACT[t].lower+': ',fmtMin(sm[t])+(sm.cnt[t]>1?' ('+sm.cnt[t]+')':'')])); parts.forEach(([l,v2],i)=>{ if(i) su.append(el('span',null,' · ')); su.append(el('span',null,l),el('b',null,v2)); }); v.append(su); }
+    }
     v.append(dayReview(k));
     const p=el('button','plus','+ Задача на этот день'); p.type='button';
     p.onclick=e=>{e.stopPropagation(); if(sel) return v.click(); inlineAdd(p,{date:k},render);};
@@ -1466,8 +1477,12 @@ input.gin{width:250px;margin:0;background:var(--paper)}
     r.append(btn('Отмена','ghost',()=>{ if(confirm('Сбросить таймер без записи?')) actCancel(); }));
     r.append(btn('Завершить','tbtn stop',actStop));
   }
+  // режим дня (сон, утро, медитация, еда, отдых, тренировки) можно скрыть целиком
+  const RT=()=>!S.routineOff;
+  function setRoutine(on){ S.routineOff=!on; save(); render(); status(on?'Режим дня снова виден.':'Режим дня скрыт — в расписании и в итогах недели. Вернуть: «показать» над календарём.'); }
   function renderActStart(){
     const box=$('#actStart'); box.innerHTML='';
+    if(!RT()){ const b=btn('Режим дня скрыт · показать','abtn rtog',()=>setRoutine(true)); b.title='Сон, утро, медитация, еда, отдых, тренировки'; box.append(b); return; }
     { const b=btn('','abtn sleep',()=>openSleep(S.view==='day'?S.cur:TODAY())); b.append(el('span','dt'),'😴 Сон'); b.title='Записать, сколько спали и как выспались'; box.append(b); }
     ATYPES.forEach(k=>{
       const on=AT&&AT.type===k;
@@ -1476,6 +1491,7 @@ input.gin{width:250px;margin:0;background:var(--paper)}
       box.append(b);
     });
     box.append(btn('+ записать вручную','abtn man',()=>openAct(null,S.view==='day'?S.cur:TODAY())));
+    const h=btn('Скрыть','abtn rtog',()=>setRoutine(false)); h.title='Скрыть режим дня: кнопки, записи в календаре и блок в итогах недели'; box.append(h);
   }
   const actsOn=k=>S.acts.filter(a=>a.date===k).sort((a,b)=>a.time.localeCompare(b.time));
   const qTxt=q=>q?' · '+q+'/10':'';
@@ -2756,8 +2772,16 @@ input.gin{width:250px;margin:0;background:var(--paper)}
     if(W.topLeaks.length) sec1.append(el('div','sub','Главные утечки: '+W.topLeaks.join(', ')));
     body.append(sec1);
 
+    // режим дня одним блоком: по умолчанию как в расписании (скрыт/виден), здесь можно открыть или закрыть отдельно
+    const rtOpen=WKR!=null?WKR:RT();
+    let rtBox=body;
+    if(W.acts.length){
+      const hd=el('div','wkrth'); hd.append(el('b',null,'Режим дня'), el('span','rs',(rtOpen?'':'скрыт · ')+'сон, медитация, утро, еда, отдых, тренировки'));
+      hd.append(btn(rtOpen?'Скрыть':'Показать','ghost',()=>{ WKR=!rtOpen; renderWeekReport(); }));
+      body.append(hd); rtBox=el('div','wkrt-body'); if(rtOpen) body.append(rtBox);
+    }
     // сон и медитация
-    { const sleeps=W.acts.filter(a=>a.type==='sleep'), meds=W.acts.filter(a=>a.type==='meditate');
+    if(rtOpen){ const sleeps=W.acts.filter(a=>a.type==='sleep'), meds=W.acts.filter(a=>a.type==='meditate');
       if(sleeps.length||meds.length){
         const ss=el('div','wksec'); ss.append(el('h3',null,'Сон и медитация'));
         const avgS=sleeps.length?Math.round(sleeps.reduce((x,a)=>x+a.mins,0)/sleeps.length):0;
@@ -2779,13 +2803,13 @@ input.gin{width:250px;margin:0;background:var(--paper)}
           ss.append(days);
           ss.append(el('div','sub','Высота столбика — сколько спали (шкала до 10 ч), вторая цифра — качество из 10.'));
         }
-        body.append(ss);
+        rtBox.append(ss);
       }
     }
 
     // режим дня: утро, еда, отдых, тренировки
-    if(W.acts.some(a=>DAYTYPES.includes(a.type))){
-      const sa=el('div','wksec'); sa.append(el('h3',null,'Режим дня'));
+    if(rtOpen&&W.acts.some(a=>DAYTYPES.includes(a.type))){
+      const sa=el('div','wksec'); sa.append(el('h3',null,'Утро, еда, отдых, тренировки'));
       const of=t=>W.acts.filter(a=>a.type===t), sumOf=l=>l.reduce((x,a)=>x+a.mins,0), daysOf=l=>new Set(l.map(a=>a.date)).size;
       const meals=of('meal'), rests=of('rest'), sports=of('sport'), morns=of('morning');
       const mSum=sumOf(meals), rSum=sumOf(rests), sSum=sumOf(sports), uSum=sumOf(morns);
@@ -2817,7 +2841,7 @@ input.gin{width:250px;margin:0;background:var(--paper)}
       DAYTYPES.forEach(t=>{const x=el('span',null,ACT[t].lower); x.style.setProperty('--c',ACT[t].color); lgd.append(x);});
       if(mDays<7&&mDays>0) lgd.append(el('span',null,'еда отмечена в '+mDays+' из 7 дней'));
       sa.append(lgd);
-      body.append(sa);
+      rtBox.append(sa);
     }
 
     // главное недели: концептуальные + важные и срочные
@@ -2849,7 +2873,8 @@ input.gin{width:250px;margin:0;background:var(--paper)}
     const s5=el('div','wksec'); const det=el('details'); const sm=el('summary',null,'Все закрытые задачи · '+W.closed.length); sm.style.cssText='cursor:pointer;font:700 14px var(--display)'; det.append(sm);
     const l5=el('div','wklist'); l5.style.marginTop='8px'; W.closed.slice().sort((x,y)=>(closedAt(x)||'').localeCompare(closedAt(y)||'')).forEach(t=>l5.append(item(t,t.kind==='concept'&&t.quad==='do'))); det.append(l5); s5.append(det); body.append(s5);
   }
-  function openWeek(mon){ WK=mon||monday(TODAY()); $('#weekModal').hidden=false; renderWeekReport(); }
+  let WKR=null; // открыт ли блок «Режим дня» в итогах (null — как в расписании)
+  function openWeek(mon){ WK=mon||monday(TODAY()); WKR=null; $('#weekModal').hidden=false; renderWeekReport(); }
   function closeWeek(){ $('#weekModal').hidden=true; WK=null; }
   $('#weekBtn').onclick=()=>openWeek();
   $('#wkClose').onclick=closeWeek;
